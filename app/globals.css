@@ -5,14 +5,7 @@
 ============================= */
 :root {
   --background: #ffffff;
-  --foreground: #0f172a; /* slate-900 for stronger contrast */
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --foreground: #0f172a; /* slate-900 */
 }
 
 /* =============================
@@ -20,8 +13,8 @@
 ============================= */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #020617; /* near-black */
-    --foreground: #f8fafc; /* slate-50 */
+    --background: #020617;
+    --foreground: #f8fafc;
   }
 }
 
@@ -36,60 +29,41 @@ body {
 }
 
 /* =========================================================
-   🔴 MOBILE CONTRAST HARD FIX (CRITICAL)
-   Fixes washed-out / light text on mobile browsers
+   MOBILE CONTRAST FIX (SAFE VERSION)
 ========================================================= */
 @media (max-width: 768px) {
-  html,
   body {
-    color: #020617 !important; /* slate-950 */
+    color: #020617;
     background-color: #ffffff;
   }
 
-  /* Default readable text */
-p,
-span,
-label,
-li {
-  color: #020617;
-}
-
-/* Only force text inside layout containers */
-section,
-article,
-main {
-  color: #020617;
-}
-
-
-  /* Headings extra strong */
   h1,
   h2,
   h3,
   h4,
   h5,
   h6 {
-    color: #020617 !important;
+    color: #020617;
   }
 
-  /* Inputs & dropdowns */
+  p,
+  span,
+  label,
+  li {
+    color: #020617;
+  }
+
   input,
   select,
   textarea,
   option {
-    color: #020617 !important;
-    background-color: #ffffff !important;
+    color: #020617;
+    background-color: #ffffff;
   }
 
-  /* Placeholder text */
   ::placeholder {
-    color: #475569 !important; /* slate-600 */
-    opacity: 1 !important;
-  }
-
-  /* Buttons inherit text color correctly */
-  button {
-    color: inherit;
+    color: #475569; /* slate-600 */
+    opacity: 1;
   }
 }
 
