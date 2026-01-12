@@ -104,7 +104,7 @@ export default function HeroBanner() {
                 src="/hero-car.png"
                 alt="Rental car"
                 fill
-                className="object-contain opacity-90"
+                className="object-contain"
                 priority
               />
             </div>
