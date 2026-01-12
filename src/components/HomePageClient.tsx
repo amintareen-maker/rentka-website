@@ -115,13 +115,13 @@ export default function HomePageClient() {
       {/* =============================
           FILTERS
       ============================== */}
-      <section className="bg-emerald-50/40 border-b border-emerald-100 pt-6 md:pt-0">
+      <section className="bg-slate-50 border-b border-slate-200 pt-6 md:pt-0">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="mb-8 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
               Find the right car for your trip
             </h2>
-            <p className="text-slate-800">
+            <p className="text-slate-700">
               Select your city and service to see available cars
             </p>
           </div>
@@ -134,14 +134,7 @@ export default function HomePageClient() {
                   Country
                 </label>
                 <select
-                  value={country}
-                  onChange={(e) => {
-                    setCountry(e.target.value);
-                    setCity(undefined);
-                    setService(undefined);
-                    setFilterError({});
-                  }}
-                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
+                  className="w-full rounded-lg border border-slate-400 px-4 py-3 text-slate-900 bg-white focus:ring-2 focus:ring-emerald-500"
                 >
                   {countries.map((c) => (
                     <option key={c.code} value={c.code}>

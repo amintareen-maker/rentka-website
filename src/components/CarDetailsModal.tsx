@@ -99,7 +99,7 @@ export default function CarDetailsModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/35 backdrop-blur-[1px]"
           onClick={onClose}
         />
 
@@ -112,7 +112,7 @@ export default function CarDetailsModal({
             </h2>
             <button
               onClick={onClose}
-              className="text-slate-600 hover:text-slate-900"
+              className="text-slate-700 hover:text-slate-900"
             >
               ✕
             </button>
@@ -133,7 +133,7 @@ export default function CarDetailsModal({
 
             {/* Details */}
             <div>
-              <p className="text-slate-700 mb-3">
+              <p className="text-slate-800 mb-3">
                 {car.category} · {car.transmission ?? "Automatic"}
                 {modelYearDisplay && ` · Model: ${modelYearDisplay}`}
                 {car.seatingCapacity && ` · ${car.seatingCapacity} seats`}
@@ -169,9 +169,9 @@ export default function CarDetailsModal({
               </div>
 
               {/* Pricing */}
-              <div className="bg-slate-50 rounded-lg p-3 text-sm space-y-3 text-slate-800">
+              <div className="bg-slate-100 rounded-lg p-3 text-sm space-y-3 text-slate-900">
                 {!hasPricing && (
-                  <p className="text-slate-700">
+                  <p className="text-slate-800">
                     Pricing available on request.
                   </p>
                 )}
@@ -247,7 +247,7 @@ export default function CarDetailsModal({
                 Request a Call
               </button>
 
-              <p className="text-xs text-slate-600 mt-2">
+              <p className="text-xs text-slate-700 mt-2">
                 Final pricing & availability confirmed by RentKA team.
               </p>
             </div>

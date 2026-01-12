@@ -24,7 +24,7 @@ export default function CarCard({
     car.modelYearLabel ?? car.modelYear;
 
   return (
-    <div className="rounded-xl border bg-white p-4 shadow-sm flex flex-col">
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-md flex flex-col">
       <div className="relative h-40 mb-3 bg-slate-100 rounded-lg">
         {car.imageURL && (
           <Image
@@ -43,7 +43,7 @@ export default function CarCard({
 
       {/* Meta */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
-        <span className="text-sm text-slate-600">
+        <span className="text-sm text-slate-800">
           {car.category}
         </span>
 
@@ -73,7 +73,7 @@ export default function CarCard({
         className={`mt-auto w-full rounded-lg py-2 text-sm font-medium transition
           ${
             disabled
-              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+              ? "bg-slate-300 text-slate-700 cursor-not-allowed"
               : "bg-blue-600 text-white hover:bg-blue-700"
           }`}
       >
