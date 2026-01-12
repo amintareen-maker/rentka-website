@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
+/* =============================
+   ROOT THEME VARIABLES
+============================= */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a; /* slate-900 for stronger contrast */
 }
 
 @theme inline {
@@ -12,22 +15,80 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* =============================
+   DARK MODE
+============================= */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #020617; /* near-black */
+    --foreground: #f8fafc; /* slate-50 */
   }
 }
 
+/* =============================
+   BASE BODY STYLES
+============================= */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-text-size-adjust: 100%;
 }
 
-/* -----------------------------
+/* =========================================================
+   🔴 MOBILE CONTRAST HARD FIX (CRITICAL)
+   Fixes washed-out / light text on mobile browsers
+========================================================= */
+@media (max-width: 768px) {
+  html,
+  body {
+    color: #020617 !important; /* slate-950 */
+    background-color: #ffffff;
+  }
+
+  /* Force readable text everywhere */
+  p,
+  span,
+  label,
+  li,
+  div {
+    color: #020617 !important;
+  }
+
+  /* Headings extra strong */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #020617 !important;
+  }
+
+  /* Inputs & dropdowns */
+  input,
+  select,
+  textarea,
+  option {
+    color: #020617 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Placeholder text */
+  ::placeholder {
+    color: #475569 !important; /* slate-600 */
+    opacity: 1 !important;
+  }
+
+  /* Buttons inherit text color correctly */
+  button {
+    color: inherit;
+  }
+}
+
+/* =============================
    SHAKE ANIMATION (FORM ERROR)
------------------------------- */
+============================= */
 @keyframes shake {
   0% {
     transform: translateX(0);
@@ -45,6 +106,7 @@ body {
     transform: translateX(0);
   }
 }
+
 .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
