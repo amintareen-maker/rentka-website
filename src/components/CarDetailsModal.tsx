@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Car } from "@/lib/useCars";
 import LeadModal from "@/components/LeadModal";
+import { track } from "@vercel/analytics";
 
 type ServiceType = "selfDrive" | "withDriver";
 
@@ -231,7 +232,17 @@ export default function CarDetailsModal({
               {/* CTA */}
               <button
                 className="w-full mt-5 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-                onClick={() => setLeadOpen(true)}
+                onClick={() => {
+                  // 🔵 Analytics: request call clicked
+                  track("request_call_clicked", {
+                    car_id: car.id,
+                    service: selectedService,
+                    country: car.country,
+                    city,
+                  });
+
+                  setLeadOpen(true);
+                }}
               >
                 Request a Call
               </button>

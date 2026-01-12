@@ -66,7 +66,7 @@ export default function RootLayout({
           </div>
         </footer>
 
-        {/* Vercel Analytics (must be inside body) */}
+        {/* ✅ Vercel Analytics */}
         <Analytics />
       </body>
     </html>

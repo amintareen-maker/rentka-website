@@ -18,42 +18,47 @@ export default function Header() {
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200">
       <div className="mx-auto max-w-7xl px-6">
 
-        {/* ROW 1 — ALWAYS VISIBLE */}
+        {/* ROW 1 — DESKTOP */}
         <div className="flex h-16 items-center justify-between">
+
           {/* LOGO */}
           <Link
             href="/"
             onClick={handleHomeClick}
-            className="flex items-center gap-2"
+            className="flex items-center"
           >
             <Image
               src="/logo.png"
               alt="RentKA"
-              width={188}
-              height={188}
+              width={140}
+              height={40}
               priority
+              className="h-8 w-auto"
             />
           </Link>
 
-          {/* DESKTOP NAV */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-700">
-            <Link href="/about" className="hover:text-slate-900">
-              About Us
-            </Link>
-            <Link href="/contact" className="hover:text-slate-900">
-              Info
-            </Link>
-          </nav>
+          {/* RIGHT SIDE: NAV + CTA */}
+          <div className="hidden md:flex items-center gap-10">
+            {/* NAV */}
+            <nav className="flex items-center gap-8 text-sm font-medium text-slate-700">
+              <Link href="/about" className="hover:text-slate-900">
+                About Us
+              </Link>
+              <Link href="/contact" className="hover:text-slate-900">
+                Info
+              </Link>
+            </nav>
 
-          {/* CTA */}
-          <a
-            href="https://wa.me/923048919511"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center rounded-md bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 transition"
-          >
-            Contact Us
-          </a>
+            {/* CTA */}
+            <a
+              href="https://wa.me/923048919511"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-md bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800 transition"
+            >
+              Contact Us
+            </a>
+          </div>
         </div>
 
         {/* ROW 2 — MOBILE ONLY */}

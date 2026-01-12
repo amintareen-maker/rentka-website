@@ -2,14 +2,14 @@
 
 import Image from "next/image";
 import { Car } from "@/lib/useCars";
+import { track } from "@vercel/analytics";
 
 type Props = {
   car: Car;
   onViewDetails: (car: Car) => void;
-  onRequestCall?: (car: Car) => void; // ✅ ADD THIS
+  onRequestCall?: (car: Car) => void; // ✅ kept as-is
   disabled?: boolean;
 };
-
 
 export default function CarCard({
   car,
@@ -60,7 +60,16 @@ export default function CarCard({
       {/* CTA */}
       <button
         disabled={disabled}
-        onClick={() => onViewDetails(car)}
+        onClick={() => {
+          // 🔵 Analytics: car details opened
+          track("car_details_opened", {
+            car_id: car.id,
+            category: car.category,
+            country: car.country,
+          });
+
+          onViewDetails(car);
+        }}
         className={`mt-auto w-full rounded-lg py-2 text-sm font-medium transition
           ${
             disabled
