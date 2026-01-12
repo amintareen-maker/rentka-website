@@ -1,6 +1,7 @@
 import "./globals.css";
 import Link from "next/link";
 import Header from "@/components/Header";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: {
@@ -10,7 +11,6 @@ export const metadata = {
   description:
     "Find verified rental cars from trusted local partners. Self-drive or with driver.",
 };
-
 
 export default function RootLayout({
   children,
@@ -65,6 +65,9 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+
+        {/* Vercel Analytics (must be inside body) */}
+        <Analytics />
       </body>
     </html>
   );
