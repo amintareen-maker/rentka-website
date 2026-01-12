@@ -23,7 +23,7 @@ export default function CarDetailsModal({
   onClose,
 }: Props) {
   /* -----------------------------
-     STATE (ALWAYS FIRST)
+     STATE
   ------------------------------ */
   const [selectedService, setSelectedService] =
     useState<ServiceType>(service);
@@ -38,7 +38,7 @@ export default function CarDetailsModal({
   }, [service]);
 
   /* -----------------------------
-     Derived safety flags (UPDATED)
+     Support flags
   ------------------------------ */
   const supportsSelfDrive = car?.supports?.withoutDriver !== false;
   const supportsWithDriver = car?.supports?.withDriver !== false;
@@ -67,7 +67,7 @@ export default function CarDetailsModal({
   }, [car, selectedService, supportsSelfDrive, supportsWithDriver]);
 
   /* -----------------------------
-     SAFE RENDER GUARD
+     Render guard
   ------------------------------ */
   if (!open || !car) return null;
 
