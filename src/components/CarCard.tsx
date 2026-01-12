@@ -6,10 +6,17 @@ import { Car } from "@/lib/useCars";
 type Props = {
   car: Car;
   onViewDetails: (car: Car) => void;
+  onRequestCall?: (car: Car) => void; // ✅ ADD THIS
   disabled?: boolean;
 };
 
-export default function CarCard({ car, onViewDetails, disabled }: Props) {
+
+export default function CarCard({
+  car,
+  onViewDetails,
+  onRequestCall,
+  disabled,
+}: Props) {
   /* -----------------------------
      Model year display
   ------------------------------ */
