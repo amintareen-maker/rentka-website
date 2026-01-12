@@ -46,14 +46,21 @@ body {
     background-color: #ffffff;
   }
 
-  /* Force readable text everywhere */
-  p,
-  span,
-  label,
-  li,
-  div {
-    color: #020617 !important;
-  }
+  /* Default readable text */
+p,
+span,
+label,
+li {
+  color: #020617;
+}
+
+/* Only force text inside layout containers */
+section,
+article,
+main {
+  color: #020617;
+}
+
 
   /* Headings extra strong */
   h1,

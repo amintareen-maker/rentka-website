@@ -81,7 +81,7 @@ export default function CarCard({
       </button>
 
       {disabled && (
-        <p className="mt-2 text-xs text-red-600 text-center font-medium">
+        <p className="mt-2 text-xs font-semibold text-red-600 text-center">
           Select city & service to continue
         </p>
       )}
