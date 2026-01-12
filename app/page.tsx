@@ -346,6 +346,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* MODAL — FIXED */}
       <CarDetailsModal
         open={detailsOpen}
         car={selectedCar}
