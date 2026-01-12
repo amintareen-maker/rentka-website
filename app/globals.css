@@ -29,12 +29,14 @@ body {
 }
 
 /* =========================================================
-   MOBILE CONTRAST FIX (SAFE VERSION)
+   MOBILE CONTRAST FIX (CORRECT & SAFE)
 ========================================================= */
 @media (max-width: 768px) {
-  body {
+  /* Enforce readable defaults ONLY at container level */
+  main,
+  section,
+  article {
     color: #020617;
-    background-color: #ffffff;
   }
 
   h1,
@@ -43,13 +45,6 @@ body {
   h4,
   h5,
   h6 {
-    color: #020617;
-  }
-
-  p,
-  span,
-  label,
-  li {
     color: #020617;
   }
 
