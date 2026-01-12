@@ -20,20 +20,16 @@ export default function CarsPage() {
 
   const [country, setCountry] = useState<string>("all");
   const [city, setCity] = useState<string>("all");
-  const [service, setService] = useState<string>("all"); // filter only
+  const [service, setService] = useState<string>("all");
 
-  // 🔹 FINAL service chosen by user (modal authority)
   const [finalService, setFinalService] = useState<ServiceType>(undefined);
 
-  // 🔹 Lead modal
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [showLeadModal, setShowLeadModal] = useState(false);
 
-  // 🔹 Details modal
   const [detailsCar, setDetailsCar] = useState<Car | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-  // 🔴 Validation flags
   const countryMissing = country === "all";
   const cityMissing = !countryMissing && city === "all";
 
@@ -106,61 +102,42 @@ export default function CarsPage() {
 
       {/* ---------------- Filters ---------------- */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        {/* Country */}
-        <div>
-          <select
-            className={`w-full rounded-lg px-3 py-2 border ${
-              countryMissing ? "border-red-500" : "border-slate-300"
-            }`}
-            value={country}
-            onChange={(e) => {
-              setCountry(e.target.value);
-              setCity("all");
-            }}
-          >
-            <option value="all">Select Country *</option>
-            {COUNTRIES.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-
-          {countryMissing && (
-            <p className="text-sm text-red-600 mt-1">
-              Please select a country to continue
-            </p>
-          )}
-        </div>
-
-        {/* City */}
-        <div>
-          <select
-            className={`w-full rounded-lg px-3 py-2 border ${
-              cityMissing ? "border-red-500" : "border-slate-300"
-            }`}
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            disabled={country === "all"}
-          >
-            <option value="all">
-              {country === "all" ? "Select country first" : "Select City *"}
+        <select
+          className={`w-full rounded-lg px-3 py-2 border ${
+            countryMissing ? "border-red-500" : "border-slate-300"
+          }`}
+          value={country}
+          onChange={(e) => {
+            setCountry(e.target.value);
+            setCity("all");
+          }}
+        >
+          <option value="all">Select Country *</option>
+          {COUNTRIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
             </option>
-            {cities.map((ct) => (
-              <option key={ct} value={ct}>
-                {ct}
-              </option>
-            ))}
-          </select>
+          ))}
+        </select>
 
-          {cityMissing && (
-            <p className="text-sm text-red-600 mt-1">
-              Please select a city to see available cars
-            </p>
-          )}
-        </div>
+        <select
+          className={`w-full rounded-lg px-3 py-2 border ${
+            cityMissing ? "border-red-500" : "border-slate-300"
+          }`}
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          disabled={country === "all"}
+        >
+          <option value="all">
+            {country === "all" ? "Select country first" : "Select City *"}
+          </option>
+          {cities.map((ct) => (
+            <option key={ct} value={ct}>
+              {ct}
+            </option>
+          ))}
+        </select>
 
-        {/* Service (filter only) */}
         <select
           className="border border-slate-300 rounded-lg px-3 py-2"
           value={service}
@@ -172,17 +149,9 @@ export default function CarsPage() {
         </select>
       </div>
 
-      {/* Guidance */}
-      {(countryMissing || cityMissing) && (
-        <div className="mb-6 text-slate-600">
-          <strong>Select location to view cars.</strong> Country and city are
-          required to show accurate availability and pricing.
-        </div>
-      )}
-
       {loading && <p className="text-slate-500">Loading cars...</p>}
 
-      {!loading && !countryMissing && !cityMissing && filteredCars.length === 0 && (
+      {!loading && filteredCars.length === 0 && (
         <p className="text-slate-500">No cars match your selection.</p>
       )}
 
@@ -195,11 +164,6 @@ export default function CarsPage() {
             onViewDetails={(selected) => {
               setDetailsCar(selected);
               setShowDetailsModal(true);
-            }}
-            onRequestCall={(selected) => {
-              setSelectedCar(selected);
-              setFinalService(undefined); // reset → user will choose in modal
-              setShowLeadModal(true);
             }}
           />
         ))}
@@ -215,12 +179,6 @@ export default function CarsPage() {
             : "selfDrive"
         }
         onClose={() => setShowDetailsModal(false)}
-        onRequestCall={(selectedService) => {
-          setShowDetailsModal(false);
-          setSelectedCar(detailsCar);
-          setFinalService(selectedService); // ✅ FINAL authority
-          setShowLeadModal(true);
-        }}
       />
 
       {/* ---------------- Lead Modal ---------------- */}
@@ -231,10 +189,7 @@ export default function CarsPage() {
           carName: selectedCar?.name,
           country,
           city,
-
-          // ✅ CORRECT — modal is the authority
           service: finalService,
-
           modelYear: selectedCar?.modelYear,
           modelYearLabel: selectedCar?.modelYearLabel,
         }}
