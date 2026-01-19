@@ -110,8 +110,6 @@ export default function HomePageClient() {
 
   return (
     <>
-      
-
       {/* =============================
           FILTERS
       ============================== */}
@@ -133,9 +131,7 @@ export default function HomePageClient() {
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Country
                 </label>
-                <select
-                  className="w-full rounded-lg border border-slate-400 px-4 py-3 text-slate-900 bg-white focus:ring-2 focus:ring-emerald-500"
-                >
+                <select className="w-full rounded-lg border border-slate-400 px-4 py-3">
                   {countries.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -239,6 +235,71 @@ export default function HomePageClient() {
                 </div>
               </div>
             ))}
+        </div>
+      </section>
+
+      {/* =============================
+          HOW RENTKA WORKS
+      ============================== */}
+      <section className="bg-slate-50 py-20">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">
+            How RentKA Works
+          </h2>
+          <p className="text-slate-800 mb-14">
+            A considered rental experience, supported by human verification.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
+            <div className="p-6">
+              <h3 className="font-semibold text-slate-900 mb-2">
+                Browse Verified Cars
+              </h3>
+              <p className="text-slate-700">
+                Carefully selected vehicles from trusted partners.
+              </p>
+            </div>
+
+            <div className="p-6">
+              <h3 className="font-semibold text-slate-900 mb-2">
+                We Confirm Availability
+              </h3>
+              <p className="text-slate-700">
+                Our team personally coordinates with the rental provider.
+              </p>
+            </div>
+
+            <div className="p-6">
+              <h3 className="font-semibold text-slate-900 mb-2">
+                Finalize & Drive
+              </h3>
+              <p className="text-slate-700">
+                Proceed with confidence once details are confirmed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* =============================
+          BOTTOM CTA
+      ============================== */}
+      <section className="bg-slate-900 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-semibold mb-4">
+            A more considered way to rent a car
+          </h2>
+          <p className="text-slate-200 mb-8">
+            Browse verified vehicles and let us handle the rest.
+          </p>
+          <button
+            onClick={() =>
+              window.scrollTo({ top: 0, behavior: "smooth" })
+            }
+            className="bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
+          >
+            Browse Cars
+          </button>
         </div>
       </section>
 
