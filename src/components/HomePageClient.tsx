@@ -23,6 +23,30 @@ export default function HomePageClient() {
   const [shakeKey, setShakeKey] = useState(0);
 
   /* -----------------------------
+     HOW IT WORKS ANIMATION STATE
+  ------------------------------ */
+  const [stepsVisible, setStepsVisible] = useState(false);
+
+  useEffect(() => {
+    const section = document.getElementById("how-rentka-works");
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStepsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(section);
+
+    return () => observer.disconnect();
+  }, []);
+
+  /* -----------------------------
      LOCATIONS
   ------------------------------ */
   const countries = useCountries();
@@ -239,44 +263,65 @@ export default function HomePageClient() {
       </section>
 
       {/* =============================
-          HOW RENTKA WORKS
+          HOW RENTKA WORKS (ANIMATED)
       ============================== */}
-      <section className="bg-slate-50 py-20">
+      <section
+        id="how-rentka-works"
+        className="bg-slate-50 py-20 overflow-hidden"
+      >
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-4">
+          <h2
+            className={`text-3xl font-bold text-slate-900 mb-4 transition-all duration-700 ${
+              stepsVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-6"
+            }`}
+          >
             How RentKA Works
           </h2>
-          <p className="text-slate-800 mb-14">
+
+          <p
+            className={`text-slate-800 mb-14 transition-all duration-700 delay-100 ${
+              stepsVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-6"
+            }`}
+          >
             A considered rental experience, supported by human verification.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
-            <div className="p-6">
-              <h3 className="font-semibold text-slate-900 mb-2">
-                Browse Verified Cars
-              </h3>
-              <p className="text-slate-700">
-                Carefully selected vehicles from trusted partners.
-              </p>
-            </div>
-
-            <div className="p-6">
-              <h3 className="font-semibold text-slate-900 mb-2">
-                We Confirm Availability
-              </h3>
-              <p className="text-slate-700">
-                Our team personally coordinates with the rental provider.
-              </p>
-            </div>
-
-            <div className="p-6">
-              <h3 className="font-semibold text-slate-900 mb-2">
-                Finalize & Drive
-              </h3>
-              <p className="text-slate-700">
-                Proceed with confidence once details are confirmed.
-              </p>
-            </div>
+            {[
+              {
+                title: "Browse Verified Cars",
+                text: "Carefully selected vehicles from trusted partners.",
+              },
+              {
+                title: "We Confirm Availability",
+                text: "Our team personally coordinates with the rental provider.",
+              },
+              {
+                title: "Finalize & Drive",
+                text: "Proceed with confidence once details are confirmed.",
+              },
+            ].map((step, index) => (
+              <div
+                key={step.title}
+                className={`p-6 transition-all duration-700 ${
+                  stepsVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-8"
+                }`}
+                style={{
+                  transitionDelay: `${200 + index * 150}ms`,
+                }}
+              >
+                <h3 className="font-semibold text-slate-900 mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-slate-700">{step.text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
