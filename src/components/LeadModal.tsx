@@ -33,6 +33,10 @@ export default function LeadModal({ open, onClose, context }: Props) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
+  /* 🆕 NEW FIELDS */
+  const [pickupDate, setPickupDate] = useState("");
+  const [preferredTime, setPreferredTime] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -63,6 +67,11 @@ export default function LeadModal({ open, onClose, context }: Props) {
       return;
     }
 
+    if (!pickupDate || !preferredTime) {
+      setError("Please select pickup date and preferred time.");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -77,6 +86,9 @@ export default function LeadModal({ open, onClose, context }: Props) {
         city: context.city ?? null,
         service: context.service ?? null,
         modelYear: modelYearDisplay,
+
+        pickupDate,
+        preferredTime,
 
         source: "website",
         status: "new",
@@ -93,12 +105,15 @@ export default function LeadModal({ open, onClose, context }: Props) {
         country: context.country || "",
         city: context.city || "",
         service: context.service || "",
+        pickupDate,
+        preferredTime,
         source: "website",
       });
 
       fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
         method: "POST",
       });
+
       setSuccess(true);
 
       setTimeout(() => {
@@ -106,6 +121,8 @@ export default function LeadModal({ open, onClose, context }: Props) {
         setName("");
         setPhone("");
         setEmail("");
+        setPickupDate("");
+        setPreferredTime("");
         onClose();
       }, 1200);
     } catch (err) {
@@ -157,74 +174,97 @@ export default function LeadModal({ open, onClose, context }: Props) {
         )}
 
         {success ? (
-  <p className="text-green-600 font-medium">
-    ✅ Request submitted. Our team will contact you shortly.
-  </p>
-) : (
-  <>
-    <div className="space-y-3">
-      <input
-        type="text"
-        placeholder="Your name *"
-        className="w-full border rounded-lg px-3 py-2"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+          <p className="text-green-600 font-medium">
+            ✅ Request submitted. Our team will contact you shortly.
+          </p>
+        ) : (
+          <>
+            <div className="space-y-3">
 
-      <input
-        type="tel"
-        placeholder="Phone number *"
-        className="w-full border rounded-lg px-3 py-2"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-      />
+              {/* 🆕 PICKUP DATE */}
+              <input
+                type="date"
+                className="w-full border rounded-lg px-3 py-2"
+                value={pickupDate}
+                min={new Date().toISOString().split("T")[0]}
+                onChange={(e) => setPickupDate(e.target.value)}
+              />
 
-      <input
-        type="email"
-        placeholder="Email (optional)"
-        className="w-full border rounded-lg px-3 py-2"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-    </div>
+              {/* 🆕 PREFERRED TIME */}
+              <input
+                type="time"
+                className="w-full border rounded-lg px-3 py-2"
+                value={preferredTime}
+                onChange={(e) => setPreferredTime(e.target.value)}
+              />
 
-    {error && (
-      <p className="text-sm text-red-600 mt-2">{error}</p>
-    )}
+              <input
+                type="text"
+                placeholder="Your name *"
+                className="w-full border rounded-lg px-3 py-2"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
 
-    <button
-      className="w-full mt-5 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-      disabled={loading}
-      onClick={handleSubmit}
-    >
-      {loading ? "Submitting..." : "Request a Call"}
-    </button>
+              <input
+                type="tel"
+                placeholder="Phone number *"
+                className="w-full border rounded-lg px-3 py-2"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
 
-    {/* CTA Disclaimer */}
-    <p className="mt-3 text-xs text-slate-500 text-center">
-      By submitting, you agree to our{" "}
-      <a
-        href="/terms"
-        className="underline hover:text-slate-700"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Terms
-      </a>{" "}
-      &{" "}
-      <a
-        href="/privacy"
-        className="underline hover:text-slate-700"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Privacy Policy
-      </a>
-      .
-    </p>
-  </>
-)}
+              <input
+                type="email"
+                placeholder="Email (optional)"
+                className="w-full border rounded-lg px-3 py-2"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
+            {error && (
+              <p className="text-sm text-red-600 mt-2">{error}</p>
+            )}
+
+            <button
+              className="w-full mt-5 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              disabled={loading}
+              onClick={handleSubmit}
+            >
+              {loading ? "Submitting..." : "Request a Call"}
+            </button>
+
+            {/* Payment disclaimer */}
+            <p className="mt-3 text-xs text-slate-500 text-center">
+              Displayed prices are provided by rental partners. Payment is
+              completed directly with the partner after confirmation.
+            </p>
+
+            {/* Legal */}
+            <p className="mt-2 text-xs text-slate-500 text-center">
+              By submitting, you agree to our{" "}
+              <a
+                href="/terms"
+                className="underline hover:text-slate-700"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Terms
+              </a>{" "}
+              &{" "}
+              <a
+                href="/privacy"
+                className="underline hover:text-slate-700"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Privacy Policy
+              </a>
+              .
+            </p>
+          </>
+        )}
       </div>
     </div>
   );
