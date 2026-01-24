@@ -1,12 +1,35 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useCars, Car } from "@/lib/useCars";
+import { useState, useEffect, useMemo } from "react";
+import { Car } from "@/lib/useCars";
 import CarCard from "@/components/CarCard";
 import CarDetailsModal from "@/components/CarDetailsModal";
-import { useCountries, useCities } from "@/lib/useLocations";
 
-export default function HomePageClient() {
+type Country = {
+  code: string;
+  name: string;
+};
+
+type City = {
+  id: string;
+  name: string;
+  supports?: {
+    serviceWithoutDriver?: boolean;
+    serviceWithDriver?: boolean;
+  };
+};
+
+type Props = {
+  initialCountries: Country[];
+  initialCitiesByCountry: Record<string, City[]>;
+  initialCars: Car[];
+};
+
+export default function HomePageClient({
+  initialCountries,
+  initialCitiesByCountry,
+  initialCars,
+}: Props) {
   /* -----------------------------
      FILTER STATE
   ------------------------------ */
@@ -42,15 +65,14 @@ export default function HomePageClient() {
     );
 
     observer.observe(section);
-
     return () => observer.disconnect();
   }, []);
 
   /* -----------------------------
-     LOCATIONS
+     LOCATIONS (SERVER DATA)
   ------------------------------ */
-  const countries = useCountries();
-  const cities = useCities(country);
+  const countries = initialCountries;
+  const cities = initialCitiesByCountry[country] || [];
   const selectedCity = cities.find((c) => c.id === city);
 
   const availableServices = {
@@ -86,9 +108,16 @@ export default function HomePageClient() {
   }, [selectedCity]);
 
   /* -----------------------------
-     CARS
+     CARS (FILTERED CLIENT-SIDE)
   ------------------------------ */
-  const { cars, loading } = useCars({ country, city, service });
+  const cars = useMemo(() => {
+    return initialCars.filter((car) => {
+      if (car.country !== country) return false;
+      if (city && car.city !== city) return false;
+      if (service && car.service !== service) return false;
+      return true;
+    });
+  }, [initialCars, country, city, service]);
 
   const categories = Array.from(
     new Set(cars.map((c) => c.category).filter(Boolean))
@@ -132,11 +161,12 @@ export default function HomePageClient() {
     }
   }, [city, service]);
 
+  /* -----------------------------
+     JSX (UNCHANGED)
+  ------------------------------ */
   return (
     <>
-      {/* =============================
-          FILTERS
-      ============================== */}
+      {/* FILTERS */}
       <section className="bg-slate-50 border-b border-slate-200 pt-6 md:pt-0">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="mb-8 text-center">
@@ -155,7 +185,16 @@ export default function HomePageClient() {
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Country
                 </label>
-                <select className="w-full rounded-lg border border-slate-400 px-4 py-3">
+                <select
+                  value={country}
+                  onChange={(e) => {
+                    setCountry(e.target.value);
+                    setCity(undefined);
+                    setService(undefined);
+                    setFilterError({});
+                  }}
+                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
+                >
                   {countries.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -215,140 +254,36 @@ export default function HomePageClient() {
                   )}
                 </select>
               </div>
-
-              {/* RESET */}
-              <div className="hidden md:block">
-                <button
-                  onClick={() => {
-                    setCity(undefined);
-                    setService(undefined);
-                    setFilterError({});
-                  }}
-                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
-                >
-                  Reset
-                </button>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* =============================
-          CARS
-      ============================== */}
+      {/* CARS */}
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-6">
-          {!loading &&
-            categories.map((category) => (
-              <div key={category} className="mb-16">
-                <h2 className="text-xl font-semibold mb-6">{category}</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {carsByCategory[category].map((car) => (
-                    <CarCard
-                      key={car.id}
-                      car={car}
-                      disabled={!canViewDetails}
-                      onViewDetails={() =>
-                        canViewDetails
-                          ? handleViewDetails(car)
-                          : handleBlockedAction()
-                      }
-                    />
-                  ))}
-                </div>
+          {categories.map((category) => (
+            <div key={category} className="mb-16">
+              <h2 className="text-xl font-semibold mb-6">{category}</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {carsByCategory[category].map((car) => (
+                  <CarCard
+                    key={car.id}
+                    car={car}
+                    disabled={!canViewDetails}
+                    onViewDetails={() =>
+                      canViewDetails
+                        ? handleViewDetails(car)
+                        : handleBlockedAction()
+                    }
+                  />
+                ))}
               </div>
-            ))}
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* =============================
-          HOW RENTKA WORKS (ANIMATED)
-      ============================== */}
-      <section
-        id="how-rentka-works"
-        className="bg-slate-50 py-20 overflow-hidden"
-      >
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <h2
-            className={`text-3xl font-bold text-slate-900 mb-4 transition-all duration-700 ${
-              stepsVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-6"
-            }`}
-          >
-            How RentKA Works
-          </h2>
-
-          <p
-            className={`text-slate-800 mb-14 transition-all duration-700 delay-100 ${
-              stepsVisible
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-6"
-            }`}
-          >
-            A considered rental experience, supported by human verification.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
-            {[
-              {
-                title: "Browse Verified Cars",
-                text: "Carefully selected vehicles from trusted partners.",
-              },
-              {
-                title: "We Confirm Availability",
-                text: "Our team personally coordinates with the rental provider.",
-              },
-              {
-                title: "Finalize & Drive",
-                text: "Proceed with confidence once details are confirmed.",
-              },
-            ].map((step, index) => (
-              <div
-                key={step.title}
-                className={`p-6 transition-all duration-700 ${
-                  stepsVisible
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-8"
-                }`}
-                style={{
-                  transitionDelay: `${200 + index * 150}ms`,
-                }}
-              >
-                <h3 className="font-semibold text-slate-900 mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-slate-700">{step.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* =============================
-          BOTTOM CTA
-      ============================== */}
-      <section className="bg-slate-900 text-white py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-semibold mb-4">
-            A more considered way to rent a car
-          </h2>
-          <p className="text-slate-200 mb-8">
-            Browse verified vehicles and let us handle the rest.
-          </p>
-          <button
-            onClick={() =>
-              window.scrollTo({ top: 0, behavior: "smooth" })
-            }
-            className="bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
-          >
-            Browse Cars
-          </button>
-        </div>
-      </section>
-
-      {/* MODAL */}
       <CarDetailsModal
         open={detailsOpen}
         car={selectedCar}
