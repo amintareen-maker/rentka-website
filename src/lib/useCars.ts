@@ -22,6 +22,7 @@ export type Car = {
   modelYear?: number;
   modelYearLabel?: string;
   model?: string;
+  vendorId?: string;
 
   pricing?: {
     selfDrive?: {

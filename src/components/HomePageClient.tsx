@@ -1,8 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { useCars, Car } from "@/lib/useCars";
 import { useCountries, useCities } from "@/lib/useLocations";
+import ModelListingsBottomSheet from "@/components/ModelListingsBottomSheet";
+import CarDetailsModal from "@/components/CarDetailsModal";
 
 /* =============================
    TYPES (MODEL CARD)
@@ -17,7 +20,12 @@ type CarModel = {
 
 export default function HomePageClient() {
   /* -----------------------------
-     FILTER STATE (UNCHANGED)
+     URL STATE
+  ------------------------------ */
+  const pathname = usePathname();
+
+  /* -----------------------------
+     FILTER STATE
   ------------------------------ */
   const [country, setCountry] = useState<string>("PK");
   const [city, setCity] = useState<string | undefined>();
@@ -32,6 +40,28 @@ export default function HomePageClient() {
   const [shakeKey, setShakeKey] = useState(0);
 
   /* -----------------------------
+     HOW RENTKA WORKS ANIMATION
+  ------------------------------ */
+  const [stepsVisible, setStepsVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.getElementById("how-rentka-works");
+      if (!el) return;
+
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 120) {
+        setStepsVisible(true);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll);
+    onScroll();
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* -----------------------------
      LOCATIONS
   ------------------------------ */
   const countries = useCountries();
@@ -44,7 +74,7 @@ export default function HomePageClient() {
   };
 
   /* -----------------------------
-     AUTO-SELECT SERVICE (UNCHANGED)
+     AUTO-SELECT SERVICE
   ------------------------------ */
   useEffect(() => {
     if (!selectedCity) {
@@ -52,12 +82,10 @@ export default function HomePageClient() {
       return;
     }
 
-    const supportsSelf = Boolean(
-      selectedCity.supports?.serviceWithoutDriver
-    );
-    const supportsDriver = Boolean(
-      selectedCity.supports?.serviceWithDriver
-    );
+    const supportsSelf =
+      selectedCity.supports?.serviceWithoutDriver;
+    const supportsDriver =
+      selectedCity.supports?.serviceWithDriver;
 
     if (supportsSelf && !supportsDriver) {
       setService("selfDrive");
@@ -71,24 +99,21 @@ export default function HomePageClient() {
   }, [selectedCity]);
 
   /* -----------------------------
-     CARS (SOURCE OF TRUTH)
+     CARS
   ------------------------------ */
   const { cars, loading } = useCars({ country, city, service });
 
   /* -----------------------------
-     PRICE EXTRACTION (MATCH APP)
+     PRICE EXTRACTION
   ------------------------------ */
   const extractDailyPrice = (data: Car): number | undefined => {
-    const supports = data.supports ?? {};
-    const pricing = data.pricing ?? {};
-
-    if (supports.withoutDriver) {
-      const p = pricing.selfDrive?.withinCity?.daily;
+    if (data.supports?.withoutDriver) {
+      const p = data.pricing?.selfDrive?.withinCity?.daily;
       if (typeof p === "number") return p;
     }
 
-    if (supports.withDriver) {
-      const p = pricing.withDriver?.withinCity?.daily;
+    if (data.supports?.withDriver) {
+      const p = data.pricing?.withDriver?.withinCity?.daily;
       if (typeof p === "number") return p;
     }
 
@@ -96,8 +121,7 @@ export default function HomePageClient() {
   };
 
   /* -----------------------------
-     DERIVE MODELS (KEY STEP)
-     === WEB VERSION OF CarModelsScreen ===
+     DERIVE MODELS
   ------------------------------ */
   const models: CarModel[] = useMemo(() => {
     const map: Record<string, CarModel> = {};
@@ -133,7 +157,7 @@ export default function HomePageClient() {
   }, [cars]);
 
   /* -----------------------------
-     BLOCKED ACTION (UNCHANGED)
+     BLOCKED ACTION
   ------------------------------ */
   const handleBlockedAction = () => {
     setShakeKey((k) => k + 1);
@@ -145,12 +169,45 @@ export default function HomePageClient() {
 
   const canBrowseModels = Boolean(city && service);
 
+  /* -----------------------------
+     STEP 2 STATE
+  ------------------------------ */
+  const [modelOpen, setModelOpen] = useState(false);
+  const [selectedModel, setSelectedModel] =
+    useState<string | null>(null);
+
+  const [selectedCar, setSelectedCar] =
+    useState<Car | null>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
+  /* -----------------------------
+     OPEN FROM URL
+  ------------------------------ */
+  useEffect(() => {
+    if (!city || !service) return;
+
+    const match = pathname.match(/^\/cars\/(.+)$/);
+    if (!match) return;
+
+    const slug = decodeURIComponent(match[1]).replace(/-/g, " ");
+
+    const found = models.find(
+      (m) => m.model.toLowerCase() === slug.toLowerCase()
+    );
+
+    if (found) {
+      setSelectedModel(found.model);
+      setModelOpen(true);
+    }
+  }, [pathname, models, city, service]);
+
   return (
     <>
-      {/* =============================
-          FILTERS (UNCHANGED)
-      ============================== */}
-      <section className="bg-slate-50 border-b border-slate-200 pt-6 md:pt-0">
+      {/* FILTERS */}
+      <section
+        id="filters"
+        className="bg-slate-50 border-b border-slate-200 pt-6 md:pt-0"
+      >
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="mb-8 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
@@ -163,7 +220,6 @@ export default function HomePageClient() {
 
           <div className="rounded-2xl bg-white p-5 md:p-8 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
-              {/* COUNTRY */}
               <div>
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Country
@@ -177,7 +233,6 @@ export default function HomePageClient() {
                 </select>
               </div>
 
-              {/* CITY */}
               <div>
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   City
@@ -188,7 +243,10 @@ export default function HomePageClient() {
                   onChange={(e) => {
                     setCity(e.target.value || undefined);
                     setService(undefined);
-                    setFilterError((p) => ({ ...p, city: false }));
+                    setFilterError((p) => ({
+                      ...p,
+                      city: false,
+                    }));
                   }}
                   className="w-full rounded-lg border border-slate-400 px-4 py-3"
                 >
@@ -201,7 +259,6 @@ export default function HomePageClient() {
                 </select>
               </div>
 
-              {/* SERVICE */}
               <div>
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Service
@@ -215,7 +272,10 @@ export default function HomePageClient() {
                         | "selfDrive"
                         | "withDriver") || undefined
                     );
-                    setFilterError((p) => ({ ...p, service: false }));
+                    setFilterError((p) => ({
+                      ...p,
+                      service: false,
+                    }));
                   }}
                   className="w-full rounded-lg border border-slate-400 px-4 py-3"
                 >
@@ -224,46 +284,20 @@ export default function HomePageClient() {
                     <option value="selfDrive">Self Drive</option>
                   )}
                   {availableServices.withDriver && (
-                    <option value="withDriver">With Driver</option>
+                    <option value="withDriver">
+                      With Driver
+                    </option>
                   )}
                 </select>
-              </div>
-
-              {/* RESET */}
-              <div className="hidden md:block">
-                <button
-                  onClick={() => {
-                    setCity(undefined);
-                    setService(undefined);
-                    setFilterError({});
-                  }}
-                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
-                >
-                  Reset
-                </button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* =============================
-          MODELS GRID (STEP 1)
-      ============================== */}
+      {/* MODELS GRID */}
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-6">
-          {loading && (
-            <div className="text-center text-slate-600">
-              Loading cars…
-            </div>
-          )}
-
-          {!loading && models.length === 0 && (
-            <div className="text-center text-slate-600">
-              No cars available
-            </div>
-          )}
-
           {!loading && models.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {models.map((m) => (
@@ -271,19 +305,30 @@ export default function HomePageClient() {
                   key={m.model}
                   onClick={() =>
                     canBrowseModels
-                      ? console.log("OPEN MODEL:", m.model)
+                      ? (() => {
+                          const slug = m.model
+                            .toLowerCase()
+                            .replace(/\s+/g, "-");
+                          window.history.pushState(
+                            {},
+                            "",
+                            `/cars/${slug}`
+                          );
+                          setSelectedModel(m.model);
+                          setModelOpen(true);
+                        })()
                       : handleBlockedAction()
                   }
                   className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg transition p-4"
                 >
                   <div className="aspect-[4/3] bg-slate-100 rounded-lg mb-4 overflow-hidden">
-                    {m.imageURL ? (
+                    {m.imageURL && (
                       <img
                         src={m.imageURL}
                         alt={m.model}
                         className="w-full h-full object-cover"
                       />
-                    ) : null}
+                    )}
                   </div>
 
                   <h3 className="font-semibold text-slate-900">
@@ -292,9 +337,9 @@ export default function HomePageClient() {
 
                   {typeof m.minPrice === "number" && (
                     <p className="text-sm text-slate-700 mt-1">
-                      Starting from PKR{" "}
+                      Starting from{" "}
                       <span className="font-semibold">
-                        {m.minPrice}
+                        PKR {m.minPrice}
                       </span>
                       /day
                     </p>
@@ -309,6 +354,117 @@ export default function HomePageClient() {
           )}
         </div>
       </section>
+
+      {/* HOW RENTKA WORKS */}
+      <section
+        id="how-rentka-works"
+        className="bg-slate-50 py-20 overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <h2
+            className={`text-3xl font-bold text-slate-900 mb-4 transition-all duration-700 ${
+              stepsVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-6"
+            }`}
+          >
+            How RentKA Works
+          </h2>
+
+          <p
+            className={`text-slate-800 mb-14 transition-all duration-700 delay-100 ${
+              stepsVisible
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-6"
+            }`}
+          >
+            A considered rental experience, supported by human verification.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
+            {[
+              {
+                title: "Browse Verified Cars",
+                text: "Carefully selected vehicles from trusted partners.",
+              },
+              {
+                title: "We Confirm Availability",
+                text: "Our team personally coordinates with the rental provider.",
+              },
+              {
+                title: "Finalize & Drive",
+                text: "Proceed with confidence once details are confirmed.",
+              },
+            ].map((step, index) => (
+              <div
+                key={step.title}
+                className={`p-6 transition-all duration-700 ${
+                  stepsVisible
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-8"
+                }`}
+                style={{
+                  transitionDelay: `${200 + index * 150}ms`,
+                }}
+              >
+                <h3 className="font-semibold text-slate-900 mb-2">
+                  {step.title}
+                </h3>
+                <p className="text-slate-700">{step.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* BOTTOM CTA */}
+      <section className="bg-slate-900 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-semibold mb-4">
+            A more considered way to rent a car
+          </h2>
+          <p className="text-slate-200 mb-8">
+            Browse verified vehicles and let us handle the rest.
+          </p>
+          <button
+            onClick={() =>
+              document
+                .getElementById("filters")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
+          >
+            Browse Cars
+          </button>
+        </div>
+      </section>
+
+      {/* STEP 2 */}
+      <ModelListingsBottomSheet
+        open={modelOpen}
+        model={selectedModel}
+        country={country}
+        city={city}
+        service={service}
+        onClose={() => {
+          setModelOpen(false);
+          window.history.pushState({}, "", "/");
+        }}
+        onSelectCar={(car) => {
+          setSelectedCar(car);
+          setModelOpen(false);
+          setDetailsOpen(true);
+        }}
+      />
+
+      {/* STEP 3 */}
+      <CarDetailsModal
+        open={detailsOpen}
+        car={selectedCar}
+        service={service!}
+        city={city}
+        onClose={() => setDetailsOpen(false)}
+      />
     </>
   );
 }

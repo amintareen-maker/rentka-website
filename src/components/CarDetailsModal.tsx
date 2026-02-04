@@ -5,8 +5,15 @@ import Image from "next/image";
 import { Car } from "@/lib/useCars";
 import LeadModal from "@/components/LeadModal";
 import { track } from "@vercel/analytics";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 type ServiceType = "selfDrive" | "withDriver";
+
+type Vendor = {
+  name?: string;
+  logoUrl?: string;
+};
 
 type Props = {
   open: boolean;
@@ -31,12 +38,47 @@ export default function CarDetailsModal({
 
   const [leadOpen, setLeadOpen] = useState(false);
 
+  // ✅ Vendor state
+  const [vendor, setVendor] = useState<Vendor | null>(null);
+
   /* -----------------------------
      Sync service from parent
   ------------------------------ */
   useEffect(() => {
     setSelectedService(service);
   }, [service]);
+
+  /* -----------------------------
+     Load vendor (FIX APPLIED HERE ONLY)
+  ------------------------------ */
+  useEffect(() => {
+    if (!open || !car?.vendorId) {
+      setVendor(null);
+      return;
+    }
+
+    const vendorId = car.vendorId; // ✅ FIX: narrow type once
+
+    const loadVendor = async () => {
+      try {
+        const ref = doc(
+          db,
+          "countries",
+          car.country,
+          "vendors",
+          vendorId
+        );
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          setVendor(snap.data() as Vendor);
+        }
+      } catch {
+        setVendor(null);
+      }
+    };
+
+    loadVendor();
+  }, [open, car]);
 
   /* -----------------------------
      Support flags
@@ -106,10 +148,29 @@ export default function CarDetailsModal({
         {/* Content */}
         <div className="relative bg-white w-full max-w-3xl mx-4 rounded-xl shadow-lg p-6 z-10">
           {/* Header */}
-          <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-semibold text-slate-900">
-              {car.name}
-            </h2>
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">
+                {car.name}
+              </h2>
+
+              {/* Vendor */}
+              <div className="flex items-center gap-2 mt-1">
+                {vendor?.logoUrl ? (
+                  <img
+                    src={vendor.logoUrl}
+                    alt={vendor.name}
+                    className="h-6 w-10 object-contain border rounded bg-white"
+                  />
+                ) : (
+                  <div className="h-6 w-10 bg-slate-100 rounded" />
+                )}
+                <span className="text-sm font-medium text-slate-800">
+                  {vendor?.name ?? "Verified Partner"}
+                </span>
+              </div>
+            </div>
+
             <button
               onClick={onClose}
               className="text-slate-700 hover:text-slate-900"
@@ -118,7 +179,7 @@ export default function CarDetailsModal({
             </button>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-6 mt-4">
             {/* Image */}
             <div className="relative h-56 bg-slate-100 rounded-lg">
               {car.imageURL && (
@@ -233,7 +294,6 @@ export default function CarDetailsModal({
               <button
                 className="w-full mt-5 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
                 onClick={() => {
-                  // 🔵 Analytics: request call clicked
                   track("request_call_clicked", {
                     car_id: car.id,
                     service: selectedService,
