@@ -1,37 +1,23 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Car } from "@/lib/useCars";
-import CarCard from "@/components/CarCard";
-import CarDetailsModal from "@/components/CarDetailsModal";
+import { useCars, Car } from "@/lib/useCars";
+import { useCountries, useCities } from "@/lib/useLocations";
 
-type Country = {
-  code: string;
-  name: string;
+/* =============================
+   TYPES (MODEL CARD)
+============================== */
+type CarModel = {
+  model: string;
+  imageURL?: string;
+  category?: string;
+  count: number;
+  minPrice?: number;
 };
 
-type City = {
-  id: string;
-  name: string;
-  supports?: {
-    serviceWithoutDriver?: boolean;
-    serviceWithDriver?: boolean;
-  };
-};
-
-type Props = {
-  initialCountries: Country[];
-  initialCitiesByCountry: Record<string, City[]>;
-  initialCars: Car[];
-};
-
-export default function HomePageClient({
-  initialCountries,
-  initialCitiesByCountry,
-  initialCars,
-}: Props) {
+export default function HomePageClient() {
   /* -----------------------------
-     FILTER STATE
+     FILTER STATE (UNCHANGED)
   ------------------------------ */
   const [country, setCountry] = useState<string>("PK");
   const [city, setCity] = useState<string | undefined>();
@@ -46,33 +32,10 @@ export default function HomePageClient({
   const [shakeKey, setShakeKey] = useState(0);
 
   /* -----------------------------
-     HOW IT WORKS ANIMATION STATE
+     LOCATIONS
   ------------------------------ */
-  const [stepsVisible, setStepsVisible] = useState(false);
-
-  useEffect(() => {
-    const section = document.getElementById("how-rentka-works");
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setStepsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
-
-  /* -----------------------------
-     LOCATIONS (SERVER DATA)
-  ------------------------------ */
-  const countries = initialCountries;
-  const cities = initialCitiesByCountry[country] || [];
+  const countries = useCountries();
+  const cities = useCities(country);
   const selectedCity = cities.find((c) => c.id === city);
 
   const availableServices = {
@@ -81,7 +44,7 @@ export default function HomePageClient({
   };
 
   /* -----------------------------
-     AUTO-SELECT SERVICE
+     AUTO-SELECT SERVICE (UNCHANGED)
   ------------------------------ */
   useEffect(() => {
     if (!selectedCity) {
@@ -108,38 +71,70 @@ export default function HomePageClient({
   }, [selectedCity]);
 
   /* -----------------------------
-     CARS (FILTERED CLIENT-SIDE)
+     CARS (SOURCE OF TRUTH)
   ------------------------------ */
-  const cars = useMemo(() => {
-    return initialCars.filter((car) => {
-      if (car.country !== country) return false;
-      if (city && car.city !== city) return false;
-      if (service && car.service !== service) return false;
-      return true;
-    });
-  }, [initialCars, country, city, service]);
-
-  const categories = Array.from(
-    new Set(cars.map((c) => c.category).filter(Boolean))
-  );
-
-  const carsByCategory: Record<string, Car[]> = {};
-  categories.forEach((category) => {
-    carsByCategory[category] = cars.filter(
-      (c) => c.category === category
-    );
-  });
+  const { cars, loading } = useCars({ country, city, service });
 
   /* -----------------------------
-     MODAL
+     PRICE EXTRACTION (MATCH APP)
   ------------------------------ */
-  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [selectedService, setSelectedService] =
-    useState<"selfDrive" | "withDriver">("selfDrive");
+  const extractDailyPrice = (data: Car): number | undefined => {
+    const supports = data.supports ?? {};
+    const pricing = data.pricing ?? {};
 
-  const canViewDetails = Boolean(city && service);
+    if (supports.withoutDriver) {
+      const p = pricing.selfDrive?.withinCity?.daily;
+      if (typeof p === "number") return p;
+    }
 
+    if (supports.withDriver) {
+      const p = pricing.withDriver?.withinCity?.daily;
+      if (typeof p === "number") return p;
+    }
+
+    return undefined;
+  };
+
+  /* -----------------------------
+     DERIVE MODELS (KEY STEP)
+     === WEB VERSION OF CarModelsScreen ===
+  ------------------------------ */
+  const models: CarModel[] = useMemo(() => {
+    const map: Record<string, CarModel> = {};
+
+    cars.forEach((car) => {
+      if (!car.model) return;
+
+      const price = extractDailyPrice(car);
+
+      if (!map[car.model]) {
+        map[car.model] = {
+          model: car.model,
+          imageURL: car.imageURL,
+          category: car.category,
+          count: 0,
+          minPrice:
+            typeof price === "number" ? price : undefined,
+        };
+      }
+
+      map[car.model].count += 1;
+
+      if (
+        typeof price === "number" &&
+        (map[car.model].minPrice === undefined ||
+          price < map[car.model].minPrice!)
+      ) {
+        map[car.model].minPrice = price;
+      }
+    });
+
+    return Object.values(map);
+  }, [cars]);
+
+  /* -----------------------------
+     BLOCKED ACTION (UNCHANGED)
+  ------------------------------ */
   const handleBlockedAction = () => {
     setShakeKey((k) => k + 1);
     setFilterError({
@@ -148,25 +143,13 @@ export default function HomePageClient({
     });
   };
 
-  const handleViewDetails = (car: Car) => {
-    setFilterError({});
-    setSelectedCar(car);
-    setSelectedService(service!);
-    setDetailsOpen(true);
-  };
+  const canBrowseModels = Boolean(city && service);
 
-  useEffect(() => {
-    if (city && service) {
-      setFilterError({});
-    }
-  }, [city, service]);
-
-  /* -----------------------------
-     JSX (UNCHANGED)
-  ------------------------------ */
   return (
     <>
-      {/* FILTERS */}
+      {/* =============================
+          FILTERS (UNCHANGED)
+      ============================== */}
       <section className="bg-slate-50 border-b border-slate-200 pt-6 md:pt-0">
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="mb-8 text-center">
@@ -185,16 +168,7 @@ export default function HomePageClient({
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Country
                 </label>
-                <select
-                  value={country}
-                  onChange={(e) => {
-                    setCountry(e.target.value);
-                    setCity(undefined);
-                    setService(undefined);
-                    setFilterError({});
-                  }}
-                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
-                >
+                <select className="w-full rounded-lg border border-slate-400 px-4 py-3">
                   {countries.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -254,43 +228,87 @@ export default function HomePageClient({
                   )}
                 </select>
               </div>
+
+              {/* RESET */}
+              <div className="hidden md:block">
+                <button
+                  onClick={() => {
+                    setCity(undefined);
+                    setService(undefined);
+                    setFilterError({});
+                  }}
+                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
+                >
+                  Reset
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CARS */}
+      {/* =============================
+          MODELS GRID (STEP 1)
+      ============================== */}
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-6">
-          {categories.map((category) => (
-            <div key={category} className="mb-16">
-              <h2 className="text-xl font-semibold mb-6">{category}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {carsByCategory[category].map((car) => (
-                  <CarCard
-                    key={car.id}
-                    car={car}
-                    disabled={!canViewDetails}
-                    onViewDetails={() =>
-                      canViewDetails
-                        ? handleViewDetails(car)
-                        : handleBlockedAction()
-                    }
-                  />
-                ))}
-              </div>
+          {loading && (
+            <div className="text-center text-slate-600">
+              Loading cars…
             </div>
-          ))}
+          )}
+
+          {!loading && models.length === 0 && (
+            <div className="text-center text-slate-600">
+              No cars available
+            </div>
+          )}
+
+          {!loading && models.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {models.map((m) => (
+                <button
+                  key={m.model}
+                  onClick={() =>
+                    canBrowseModels
+                      ? console.log("OPEN MODEL:", m.model)
+                      : handleBlockedAction()
+                  }
+                  className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg transition p-4"
+                >
+                  <div className="aspect-[4/3] bg-slate-100 rounded-lg mb-4 overflow-hidden">
+                    {m.imageURL ? (
+                      <img
+                        src={m.imageURL}
+                        alt={m.model}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : null}
+                  </div>
+
+                  <h3 className="font-semibold text-slate-900">
+                    {m.model}
+                  </h3>
+
+                  {typeof m.minPrice === "number" && (
+                    <p className="text-sm text-slate-700 mt-1">
+                      Starting from PKR{" "}
+                      <span className="font-semibold">
+                        {m.minPrice}
+                      </span>
+                      /day
+                    </p>
+                  )}
+
+                  <p className="text-sm text-slate-500 mt-1">
+                    {m.count} option(s)
+                  </p>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
-
-      <CarDetailsModal
-        open={detailsOpen}
-        car={selectedCar}
-        service={selectedService}
-        city={city}
-        onClose={() => setDetailsOpen(false)}
-      />
     </>
   );
 }

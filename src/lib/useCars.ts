@@ -21,6 +21,7 @@ export type Car = {
   depositAmount?: number;
   modelYear?: number;
   modelYearLabel?: string;
+  model?: string;
 
   pricing?: {
     selfDrive?: {
