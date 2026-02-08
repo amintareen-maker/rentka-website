@@ -20,6 +20,9 @@ type LeadContext = {
   service?: "selfDrive" | "withDriver";
   modelYear?: number;
   modelYearLabel?: string;
+  // ✅ NEW
+  vendorName?: string | null;
+  vendorId?: string | null;
 };
 
 type Props = {
@@ -89,6 +92,8 @@ export default function LeadModal({ open, onClose, context }: Props) {
 
         pickupDate,
         preferredTime,
+        vendorName: context.vendorName ?? null,
+        vendorId: context.vendorId ?? null,
 
         source: "website",
         status: "new",
@@ -101,6 +106,9 @@ export default function LeadModal({ open, onClose, context }: Props) {
         phone: phone.trim(),
         email: email.trim() || "",
         carName: context.carName || "",
+        // ✅ NEW
+        vendorName: context.vendorName || "",
+        vendorId: context.vendorId || "",
         modelYear: String(modelYearDisplay || ""),
         country: context.country || "",
         city: context.city || "",
@@ -157,6 +165,9 @@ export default function LeadModal({ open, onClose, context }: Props) {
           <div className="mb-4 rounded-lg border bg-slate-50 p-3 text-sm space-y-1">
             {context.carName && (
               <p><strong>Car:</strong> {context.carName}</p>
+            )}
+            {context.vendorName && (
+              <p><strong>Vendor:</strong> {context.vendorName}</p>
             )}
             {modelYearDisplay && (
               <p><strong>Model:</strong> {modelYearDisplay}</p>

@@ -326,6 +326,8 @@ export default function CarDetailsModal({
           country: car.country,
           city,
           service: selectedService,
+          vendorName: vendor?.name ?? null,
+          vendorId: car.vendorId ?? null,
         }}
       />
     </>
