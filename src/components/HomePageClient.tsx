@@ -422,12 +422,12 @@ export default function HomePageClient() {
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="bg-slate-900 text-white py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white tracking-tight mb-4">
+      <section className="bg-slate-950 text-white py-20">
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <h2 className="text-3xl font-bold tracking-tight text-white mb-4">
             A more considered way to rent a car
           </h2>
-          <p className="text-slate-200 mb-8">
+          <p className="text-white/90 mb-8">
             Browse verified vehicles and let us handle the rest.
           </p>
           <button
@@ -445,7 +445,6 @@ export default function HomePageClient() {
           </button>
         </div>
       </section>
-
 
       {/* STEP 2 */}
       <ModelListingsBottomSheet
