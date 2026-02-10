@@ -159,13 +159,17 @@ export default function HomePageClient() {
   /* -----------------------------
      BLOCKED ACTION
   ------------------------------ */
-  const handleBlockedAction = () => {
-    setShakeKey((k) => k + 1);
-    setFilterError({
-      city: !city,
-      service: !service,
-    });
-  };
+ const handleBlockedAction = () => {
+  setShakeKey((k) => k + 1);
+  setFilterError({
+    city: !city,
+    service: !service,
+  });
+
+  document
+    .getElementById("filters")
+    ?.scrollIntoView({ behavior: "smooth" });
+};
 
   const canBrowseModels = Boolean(city && service);
 
