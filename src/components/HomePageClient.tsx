@@ -422,29 +422,29 @@ export default function HomePageClient() {
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="bg-slate-950 text-white py-20">
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-3xl font-bold tracking-tight text-white mb-4">
-            A more considered way to rent a car
-          </h2>
-          <p className="text-white/90 mb-8">
-            Browse verified vehicles and let us handle the rest.
-          </p>
-          <button
-            onClick={() =>
-              document
-                .getElementById("filters")
-                ?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                })
-            }
-            className="bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
-          >
-            Browse Cars
-          </button>
-        </div>
-      </section>
+<section className="bg-slate-950 text-white py-24 overflow-visible">
+  <div className="max-w-4xl mx-auto px-6 text-center relative z-20">
+    <h2 className="text-3xl font-bold tracking-tight text-white mb-4">
+      A more considered way to rent a car
+    </h2>
+    <p className="text-white/90 mb-8">
+      Browse verified vehicles and let us handle the rest.
+    </p>
+    <button
+      onClick={() =>
+        document
+          .getElementById("filters")
+          ?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          })
+      }
+      className="bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
+    >
+      Browse Cars
+    </button>
+  </div>
+</section>
 
       {/* STEP 2 */}
       <ModelListingsBottomSheet
