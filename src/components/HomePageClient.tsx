@@ -243,12 +243,13 @@ export default function HomePageClient() {
                   onChange={(e) => {
                     setCity(e.target.value || undefined);
                     setService(undefined);
-                    setFilterError((p) => ({
-                      ...p,
-                      city: false,
-                    }));
+                    setFilterError((p) => ({ ...p, city: false }));
                   }}
-                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
+                  className={`w-full rounded-lg px-4 py-3 border ${
+                    filterError.city
+                      ? "border-red-500 ring-1 ring-red-500 shake"
+                      : "border-slate-400"
+                  }`}
                 >
                   <option value="">Select city</option>
                   {cities.map((c) => (
@@ -272,25 +273,30 @@ export default function HomePageClient() {
                         | "selfDrive"
                         | "withDriver") || undefined
                     );
-                    setFilterError((p) => ({
-                      ...p,
-                      service: false,
-                    }));
+                    setFilterError((p) => ({ ...p, service: false }));
                   }}
-                  className="w-full rounded-lg border border-slate-400 px-4 py-3"
+                  className={`w-full rounded-lg px-4 py-3 border ${
+                    filterError.service
+                      ? "border-red-500 ring-1 ring-red-500 shake"
+                      : "border-slate-400"
+                  }`}
                 >
                   <option value="">Select service</option>
                   {availableServices.selfDrive && (
                     <option value="selfDrive">Self Drive</option>
                   )}
                   {availableServices.withDriver && (
-                    <option value="withDriver">
-                      With Driver
-                    </option>
+                    <option value="withDriver">With Driver</option>
                   )}
                 </select>
               </div>
             </div>
+
+            {(filterError.city || filterError.service) && (
+              <p className="mt-3 text-sm text-red-600">
+                Please select city and service to proceed
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -309,11 +315,7 @@ export default function HomePageClient() {
                           const slug = m.model
                             .toLowerCase()
                             .replace(/\s+/g, "-");
-                          window.history.pushState(
-                            {},
-                            "",
-                            `/cars/${slug}`
-                          );
+                          window.history.pushState({}, "", `/cars/${slug}`);
                           setSelectedModel(m.model);
                           setModelOpen(true);
                         })()
@@ -403,9 +405,7 @@ export default function HomePageClient() {
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-8"
                 }`}
-                style={{
-                  transitionDelay: `${200 + index * 150}ms`,
-                }}
+                style={{ transitionDelay: `${200 + index * 150}ms` }}
               >
                 <h3 className="font-semibold text-slate-900 mb-2">
                   {step.title}
@@ -465,6 +465,20 @@ export default function HomePageClient() {
         city={city}
         onClose={() => setDetailsOpen(false)}
       />
+
+      <style jsx>{`
+        .shake {
+          animation: shake 0.35s ease-in-out;
+        }
+        @keyframes shake {
+          0% { transform: translateX(0); }
+          20% { transform: translateX(-4px); }
+          40% { transform: translateX(4px); }
+          60% { transform: translateX(-3px); }
+          80% { transform: translateX(3px); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
     </>
   );
 }
