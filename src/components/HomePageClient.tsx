@@ -424,7 +424,7 @@ export default function HomePageClient() {
       {/* BOTTOM CTA */}
       <section className="bg-slate-900 text-white py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-semibold mb-4">
+          <h2 className="text-3xl font-bold text-white tracking-tight mb-4">
             A more considered way to rent a car
           </h2>
           <p className="text-slate-200 mb-8">
@@ -434,7 +434,10 @@ export default function HomePageClient() {
             onClick={() =>
               document
                 .getElementById("filters")
-                ?.scrollIntoView({ behavior: "smooth" })
+                ?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                })
             }
             className="bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
           >
@@ -442,6 +445,7 @@ export default function HomePageClient() {
           </button>
         </div>
       </section>
+
 
       {/* STEP 2 */}
       <ModelListingsBottomSheet
