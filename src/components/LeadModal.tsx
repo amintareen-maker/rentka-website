@@ -248,8 +248,9 @@ export default function LeadModal({ open, onClose, context }: Props) {
 
             {/* Payment disclaimer */}
             <p className="mt-3 text-xs text-slate-500 text-center">
-              Displayed prices are provided by rental partners. Payment is
-              completed directly with the partner after confirmation.
+              We respond within minutes during (8 AM – 8 PM).
+              Displayed prices are provided by rental partners. 
+              Payment in advance is must after confirmation to proceed with booking.
             </p>
 
             {/* Legal */}
