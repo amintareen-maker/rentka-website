@@ -308,7 +308,8 @@ export default function CarDetailsModal({
               </button>
 
               <p className="text-xs text-slate-700 mt-2">
-                Final pricing & availability confirmed by RentKA team.
+                Price includes driver service for 10 hours. Fuel charges are settled separately.
+                RentKA team will confirm the availability and contact you.
               </p>
             </div>
           </div>
