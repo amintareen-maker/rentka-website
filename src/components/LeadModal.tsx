@@ -160,24 +160,27 @@ Please confirm availability.
 
       if (isMobile) {
         window.open(whatsappUrl, "_blank");
+
+        setTimeout(() => {
+          setSuccess(false);
+          setDesktopWhatsappUrl(null);
+          setName("");
+          setPhone("");
+          setEmail("");
+          setPickupDate("");
+          setPreferredTime("");
+          onClose();
+        }, 800);
       } else {
         setDesktopWhatsappUrl(whatsappUrl);
       }
+
 
       /* ===============================
          Close modal normally
          =============================== */
 
-      setTimeout(() => {
-        setSuccess(false);
-        setDesktopWhatsappUrl(null);
-        setName("");
-        setPhone("");
-        setEmail("");
-        setPickupDate("");
-        setPreferredTime("");
-        onClose();
-      }, 800);
+
 
     } catch (err) {
       console.error("Failed to save lead:", err);
