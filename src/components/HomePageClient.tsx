@@ -44,6 +44,9 @@ export default function HomePageClient() {
   ------------------------------ */
   const [stepsVisible, setStepsVisible] = useState(false);
 
+  /* ✅ ADDED CHAT STATE (nothing else changed) */
+  const [chatOpen, setChatOpen] = useState(false);
+  
   useEffect(() => {
     const onScroll = () => {
       const el = document.getElementById("how-rentka-works");
@@ -472,6 +475,45 @@ export default function HomePageClient() {
         city={city}
         onClose={() => setDetailsOpen(false)}
       />
+      
+      {/* WHATSAPP CHAT WIDGET */}
+      <div className="fixed bottom-24 right-6 z-50">
+
+        {chatOpen && (
+          <div className="bg-white w-72 rounded-2xl shadow-xl border border-slate-200 p-4 mb-3 animate-fade-in relative">
+            <p className="text-sm font-semibold text-slate-900 mb-1">
+              👋 Need help?
+            </p>
+            <p className="text-sm text-slate-600 mb-3">
+              We can help you find the right car quickly.
+            </p>
+
+            <a
+              href="https://wa.me/923048919511?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-center bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-medium"
+            >
+              Chat on WhatsApp
+            </a>
+
+            <button
+              onClick={() => setChatOpen(false)}
+              className="absolute top-2 right-3 text-slate-400 hover:text-slate-600 text-sm"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        <button
+          onClick={() => setChatOpen((prev) => !prev)}
+          className="bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition-all duration-300"
+        >
+          💬
+        </button>
+      </div>
+
       {/* FLOATING WHATSAPP BUTTON */}
       <a
         href="https://wa.me/923048919511?text=Hi%20RentKA,%20I%20would%20like%20to%20browse%20available%20cars."
@@ -500,6 +542,14 @@ export default function HomePageClient() {
           60% { transform: translateX(-3px); }
           80% { transform: translateX(3px); }
           100% { transform: translateX(0); }
+        }
+          @keyframes fade-in {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.25s ease-out;
         }
       `}</style>
     </>
