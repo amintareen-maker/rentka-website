@@ -31,7 +31,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-slate-800 max-w-4xl mx-auto">
             <div>• Prices change from vendor to vendor</div>
-            <div>• Car condition is often unclear</div>
+            <div>• Terms and conditions are often unclear</div>
             <div>• Availability is not always reliable</div>
             <div>• First-time renters don’t know who to trust</div>
           </div>
@@ -68,7 +68,7 @@ export default function AboutPage() {
 
             <div className="border rounded-xl p-6">
               <h3 className="font-medium mb-2 text-slate-900">
-                Clear Pricing
+                Transparent Pricing
               </h3>
               <p className="text-slate-700">
                 What you see is what you pay — no surprises.

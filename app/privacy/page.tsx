@@ -31,8 +31,8 @@ export default function PrivacyPage() {
         <li>Phone number</li>
         <li>Email address (if provided)</li>
         <li>CNIC photo (for identity verification)</li>
-        <li>City and location preferences</li>
-        <li>Car rental and service preferences</li>
+        <li>Pickup and drop location details</li>
+        <li>Payment confirmation</li>
         <li>Booking and request-related information</li>
         <li>Basic device and usage data required for app functionality</li>
       </ul>
@@ -43,10 +43,18 @@ export default function PrivacyPage() {
       <ul className="list-disc pl-6 mb-4 space-y-1">
         <li>Create and manage your user account</li>
         <li>Contact you regarding bookings, requests, or support</li>
+        <li>Verify customer identity</li>
         <li>Connect you with car rental partners to fulfill your request</li>
-        <li>Improve app performance and user experience</li>
+        <li>Process payments and maintain accounting records</li>
+        <li>Email may be used for booking communication. Marketing emails will only be sent if customer explicitly opts-in.</li>
         <li>Ensure legal, operational, and security compliance</li>
       </ul>
+
+      <h2 className="text-xl font-semibold mt-6 mb-2">Data Retention</h2>
+      <p className="mb-4">
+         Booking records and payment confirmations may be retained for record-keeping purposes.
+         CNIC photos are retained for up to 6 months for dispute resolution and legal compliance purposes, after which they may be deleted.
+      </p>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">Data Sharing</h2>
       <p className="mb-4">
@@ -66,9 +74,7 @@ export default function PrivacyPage() {
 
       <h2 className="text-xl font-semibold mt-6 mb-2">Data Security</h2>
       <p className="mb-4">
-        We take reasonable technical and organizational measures to protect your
-        data. However, no online system is completely secure, and absolute
-        security cannot be guaranteed.
+        RentKA takes reasonable steps to protect personal information from unauthorized access or misuse.
       </p>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">
