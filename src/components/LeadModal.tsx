@@ -10,6 +10,8 @@ import { db } from "@/lib/firebase";
 const SHEETS_WEBHOOK =
   "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
 
+const WHATSAPP_NUMBER = "923048919511";
+
 /* ===============================
    Types
    =============================== */
@@ -123,6 +125,38 @@ export default function LeadModal({ open, onClose, context }: Props) {
       });
 
       setSuccess(true);
+      /* ===============================
+        📲 WHATSAPP REDIRECT
+        =============================== */
+
+      const message = `
+      Hi RentKA,
+
+      I just requested:
+
+      Car: ${context.carName ?? "N/A"}
+      Vendor: ${context.vendorName ?? "N/A"}
+      Service: ${serviceLabel ?? "N/A"}
+      City: ${context.city ?? "N/A"}
+      Pickup Date: ${pickupDate}
+      Preferred Time: ${preferredTime}
+
+      My Name: ${name}
+      Phone: ${phone}
+
+      Please confirm availability.
+      `;
+
+      const encodedMessage = encodeURIComponent(message);
+
+      window.open(
+        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`,
+        "_blank"
+      );
+
+      /* ===============================
+        Close modal normally
+        =============================== */
 
       setTimeout(() => {
         setSuccess(false);
@@ -132,7 +166,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
         setPickupDate("");
         setPreferredTime("");
         onClose();
-      }, 1200);
+      }, 800);
     } catch (err) {
       console.error("Failed to save lead:", err);
       setError("Something went wrong. Please try again.");
@@ -250,7 +284,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
             <p className="mt-3 text-xs text-slate-500 text-center">
               We respond within minutes during (8 AM – 8 PM).
               Displayed prices are provided by rental partners. 
-              Payment in advance is must after confirmation to proceed with booking.
+              Advance payment is required after confirmation to proceed with booking.
             </p>
 
             {/* Legal */}
