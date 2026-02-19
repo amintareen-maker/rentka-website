@@ -22,7 +22,6 @@ type LeadContext = {
   service?: "selfDrive" | "withDriver";
   modelYear?: number;
   modelYearLabel?: string;
-  // ✅ NEW
   vendorName?: string | null;
   vendorId?: string | null;
 };
@@ -38,13 +37,13 @@ export default function LeadModal({ open, onClose, context }: Props) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  /* 🆕 NEW FIELDS */
   const [pickupDate, setPickupDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [desktopWhatsappUrl, setDesktopWhatsappUrl] = useState<string | null>(null);
 
   if (!open) return null;
 
@@ -81,22 +80,24 @@ export default function LeadModal({ open, onClose, context }: Props) {
       setLoading(true);
 
       /* 🔥 FIREBASE (SOURCE OF TRUTH) */
+      const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
+      const randomDigits = Math.floor(1000 + Math.random() * 9000);
+      const leadId = `RK-${cityCode}-${randomDigits}`;
+
       await addDoc(collection(db, "leads"), {
+        leadId,
         name: name.trim(),
         phone: phone.trim(),
         email: email.trim() || null,
-
         carName: context.carName ?? null,
         country: context.country ?? null,
         city: context.city ?? null,
         service: context.service ?? null,
         modelYear: modelYearDisplay,
-
         pickupDate,
         preferredTime,
         vendorName: context.vendorName ?? null,
         vendorId: context.vendorId ?? null,
-
         source: "website",
         status: "new",
         createdAt: serverTimestamp(),
@@ -108,7 +109,6 @@ export default function LeadModal({ open, onClose, context }: Props) {
         phone: phone.trim(),
         email: email.trim() || "",
         carName: context.carName || "",
-        // ✅ NEW
         vendorName: context.vendorName || "",
         vendorId: context.vendorId || "",
         modelYear: String(modelYearDisplay || ""),
@@ -118,6 +118,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
         pickupDate,
         preferredTime,
         source: "website",
+        leadId,
       });
 
       fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
@@ -125,41 +126,51 @@ export default function LeadModal({ open, onClose, context }: Props) {
       });
 
       setSuccess(true);
+
       /* ===============================
-        📲 WHATSAPP REDIRECT
-        =============================== */
+         📲 WHATSAPP REDIRECT
+         =============================== */
 
       const message = `
-      Hi RentKA,
+Hi RentKA,
 
-      I just requested:
+Lead ID: ${leadId}
 
-      Car: ${context.carName ?? "N/A"}
-      Vendor: ${context.vendorName ?? "N/A"}
-      Service: ${serviceLabel ?? "N/A"}
-      City: ${context.city ?? "N/A"}
-      Pickup Date: ${pickupDate}
-      Preferred Time: ${preferredTime}
+I just requested:
 
-      My Name: ${name}
-      Phone: ${phone}
+Car: ${context.carName ?? "N/A"}
+Vendor: ${context.vendorName ?? "N/A"}
+Service: ${serviceLabel ?? "N/A"}
+City: ${context.city ?? "N/A"}
+Pickup Date: ${pickupDate}
+Preferred Time: ${preferredTime}
 
-      Please confirm availability.
-      `;
+My Name: ${name}
+Phone: ${phone}
+
+Source: Website
+
+Please confirm availability.
+`;
 
       const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
-      window.open(
-        `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`,
-        "_blank"
-      );
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        window.open(whatsappUrl, "_blank");
+      } else {
+        setDesktopWhatsappUrl(whatsappUrl);
+      }
 
       /* ===============================
-        Close modal normally
-        =============================== */
+         Close modal normally
+         =============================== */
 
       setTimeout(() => {
         setSuccess(false);
+        setDesktopWhatsappUrl(null);
         setName("");
         setPhone("");
         setEmail("");
@@ -167,6 +178,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
         setPreferredTime("");
         onClose();
       }, 800);
+
     } catch (err) {
       console.error("Failed to save lead:", err);
       setError("Something went wrong. Please try again.");
@@ -180,17 +192,14 @@ export default function LeadModal({ open, onClose, context }: Props) {
      =============================== */
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative bg-white w-full max-w-md mx-4 rounded-xl p-6 z-10">
         <h2 className="text-lg font-semibold mb-4">Request a Call</h2>
 
-        {/* 🔍 CONTEXT SUMMARY */}
         {(context.carName ||
           context.country ||
           context.city ||
@@ -219,14 +228,24 @@ export default function LeadModal({ open, onClose, context }: Props) {
         )}
 
         {success ? (
-          <p className="text-green-600 font-medium">
-            ✅ Request submitted. Our team will contact you shortly.
-          </p>
+          <div className="space-y-3">
+            <p className="text-green-600 font-medium">
+              ✅ Request submitted successfully.
+            </p>
+
+            {desktopWhatsappUrl && (
+              <button
+                onClick={() => window.open(desktopWhatsappUrl, "_blank")}
+                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+              >
+                Open WhatsApp Chat
+              </button>
+            )}
+          </div>
         ) : (
           <>
             <div className="space-y-3">
 
-              {/* 🆕 PICKUP DATE */}
               <input
                 type="date"
                 className="w-full border rounded-lg px-3 py-2"
@@ -235,7 +254,6 @@ export default function LeadModal({ open, onClose, context }: Props) {
                 onChange={(e) => setPickupDate(e.target.value)}
               />
 
-              {/* 🆕 PREFERRED TIME */}
               <input
                 type="time"
                 className="w-full border rounded-lg px-3 py-2"
@@ -280,14 +298,12 @@ export default function LeadModal({ open, onClose, context }: Props) {
               {loading ? "Submitting..." : "Request a Call"}
             </button>
 
-            {/* Payment disclaimer */}
             <p className="mt-3 text-xs text-slate-500 text-center">
               We respond within minutes during (8 AM – 8 PM).
               Displayed prices are provided by rental partners. 
               Advance payment is required after confirmation to proceed with booking.
             </p>
 
-            {/* Legal */}
             <p className="mt-2 text-xs text-slate-500 text-center">
               By submitting, you agree to our{" "}
               <a
