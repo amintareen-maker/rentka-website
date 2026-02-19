@@ -26,9 +26,11 @@ export default function PrivacyPage() {
         Information We Collect
       </h2>
       <ul className="list-disc pl-6 mb-4 space-y-1">
+      RentKA may collect the following information:
         <li>Full name</li>
         <li>Phone number</li>
         <li>Email address (if provided)</li>
+        <li>CNIC photo (for identity verification)</li>
         <li>City and location preferences</li>
         <li>Car rental and service preferences</li>
         <li>Booking and request-related information</li>

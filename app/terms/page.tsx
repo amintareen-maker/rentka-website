@@ -18,7 +18,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          1. Service Overview
+        Service Overview
         </h2>
         <p className="mb-4 text-slate-700">
           RentKA is a car rental marketplace that connects customers with
@@ -27,7 +27,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          2. Booking & Requests
+        Booking & Requests
         </h2>
         <p className="mb-4 text-slate-700">
           Submitting a request on our website does not guarantee availability.
@@ -36,7 +36,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          3. Pricing & Payments
+        Pricing & Payments
         </h2>
         <p className="mb-4 text-slate-700">
           All prices, deposits, and payment terms are confirmed during booking
@@ -46,7 +46,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          4. Rental Duration
+        Rental Duration
         </h2>
         <p className="mb-4 text-slate-700">
           Each booking includes 10 hours of service.
@@ -58,7 +58,7 @@ export default function TermsPage() {
         </p>
         
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          5. Pickup Time Changes
+        Pickup Time Changes
         </h2>
         <p className="mb-4 text-slate-700">
           Customers may request a pickup time change at least 3 hours prior to scheduled pickup time, subject to availability.
@@ -66,7 +66,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          6. User Responsibility
+        User Responsibility
         </h2>
         <p className="mb-4 text-slate-700">
           Customers must provide accurate information. Any misuse, false
@@ -75,7 +75,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          6. Booking Extension
+        Booking Extension
         </h2>
         <p className="mb-4 text-slate-700">
           Customers may request a same-day extension of booking.
@@ -83,7 +83,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          7. Limitation of Liability & Accident
+        Limitation of Liability & Accident
         </h2>
         <p className="mb-4 text-slate-700">
           RentKA is not liable for indirect damages, losses, or disputes arising
@@ -94,21 +94,21 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          8. Traffic Fines
+        Traffic Fines
         </h2>
         <p className="text-slate-700">
           Any traffic violations or fines incurred during the ride are the responsibility of the assigned driver.
         </p>
         
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          9. Cancellation & Refund
+        Cancellation & Refund
         </h2>
         <p className="text-slate-700">
           Refund and cancellation terms apply as per RentKA Refund & Cancellation Policy.
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          8. Changes to Terms
+        Changes to Terms
         </h2>
         <p className="text-slate-700">
           We may update these terms at any time. Continued use of the website
@@ -116,7 +116,7 @@ export default function TermsPage() {
         </p>
 
         <h2 className="text-xl font-semibold mt-6 mb-2 text-slate-900">
-          8. Emergency & Support
+        Emergency & Support
         </h2>
         <p className="text-slate-700">
           In case of any issue during the ride, customers may immediately contact RentKA support for assistance.
