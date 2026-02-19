@@ -384,7 +384,7 @@ export default function HomePageClient() {
                 : "opacity-0 translate-y-6"
             }`}
           >
-            A considered rental experience, supported by human verification.
+            A considered rental experience, Dedicated support throughout your ride.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
