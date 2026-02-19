@@ -159,27 +159,26 @@ Please confirm availability.
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile) {
-        window.open(whatsappUrl, "_blank");
+      window.open(whatsappUrl, "_blank");
 
-        setTimeout(() => {
-          setSuccess(false);
-          setDesktopWhatsappUrl(null);
-          setName("");
-          setPhone("");
-          setEmail("");
-          setPickupDate("");
-          setPreferredTime("");
-          onClose();
-        }, 800);
-      } else {
-        setDesktopWhatsappUrl(whatsappUrl);
-      }
+      setTimeout(() => {
+        setSuccess(false);
+        setDesktopWhatsappUrl(null);
+        setName("");
+        setPhone("");
+        setEmail("");
+        setPickupDate("");
+        setPreferredTime("");
+        onClose();
+      }, 800);
+    } else {
+      setDesktopWhatsappUrl(whatsappUrl);
+    }
 
 
       /* ===============================
          Close modal normally
          =============================== */
-
 
 
     } catch (err) {
@@ -200,7 +199,7 @@ Please confirm availability.
         onClick={onClose}
       />
 
-      <div className="relative bg-white w-full max-w-md mx-4 rounded-xl p-6 z-10">
+      <div className="relative bg-white w-full max-w-md mx-4 rounded-2xl p-8 z-10 shadow-xl">
         <h2 className="text-lg font-semibold mb-4">Request a Call</h2>
 
         {(context.carName ||
@@ -231,19 +230,53 @@ Please confirm availability.
         )}
 
         {success ? (
-          <div className="space-y-3">
-            <p className="text-green-600 font-medium">
-              ✅ Request submitted successfully.
-            </p>
+          <div className="space-y-5">
 
+            {/* Success Header */}
+            <div className="text-center space-y-2">
+              <div className="text-4xl">✅</div>
+              <h3 className="text-xl font-semibold text-slate-800">
+                Request Sent Successfully
+              </h3>
+              <p className="text-sm text-slate-500">
+                We’ve saved your request and are ready to confirm availability.
+              </p>
+            </div>
+
+            {/* Summary Card */}
+            <div className="rounded-xl border bg-gradient-to-br from-slate-50 to-slate-100 p-4 text-sm space-y-1 shadow-sm">
+              {context.carName && (
+                <p><strong>Car:</strong> {context.carName}</p>
+              )}
+              {context.vendorName && (
+                <p><strong>Vendor:</strong> {context.vendorName}</p>
+              )}
+              {modelYearDisplay && (
+                <p><strong>Model:</strong> {modelYearDisplay}</p>
+              )}
+              {context.city && (
+                <p><strong>City:</strong> {context.city}</p>
+              )}
+              {serviceLabel && (
+                <p><strong>Service:</strong> {serviceLabel}</p>
+              )}
+            </div>
+
+            {/* WhatsApp CTA */}
             {desktopWhatsappUrl && (
               <button
                 onClick={() => window.open(desktopWhatsappUrl, "_blank")}
-                className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+                className="w-full bg-green-600 hover:bg-green-700 transition-all duration-200 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg"
               >
-                Open WhatsApp Chat
+                Continue on WhatsApp →
               </button>
             )}
+
+            {/* Reassurance */}
+            <p className="text-xs text-center text-slate-400">
+              You can also wait — our team will contact you shortly.
+            </p>
+
           </div>
         ) : (
           <>
