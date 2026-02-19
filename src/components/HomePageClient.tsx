@@ -68,7 +68,7 @@ export default function HomePageClient() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setChatOpen(true);
-    }, 5000);
+    }, 8000);
 
     return () => clearTimeout(timer);
   }, []);
