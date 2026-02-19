@@ -46,7 +46,7 @@ export default function HomePageClient() {
 
   /* ✅ ADDED CHAT STATE (nothing else changed) */
   const [chatOpen, setChatOpen] = useState(false);
-  
+  // SCROLL EFFECT
   useEffect(() => {
     const onScroll = () => {
       const el = document.getElementById("how-rentka-works");
@@ -62,6 +62,15 @@ export default function HomePageClient() {
     onScroll();
 
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // ✅ AUTO-OPEN CHAT AFTER 5 SECONDS (SEPARATE HOOK)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setChatOpen(true);
+    }, 5000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   /* -----------------------------
