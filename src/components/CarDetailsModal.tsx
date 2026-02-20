@@ -191,6 +191,21 @@ export default function CarDetailsModal({
                 />
               )}
             </div>
+            
+            {/* Additional Charges - With Driver Only */}
+              {selectedService === "withDriver" && (
+                <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
+                  <p className="font-semibold text-slate-900">
+                    Additional Charges Policy
+                  </p>
+
+                  <p>• Airport pickup & drop-off charges apply separately.</p>
+                  <p>• Vehicle decoration for weddings or events is charged separately.</p>
+                  <p>• Fuel is billed separately unless stated otherwise.</p>
+                  <p>• Extra hours beyond the included duration are chargeable.</p>
+                  <p>• Toll tax & parking (if applicable) are payable by customer.</p>
+                </div>
+              )}
 
             {/* Details */}
             <div>
@@ -289,20 +304,7 @@ export default function CarDetailsModal({
                   </div>
                 )}
               </div>
-              {/* Additional Charges - With Driver Only */}
-              {selectedService === "withDriver" && (
-                <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
-                  <p className="font-semibold text-slate-900">
-                    Additional Charges Policy
-                  </p>
-
-                  <p>• Airport pickup & drop-off charges apply separately.</p>
-                  <p>• Vehicle decoration for weddings or events is charged separately.</p>
-                  <p>• Fuel is billed separately unless stated otherwise.</p>
-                  <p>• Extra hours beyond the included duration are chargeable.</p>
-                  <p>• Toll tax & parking (if applicable) are payable by customer.</p>
-                </div>
-              )}
+              
 
               {/* CTA */}
               <button
