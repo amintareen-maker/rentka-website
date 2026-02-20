@@ -33,6 +33,8 @@ export default function CarDetailsModal({
   /* -----------------------------
      STATE
   ------------------------------ */
+  const [showCharges, setShowCharges] = useState(false);
+  
   const [selectedService, setSelectedService] =
     useState<ServiceType>(service);
 
@@ -193,10 +195,10 @@ export default function CarDetailsModal({
                   />
                 )}
               </div>
-
-              {/* Additional Charges - With Driver Only */}
+              
+              {/* Additional Charges - Desktop Only , for mobile its separate incase you want to change*/}
               {selectedService === "withDriver" && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
+                <div className="hidden md:block bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
                   <p className="font-semibold text-slate-900">
                     Additional Charges Policy
                   </p>
@@ -207,8 +209,9 @@ export default function CarDetailsModal({
                   <p>• Extra hours beyond the included duration are chargeable.</p>
                   <p>• Toll tax & parking (if applicable) are payable by customer.</p>
                 </div>
-              )}
+                )}
             </div>
+
             {/* Details */}
             <div>
               <p className="text-slate-800 mb-3">
@@ -306,7 +309,29 @@ export default function CarDetailsModal({
                   </div>
                 )}
               </div>
-              
+
+              {/* Mobile Charges Accordion */}
+              {selectedService === "withDriver" && (
+                <div className="md:hidden mt-4">
+                  <button
+                    onClick={() => setShowCharges(!showCharges)}
+                    className="w-full text-left bg-slate-100 border border-slate-200 rounded-lg p-3 text-sm font-medium text-slate-800 flex justify-between items-center"
+                  >
+                    <span>View Additional Charges</span>
+                    <span className="text-xs">{showCharges ? "▲" : "▼"}</span>
+                  </button>
+
+                  {showCharges && (
+                    <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
+                      <p>• Airport pickup & drop-off charges apply separately.</p>
+                      <p>• Vehicle decoration for weddings or events is charged separately.</p>
+                      <p>• Fuel is billed separately unless stated otherwise.</p>
+                      <p>• Extra hours beyond the included duration are chargeable.</p>
+                      <p>• Toll tax & parking (if applicable) are payable by customer.</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* CTA */}
               <button
