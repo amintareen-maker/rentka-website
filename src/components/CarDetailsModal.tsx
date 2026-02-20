@@ -204,7 +204,7 @@ export default function CarDetailsModal({
                   </p>
 
                   <p>• Airport pickup & drop-off charges apply separately.</p>
-                  <p>• Vehicle decoration for weddings or events is charged separately.</p>
+                  <p>• Decoration for weddings or events is permitted; however, a post-event cleaning and service fee will apply.</p>
                   <p>• Fuel is billed separately unless stated otherwise.</p>
                   <p>• Extra hours beyond the included duration are chargeable.</p>
                   <p>• Toll tax & parking (if applicable) are payable by customer.</p>
@@ -324,7 +324,7 @@ export default function CarDetailsModal({
                   {showCharges && (
                     <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
                       <p>• Airport pickup & drop-off charges apply separately.</p>
-                      <p>• Vehicle decoration for weddings or events is charged separately.</p>
+                      <p>• Decoration for weddings or events is permitted; however, a post-event cleaning and service fee will apply.</p>
                       <p>• Fuel is billed separately unless stated otherwise.</p>
                       <p>• Extra hours beyond the included duration are chargeable.</p>
                       <p>• Toll tax & parking (if applicable) are payable by customer.</p>
