@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 /* -----------------------------
@@ -85,7 +85,19 @@ export function useCars({ country, city, service }: UseCarsParams) {
         setLoading(true);
 
         const ref = collection(db, "countries", country, "cars");
-        const snap = await getDocs(ref);
+
+        let q;
+
+        // 🔥 PERFORMANCE RULE
+        // If city OR service not selected → limit to 20 cars
+        if (!city || !service) {
+          q = query(ref, limit(20));
+        } else {
+          // If both selected → fetch full collection
+          q = ref;
+        }
+
+        const snap = await getDocs(q);
 
         const results: Car[] = [];
 
@@ -96,10 +108,16 @@ export function useCars({ country, city, service }: UseCarsParams) {
           if (city && data.cityList && !data.cityList.includes(city)) return;
 
           // Service filter
-          if (service === "selfDrive" && data.supports?.withoutDriver === false)
+          if (
+            service === "selfDrive" &&
+            data.supports?.withoutDriver === false
+          )
             return;
 
-          if (service === "withDriver" && data.supports?.withDriver === false)
+          if (
+            service === "withDriver" &&
+            data.supports?.withDriver === false
+          )
             return;
 
           results.push({
