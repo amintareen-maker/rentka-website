@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 export default function HeroBanner() {
-  const images = Array.from({ length: 7 }, (_, i) => `/hero-${i + 1}.webp`);
+  const images = Array.from({ length: 4}, (_, i) => `/hero-${i + 1}.webp`);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
