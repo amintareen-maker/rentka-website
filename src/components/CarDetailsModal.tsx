@@ -315,7 +315,7 @@ export default function CarDetailsModal({
                 <div className="md:hidden mt-4">
                   <button
                     onClick={() => setShowCharges(!showCharges)}
-                    className="w-full text-left bg-slate-100 border border-slate-200 rounded-lg p-3 text-sm font-medium text-slate-800 flex justify-between items-center"
+                    className="w-full text-left border border-amber-300 rounded-lg p-3 text-sm font-medium text-amber-700 flex justify-between items-center hover:bg-amber-50 transition"
                   >
                     <span>View Additional Charges</span>
                     <span className="text-xs">{showCharges ? "▲" : "▼"}</span>
