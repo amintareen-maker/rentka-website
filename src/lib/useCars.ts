@@ -63,21 +63,33 @@ export type UseCarsParams = {
   country: string;
   city?: string;
   service?: "selfDrive" | "withDriver";
+  initialCars?: Car[];
 };
 
 /* -----------------------------
    Hook
 ------------------------------ */
 
-export function useCars({ country, city, service }: UseCarsParams) {
-  const [cars, setCars] = useState<Car[]>([]);
-  const [loading, setLoading] = useState(true);
+export function useCars(
+  { country, city, service, initialCars }: UseCarsParams
+): { cars: Car[]; loading: boolean } {
+
+  const [cars, setCars] = useState<Car[]>(initialCars || []);
+  const [loading, setLoading] = useState(
+    !initialCars || initialCars.length === 0
+  );
 
   useEffect(() => {
     if (!country) {
       setCars([]);
       setLoading(false);
       return;
+    }
+
+    // If we already have initial cars and no filters selected, skip fetching
+    if (initialCars && !city && !service) {
+    setLoading(false);
+    return;
     }
 
     const fetchCars = async () => {

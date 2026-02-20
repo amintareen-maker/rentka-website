@@ -18,7 +18,7 @@ type CarModel = {
   minPrice?: number;
 };
 
-export default function HomePageClient() {
+export default function HomePageClient({ initialCars = [] }: { initialCars?: Car[] }) {
   /* -----------------------------
      URL STATE
   ------------------------------ */
@@ -113,7 +113,12 @@ export default function HomePageClient() {
   /* -----------------------------
      CARS
   ------------------------------ */
-  const { cars, loading } = useCars({ country, city, service });
+  const { cars, loading } = useCars({ 
+  country, 
+  city, 
+  service,
+  initialCars 
+});
 
   /* -----------------------------
      PRICE EXTRACTION
