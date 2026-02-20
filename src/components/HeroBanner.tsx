@@ -9,6 +9,7 @@ export default function HeroBanner() {
     "/hero-1.webp",
     "/hero-2.webp",
     "/hero-3.webp",
+    "/hero-4.webp",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
