@@ -41,6 +41,9 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-10">
             {/* NAV */}
             <nav className="flex items-center gap-8 text-sm font-medium text-slate-700">
+              <Link href="/rent-a-car-islamabad" className="hover:text-slate-900">
+                Islamabad Rental
+              </Link>
               <Link href="/about" className="hover:text-slate-900">
                 About Us
               </Link>
@@ -63,6 +66,9 @@ export default function Header() {
 
         {/* ROW 2 — MOBILE ONLY */}
         <nav className="flex md:hidden items-center gap-6 pb-3 text-sm font-medium text-slate-700">
+          <Link href="/rent-a-car-islamabad" className="hover:text-slate-900">
+            Islamabad Rental
+          </Link>
           <Link href="/about" className="hover:text-slate-900">
             About Us
           </Link>
