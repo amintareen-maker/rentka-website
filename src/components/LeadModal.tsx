@@ -282,20 +282,30 @@ Please confirm availability.
           <>
             <div className="space-y-3">
 
-              <input
-                type="date"
-                className="w-full border rounded-lg px-3 py-2"
-                value={pickupDate}
-                min={new Date().toISOString().split("T")[0]}
-                onChange={(e) => setPickupDate(e.target.value)}
-              />
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-600">
+                  Pickup Date *
+                </label>
+                <input
+                  type="date"
+                  className="w-full border rounded-lg px-3 py-2 bg-white"
+                  value={pickupDate}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => setPickupDate(e.target.value)}
+                />
+              </div>
 
-              <input
-                type="time"
-                className="w-full border rounded-lg px-3 py-2"
-                value={preferredTime}
-                onChange={(e) => setPreferredTime(e.target.value)}
-              />
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-slate-600">
+                  Preferred Time *
+                </label>
+                <input
+                  type="time"
+                  className="w-full border rounded-lg px-3 py-2 bg-white"
+                  value={preferredTime}
+                  onChange={(e) => setPreferredTime(e.target.value)}
+                />
+              </div>
 
               <input
                 type="text"
