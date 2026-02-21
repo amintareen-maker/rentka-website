@@ -9,7 +9,7 @@ export const metadata = {
     template: "%s | RentKA",
   },
   description:
-    "Find reliable rental cars with clear pricing and flexible options, Car rental with professional driver in Islamabad and Rawalpindi. Airport transfers, full-day bookings, and outstation trips available. Advance confirmation may apply.",
+    "Find reliable rental cars with clear pricing and flexible options,Affordable car rental with professional driver in Islamabad and Rawalpindi. Airport transfers, full-day bookings, and outstation trips available. Advance confirmation may apply.",
 };
 
 export default function RootLayout({
