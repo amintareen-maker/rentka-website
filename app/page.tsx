@@ -3,10 +3,32 @@ import HomePageClient from "@/components/HomePageClient";
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-export const metadata = {
-  title: "Verified Car Rentals in Your City | RentKA",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title:
+    "Rent a Car in Islamabad & Rawalpindi with Driver | Affordable Car Rental – RentKA",
   description:
-    "Find verified rental cars from trusted local partners. Self-drive or with driver. No upfront payment required.",
+    "Affordable car rental in Islamabad and Rawalpindi with driver. Book full-day city rides, airport transfers, and Murree trips. Verified drivers, transparent pricing, and reliable service.",
+  keywords: [
+    "rent a car islamabad",
+    "rent a car rawalpindi",
+    "car rental islamabad with driver",
+    "car rental rawalpindi with driver",
+    "islamabad airport car rental",
+    "murree trip car rental",
+    "affordable car rental islamabad",
+  ],
+  openGraph: {
+    title:
+      "Rent a Car in Islamabad & Rawalpindi with Driver | RentKA",
+    description:
+      "Book affordable with-driver car rental in Islamabad and Rawalpindi. Airport pickup, full-day city rides, and Murree trips available.",
+    url: "https://www.rentka.co",
+    siteName: "RentKA",
+    locale: "en_PK",
+    type: "website",
+  },
 };
 
 async function getInitialCars() {
