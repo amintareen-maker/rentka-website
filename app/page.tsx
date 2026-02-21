@@ -66,8 +66,11 @@ export default async function Page() {
         Rent a Car in Islamabad & Rawalpindi with Driver
       </h2>
       <p className="text-slate-700 leading-relaxed">
-        RentKA offers affordable <a href="/rent-a-car-islamabad" className="text-blue-600 hover:underline">car rental in Islamabad</a> and Rawalpindi with
-        professional drivers and transparent pricing. Whether you need a
+        RentKA offers affordable 
+        <a href="/rent-a-car-islamabad" className="text-blue-600 hover:underline"> car rental in Islamabad</a> 
+        and 
+        <a href="/rent-a-car-rawalpindi" className="text-blue-600 hover:underline"> car rental in Rawalpindi</a> 
+        with professional drivers and transparent pricing. Whether you need a
         full-day city ride, airport transfer, or outstation trip, we connect
         you with verified local vendors to ensure reliable service without
         unnecessary complications.
@@ -139,12 +142,21 @@ export default async function Page() {
 
   </div>
   <div className="pt-8">
+  <div className="pt-8 flex flex-wrap gap-4">
   <a
     href="/rent-a-car-islamabad"
     className="inline-block bg-slate-900 text-white px-6 py-3 rounded-md hover:bg-slate-700 transition"
   >
     Explore Car Rental in Islamabad
   </a>
+
+  <a
+    href="/rent-a-car-rawalpindi"
+    className="inline-block border border-slate-900 text-slate-900 px-6 py-3 rounded-md hover:bg-slate-100 transition"
+  >
+    Explore Car Rental in Rawalpindi
+  </a>
+</div>
 </div>
 </section>
   </>
