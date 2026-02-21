@@ -5,11 +5,11 @@ import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: {
-    default: "RentKA | Verified Car Rentals Without the Hassle",
+    default: "RentKA | Affordable Car Rental with Driver",
     template: "%s | RentKA",
   },
   description:
-    "Find verified rental cars from trusted local partners. Self-drive or with driver.",
+    "Find reliable rental cars with clear pricing and flexible options, Car rental with professional driver in Islamabad and Rawalpindi. Airport transfers, full-day bookings, and outstation trips available. Advance confirmation may apply.",
 };
 
 export default function RootLayout({
