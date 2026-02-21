@@ -283,29 +283,44 @@ Please confirm availability.
             <div className="space-y-3">
 
               <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-600">
-                  Pickup Date *
-                </label>
+              <label className="text-sm font-medium text-slate-600">
+                Pickup Date *
+              </label>
+
+              <div className="relative">
                 <input
                   type="date"
-                  className="w-full border rounded-lg px-3 py-2 bg-white"
+                  className="w-full border rounded-xl px-4 py-3 pr-12 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={pickupDate}
                   min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => setPickupDate(e.target.value)}
                 />
-              </div>
 
-              <div className="space-y-1">
-                <label className="text-sm font-medium text-slate-600">
-                  Preferred Time *
-                </label>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  📅
+                </span>
+              </div>
+            </div>
+
+            {/* Preferred Time */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-slate-600">
+                Preferred Time *
+              </label>
+
+              <div className="relative">
                 <input
                   type="time"
-                  className="w-full border rounded-lg px-3 py-2 bg-white"
+                  className="w-full border rounded-xl px-4 py-3 pr-12 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={preferredTime}
                   onChange={(e) => setPreferredTime(e.target.value)}
                 />
+
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  🕒
+                </span>
               </div>
+            </div>
 
               <input
                 type="text"

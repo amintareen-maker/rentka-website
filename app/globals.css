@@ -86,3 +86,16 @@ body {
 .animate-shake {
   animation: shake 0.3s ease-in-out;
 }
+
+/* =============================
+   HIDE DEFAULT DATE/TIME ICON (MOBILE FIX)
+============================= */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
