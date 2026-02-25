@@ -119,6 +119,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
         preferredTime,
         source: "website",
         leadId,
+        status: "new", // ✅ ADD THIS
       });
 
       fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
