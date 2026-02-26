@@ -231,7 +231,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       >
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="mb-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-[var(--rentka-blue)] mb-2">
               Find the right car for your trip
             </h2>
             <p className="text-slate-700">
@@ -342,7 +342,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                         })()
                       : handleBlockedAction()
                   }
-                  className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg transition p-4"
+                  className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
                 >
                   <div className="aspect-[4/3] bg-slate-100 rounded-lg mb-4 overflow-hidden">
                     {m.imageURL && (
@@ -354,7 +354,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                     )}
                   </div>
 
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-slate-900 group-hover:text-[var(--rentka-blue)] transition">
                     {m.model}
                   </h3>
 
@@ -506,7 +506,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
               href="https://wa.me/923048919511?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
               target="_blank"
               rel="noopener noreferrer"
-              className="block text-center bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-medium"
+              className="block text-center bg-[var(--rentka-green)] hover:bg-[var(--rentka-green-hover)] text-white py-2 rounded-lg font-medium transition"
             >
               Chat on WhatsApp
             </a>
@@ -523,7 +523,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
         {/* WhatsApp Icon Trigger */}
         <button
           onClick={() => setChatOpen((prev) => !prev)}
-          className="bg-green-500 hover:bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition-all duration-300"
+          className="bg-[var(--rentka-green)] hover:bg-[var(--rentka-green-hover)] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition-all duration-300"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

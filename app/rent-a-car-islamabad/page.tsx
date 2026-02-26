@@ -19,7 +19,7 @@ export default function IslamabadRentalPage() {
     <section className="mx-auto max-w-5xl px-4 py-16 space-y-12">
       
       <div>
-        <h1 className="text-3xl font-bold mb-4">
+        <h1 className="text-3xl font-bold mb-4 text-[var(--rentka-blue)]">
           Rent a Car in Islamabad with Driver
         </h1>
         <p className="text-slate-700 leading-relaxed">
@@ -32,7 +32,7 @@ export default function IslamabadRentalPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-3">
+        <h2 className="text-2xl font-semibold mb-3 text-[var(--rentka-blue)]">
           Full-Day Car Rental in Islamabad
         </h2>
         <p className="text-slate-700 leading-relaxed">
@@ -45,7 +45,7 @@ export default function IslamabadRentalPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-3">
+        <h2 className="text-2xl font-semibold mb-3 text-[var(--rentka-blue)]">
           Islamabad Airport Transfers
         </h2>
         <p className="text-slate-700 leading-relaxed">
@@ -57,7 +57,7 @@ export default function IslamabadRentalPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-3">
+        <h2 className="text-2xl font-semibold mb-3 text-[var(--rentka-blue)]">
           Murree & Outstation Trips
         </h2>
         <p className="text-slate-700 leading-relaxed">
@@ -75,7 +75,7 @@ export default function IslamabadRentalPage() {
 
         <div className="space-y-6">
           <div>
-            <h3 className="font-medium">
+            <h3 className="font-semibold text-slate-900">
               Is driver included in the rental price?
             </h3>
             <p className="text-slate-700 mt-1">
@@ -85,7 +85,7 @@ export default function IslamabadRentalPage() {
           </div>
 
           <div>
-            <h3 className="font-medium">
+            <h3 className="font-semibold text-slate-900">
               Do I need to pay in advance?
             </h3>
             <p className="text-slate-700 mt-1">
@@ -95,7 +95,7 @@ export default function IslamabadRentalPage() {
           </div>
 
           <div>
-            <h3 className="font-medium">
+            <h3 className="font-semibold text-slate-900">
               Which areas of Islamabad do you serve?
             </h3>
             <p className="text-slate-700 mt-1">
