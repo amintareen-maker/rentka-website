@@ -175,7 +175,7 @@ export default function CarDetailsModal({
 
             <button
               onClick={onClose}
-              className="text-slate-700 hover:text-slate-900"
+              className="text-slate-700 hover:text-[var(--rentka-blue)]"
             >
               ✕
             </button>
@@ -198,7 +198,7 @@ export default function CarDetailsModal({
               
               {/* Additional Charges - Desktop Only , for mobile its separate incase you want to change*/}
               {selectedService === "withDriver" && (
-                <div className="hidden md:block bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
+                <div className="hidden md:block bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
                   <p className="font-semibold text-slate-900">
                     Additional Charges Policy
                   </p>
@@ -226,8 +226,8 @@ export default function CarDetailsModal({
                   <button
                     className={`flex-1 py-2 rounded-lg border text-sm font-medium ${
                       selectedService === "selfDrive"
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "border-slate-300 text-slate-800"
+                        ? "bg-[var(--rentka-green)] text-white border-[var(--rentka-green)]"
+                        : "border-slate-300 text-slate-800 hover:border-[var(--rentka-green)]"
                     }`}
                     onClick={() => setSelectedService("selfDrive")}
                   >
@@ -239,8 +239,8 @@ export default function CarDetailsModal({
                   <button
                     className={`flex-1 py-2 rounded-lg border text-sm font-medium ${
                       selectedService === "withDriver"
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "border-slate-300 text-slate-800"
+                        ? "bg-[var(--rentka-green)] text-white border-[var(--rentka-green)]"
+                        : "border-slate-300 text-slate-800 hover:border-[var(--rentka-green)]"
                     }`}
                     onClick={() => setSelectedService("withDriver")}
                   >
@@ -322,7 +322,7 @@ export default function CarDetailsModal({
                   </button>
 
                   {showCharges && (
-                    <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
+                    <div className="mt-2 bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
                       <p>• Airport pickup & drop-off charges apply separately.</p>
                       <p>• Decoration for weddings or events is permitted; however, a post-event cleaning and service fee will apply.</p>
                       <p>• Fuel is billed separately unless stated otherwise.</p>
@@ -335,7 +335,7 @@ export default function CarDetailsModal({
 
               {/* CTA */}
               <button
-                className="w-full mt-5 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                className="w-full mt-5 bg-[var(--rentka-blue)] text-white py-2 rounded-lg hover:opacity-90 transition"
                 onClick={() => {
                   track("request_call_clicked", {
                     car_id: car.id,
