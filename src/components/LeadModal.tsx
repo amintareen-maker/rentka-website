@@ -201,7 +201,7 @@ Please confirm availability.
       />
 
       <div className="relative bg-white w-full max-w-md mx-4 rounded-2xl p-8 z-10 shadow-xl border border-slate-200">
-        <h2 className="text-xl font-semibold mb-4 text-[var(--rentka-green)]">
+        <h2 className="text-xl font-semibold mb-4 text-[var(--rentka-blue)]">
           Request a Call
         </h2>
 
