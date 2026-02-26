@@ -70,14 +70,14 @@ export default async function Page() {
               RentKA offers affordable{" "}
               <Link
                 href="/rent-a-car-islamabad"
-                className="text-blue-600 hover:underline"
+                className="text-[var(--rentka-blue)] hover:underline"
               >
                 car rental in Islamabad
               </Link>{" "}
               and{" "}
               <Link
                 href="/rent-a-car-rawalpindi"
-                className="text-blue-600 hover:underline"
+                className="text-[var(--rentka-blue)] hover:underline"
               >
                 car rental in Rawalpindi
               </Link>{" "}
@@ -109,7 +109,7 @@ export default async function Page() {
               We provide convenient{" "}
               <Link
                 href="/airport-car-rental-islamabad"
-                className="text-blue-600 hover:underline"
+                className="text-[var(--rentka-blue)] hover:underline"
               >
                 airport pickup and drop-off services from Islamabad International Airport
               </Link>

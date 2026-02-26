@@ -73,7 +73,7 @@ export default function HeroBanner() {
 
           {/* LEFT */}
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
               Rent a car from verified local partners — without confusion
             </h1>
 
@@ -87,7 +87,7 @@ export default function HeroBanner() {
             </p>
 
             <Link href="#filters">
-              <button className="mt-8 rounded-lg bg-yellow-400 px-6 py-3 font-semibold text-black hover:bg-yellow-500 transition">
+              <button className="mt-8 rounded-lg bg-[var(--rentka-green)] px-6 py-3 font-semibold text-white hover:bg-[var(--rentka-green-hover)] transition">
                 See available cars in your city
               </button>
             </Link>
@@ -129,8 +129,8 @@ export default function HeroBanner() {
                   onClick={() => setCurrentIndex(i)}
                   className={`h-2 w-2 rounded-full transition ${
                     i === currentIndex
-                      ? "bg-gray-800"
-                      : "bg-gray-300 hover:bg-gray-400"
+                    ? "bg-[var(--rentka-blue)]"
+                    : "bg-gray-300 hover:bg-gray-400"
                   }`}
                 />
               ))}

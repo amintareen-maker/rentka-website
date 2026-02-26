@@ -6,6 +6,9 @@
 :root {
   --background: #ffffff;
   --foreground: #0f172a; /* slate-900 */
+  --rentka-green: #5BAE4A;
+  --rentka-green-hover: #4E9C3F;
+  --rentka-blue: #0F2B46;
 }
 
 /* =============================

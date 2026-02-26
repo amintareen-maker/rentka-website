@@ -439,7 +439,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="bg-slate-950 text-white py-20 md:py-24 overflow-visible border-b border-slate-200">
+      <section className="bg-[var(--rentka-blue)] text-white py-16 md:py-24 overflow-visible">
         <div className="max-w-4xl mx-auto px-6 text-center relative z-20">
           <h2 className="text-3xl font-bold tracking-tight !text-white mb-4">
             A more considered way to rent a car
@@ -456,7 +456,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                   block: "start",
                 })
             }
-            className="bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
+            className="bg-[var(--rentka-green)] text-black px-8 py-3 rounded-lg font-medium hover:bg-[var(--rentka-green-hover)] transition"
           >
             Browse Cars
           </button>
