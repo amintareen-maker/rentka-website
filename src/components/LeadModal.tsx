@@ -200,15 +200,17 @@ Please confirm availability.
         onClick={onClose}
       />
 
-      <div className="relative bg-white w-full max-w-md mx-4 rounded-2xl p-8 z-10 shadow-xl">
-        <h2 className="text-lg font-semibold mb-4">Request a Call</h2>
+      <div className="relative bg-white w-full max-w-md mx-4 rounded-2xl p-8 z-10 shadow-xl border border-slate-200">
+        <h2 className="text-xl font-semibold mb-4 text-[var(--rentka-green)]">
+          Request a Call
+        </h2>
 
         {(context.carName ||
           context.country ||
           context.city ||
           serviceLabel ||
           modelYearDisplay) && (
-          <div className="mb-4 rounded-lg border bg-slate-50 p-3 text-sm space-y-1">
+         <div className="mb-4 rounded-lg border border-[var(--rentka-blue)]/20 bg-[var(--rentka-blue)]/5 p-3 text-sm space-y-1">
             {context.carName && (
               <p><strong>Car:</strong> {context.carName}</p>
             )}
@@ -237,14 +239,18 @@ Please confirm availability.
             <div className="text-center space-y-2">
               <div className="text-4xl">✅</div>
               <h3 className="text-xl font-semibold text-slate-800">
-                Request Sent Successfully
+                You're Almost Confirmed!
               </h3>
               <p className="text-sm text-slate-500">
-                We’ve saved your request and are ready to confirm availability.
+                Final confirmation happens on WhatsApp.
               </p>
             </div>
 
             {/* Summary Card */}
+           <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
+              <span className="text-[var(--rentka-green)]">✔</span>
+              <span>No payment required at this stage</span>
+            </div> 
             <div className="rounded-xl border bg-gradient-to-br from-slate-50 to-slate-100 p-4 text-sm space-y-1 shadow-sm">
               {context.carName && (
                 <p><strong>Car:</strong> {context.carName}</p>
@@ -267,15 +273,18 @@ Please confirm availability.
             {desktopWhatsappUrl && (
               <button
                 onClick={() => window.open(desktopWhatsappUrl, "_blank")}
-                className="w-full bg-green-600 hover:bg-green-700 transition-all duration-200 text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg"
+                className="w-full bg-[var(--rentka-green)] hover:opacity-90 transition text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg"
               >
-                Continue on WhatsApp →
+                Confirm Instantly on WhatsApp →
               </button>
             )}
 
             {/* Reassurance */}
             <p className="text-xs text-center text-slate-400">
               You can also wait — our team will contact you shortly.
+            </p>
+            <p className="text-xs text-slate-400 -mt-2">
+              We will only use this number to confirm your booking.
             </p>
 
           </div>
@@ -291,7 +300,7 @@ Please confirm availability.
               <div className="relative">
                 <input
                   type="date"
-                  className="w-full border rounded-xl px-4 py-3 pr-12 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border rounded-xl px-4 py-3 pr-12 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[var(--rentka-blue)] focus:border-[var(--rentka-blue)]"
                   value={pickupDate}
                   min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => setPickupDate(e.target.value)}
@@ -326,7 +335,7 @@ Please confirm availability.
               <input
                 type="text"
                 placeholder="Your name *"
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--rentka-blue)] focus:border-[var(--rentka-blue)]"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -353,11 +362,11 @@ Please confirm availability.
             )}
 
             <button
-              className="w-full mt-5 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="w-full mt-5 bg-[var(--rentka-green)] text-white py-3 rounded-lg hover:opacity-90 transition disabled:opacity-50 font-semibold shadow-sm hover:shadow-md"
               disabled={loading}
               onClick={handleSubmit}
             >
-              {loading ? "Submitting..." : "Request a Call"}
+              {loading ? "Submitting..." : "Check Availability Now"}
             </button>
 
             <p className="mt-3 text-xs text-slate-500 text-center">
@@ -370,7 +379,7 @@ Please confirm availability.
               By submitting, you agree to our{" "}
               <a
                 href="/terms"
-                className="underline hover:text-slate-700"
+                className="underline hover:text-[var(--rentka-blue)]"
                 target="_blank"
                 rel="noopener noreferrer"
               >
