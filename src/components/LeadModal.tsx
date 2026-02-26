@@ -204,6 +204,9 @@ Please confirm availability.
         <h2 className="text-xl font-semibold mb-4 text-[var(--rentka-blue)]">
           Request a Call
         </h2>
+        <p className="text-xs text-slate-400 -mt-2">
+          Fill form, Submit, Chat, Confirm
+        </p>
 
         {(context.carName ||
           context.country ||
