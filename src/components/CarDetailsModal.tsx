@@ -140,7 +140,7 @@ export default function CarDetailsModal({
   return (
     <>
       {/* MODAL */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center overflow-y-auto py-6">
         {/* Backdrop */}
         <div
           className="absolute inset-0 bg-black/35 backdrop-blur-[1px]"
@@ -148,7 +148,7 @@ export default function CarDetailsModal({
         />
 
         {/* Content */}
-        <div className="relative bg-white w-full max-w-3xl mx-4 rounded-xl shadow-lg p-6 z-10">
+        <div className="relative bg-white w-full max-w-3xl mx-4 rounded-xl shadow-lg p-6 z-10 max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex justify-between items-start mb-2">
             <div>
