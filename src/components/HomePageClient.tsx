@@ -381,7 +381,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       {/* HOW RENTKA WORKS */}
       <section
         id="how-rentka-works"
-        className="bg-slate-50 py-20 overflow-hidden"
+        className="bg-slate-50 py-20 overflow-hidden mb-8 md:mb-0"
       >
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h2
@@ -439,7 +439,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="bg-slate-950 text-white py-24 overflow-visible">
+      <section className="bg-slate-950 text-white py-16 md:py-24 overflow-visible border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-6 text-center relative z-20">
           <h2 className="text-3xl font-bold tracking-tight !text-white mb-4">
             A more considered way to rent a car
