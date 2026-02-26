@@ -226,7 +226,7 @@ export default function CarDetailsModal({
                   <button
                     className={`flex-1 py-2 rounded-lg border text-sm font-medium ${
                       selectedService === "selfDrive"
-                        ? "bg-[var(--rentka-green)] text-white border-[var(--rentka-green)]"
+                        ? "bg-[var(--rentka-blue)] text-white border-[var(--rentka-green)]"
                         : "border-slate-300 text-slate-800 hover:border-[var(--rentka-green)]"
                     }`}
                     onClick={() => setSelectedService("selfDrive")}
@@ -239,7 +239,7 @@ export default function CarDetailsModal({
                   <button
                     className={`flex-1 py-2 rounded-lg border text-sm font-medium ${
                       selectedService === "withDriver"
-                        ? "bg-[var(--rentka-green)] text-white border-[var(--rentka-green)]"
+                        ? "bg-[var(--rentka-blue)] text-white border-[var(--rentka-green)]"
                         : "border-slate-300 text-slate-800 hover:border-[var(--rentka-green)]"
                     }`}
                     onClick={() => setSelectedService("withDriver")}
@@ -335,7 +335,7 @@ export default function CarDetailsModal({
 
               {/* CTA */}
               <button
-                className="w-full mt-5 bg-[var(--rentka-blue)] text-white py-2 rounded-lg hover:opacity-90 transition"
+                className="w-full mt-5 bg-[var(--rentka-green)] text-white py-2 rounded-lg hover:opacity-90 transition"
                 onClick={() => {
                   track("request_call_clicked", {
                     car_id: car.id,
