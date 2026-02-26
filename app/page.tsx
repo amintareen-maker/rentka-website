@@ -59,7 +59,7 @@ export default async function Page() {
       <HomePageClient initialCars={initialCars} />
 
       {/* SEO Content Section */}
-      <section className="mx-auto max-w-5xl px-4 py-16">
+      <section className="bg-white mx-auto max-w-5xl px-4 py-16">
         <div className="space-y-10">
 
           <div>
