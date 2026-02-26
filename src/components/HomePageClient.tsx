@@ -456,7 +456,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                   block: "start",
                 })
             }
-            className="bg-[var(--rentka-green)] text-black px-8 py-3 rounded-lg font-medium hover:bg-[var(--rentka-green-hover)] transition"
+            className="bg-[var(--rentka-green)] text-white px-8 py-3 rounded-lg font-medium hover:bg-[var(--rentka-green-hover)] transition"
           >
             Browse Cars
           </button>
