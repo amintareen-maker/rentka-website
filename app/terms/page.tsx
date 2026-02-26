@@ -8,9 +8,20 @@ export default function TermsPage() {
   return (
     <main className="pt-16 bg-white">
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-6 text-slate-900">
+        <h1 className="text-3xl font-bold mb-4 text-slate-900">
           Terms & Conditions
         </h1>
+
+        {/* Download PDF Button */}
+        <div className="mb-8">
+          <a
+            href="/rentka-terms-and-conditions.pdf"
+            download
+            className="inline-flex items-center px-5 py-3 rounded-xl bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition"
+          >
+            Download PDF Version
+          </a>
+        </div>
 
         <p className="mb-6 text-slate-700">
           By accessing RentKA’s website or confirming a booking, you agree to
