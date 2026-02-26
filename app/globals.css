@@ -14,12 +14,7 @@
 /* =============================
    DARK MODE
 ============================= */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #020617;
-    --foreground: #f8fafc;
-  }
-}
+
 
 /* =============================
    BASE BODY STYLES
