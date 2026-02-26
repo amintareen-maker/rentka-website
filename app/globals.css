@@ -34,23 +34,6 @@ body {
 /* =========================================================
    MOBILE CONTRAST FIX (CORRECT & SAFE)
 ========================================================= */
-@media (max-width: 768px) {
-  /* Enforce readable defaults ONLY at container level */
-  main,
-  section,
-  article {
-    color: #020617;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    color: #020617;
-  }
-
   input,
   select,
   textarea,
@@ -63,7 +46,7 @@ body {
     color: #475569; /* slate-600 */
     opacity: 1;
   }
-}
+
 
 /* =============================
    SHAKE ANIMATION (FORM ERROR)
