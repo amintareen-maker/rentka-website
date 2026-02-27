@@ -204,7 +204,7 @@ Please confirm availability.
         <h2 className="text-xl font-semibold mb-4 text-[var(--rentka-blue)]">
           Request a Call
         </h2>
-        <p> className="text-sm font-medium text-[var(--rentka-green)]"
+        <p className="text-sm font-medium text-[var(--rentka-green)]">
           Fill form, Submit, Chat, Confirm
         </p>
 
