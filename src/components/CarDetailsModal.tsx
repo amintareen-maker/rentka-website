@@ -199,7 +199,7 @@ export default function CarDetailsModal({
               {/* Additional Charges - Desktop Only , for mobile its separate incase you want to change*/}
               {selectedService === "withDriver" && (
                 <div className="hidden md:block bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-800 space-y-1">
-                  <p className="font-semibold text-slate-900">
+                  <p className="text-sm font-medium text-[var(--rentka-green)]">  
                     Additional Charges Policy
                   </p>
 
