@@ -338,7 +338,7 @@ Please confirm availability.
               <input
                 type="text"
                 placeholder="Your name *"
-                className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--rentka-blue)] focus:border-[var(--rentka-blue)]"
+               className="w-full border rounded-lg px-3 py-2"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
