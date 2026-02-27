@@ -125,17 +125,19 @@ export default function AboutPage() {
       {/* =============================
           CTA
       ============================== */}
-      <section className="bg-slate-900 text-white">
+      <section className="bg-[var(--rentka-blue)] text-white">
         <div className="max-w-4xl mx-auto px-6 py-20 text-center">
-          <h2 className="text-3xl font-semibold mb-4">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-4 tracking-tight">
             Rent a car without the uncertainty
           </h2>
-          <p className="text-slate-200 mb-8">
+
+          <p className="text-white/80 mb-8 max-w-2xl mx-auto">
             Browse verified vehicles and let us handle the rest.
           </p>
+
           <a
             href="/"
-            className="inline-block bg-white text-slate-900 px-8 py-3 rounded-lg font-medium"
+            className="inline-block bg-[var(--rentka-green)] hover:bg-[var(--rentka-green-hover)] text-white px-8 py-3 rounded-lg font-medium transition"
           >
             Browse Cars
           </a>
