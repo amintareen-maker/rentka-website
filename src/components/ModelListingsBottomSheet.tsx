@@ -132,7 +132,7 @@ export default function ModelListingsBottomSheet({
       <div className="relative w-full max-w-4xl bg-white rounded-t-2xl shadow-xl p-6 z-10 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center mb-4">
-          <h2 className="text-xl font-semibold text-slate-900">
+          <h2 className="text-xl font-semibold text-[var(--rentka-blue)]">
             {model}
           </h2>
           <button
@@ -170,7 +170,7 @@ export default function ModelListingsBottomSheet({
               <button
                 key={car.id}
                 onClick={() => onSelectCar(car)}
-                className="w-full text-left border border-slate-200 rounded-xl p-4 hover:shadow-md transition bg-white"
+                className="w-full text-left border border-slate-200 rounded-xl p-4 hover:shadow-md hover:border-[var(--rentka-green)] transition bg-white"
               >
                 <div className="flex gap-4">
                   {/* Car Image */}
@@ -215,10 +215,15 @@ export default function ModelListingsBottomSheet({
                     </div>
 
                     {price && (
-                      <p className="mt-1 text-green-700 font-semibold">
+                      <p className="mt-1 text-[var(--rentka-blue)] font-semibold">
                         PKR {price.toLocaleString()} / day
                       </p>
                     )}
+                    <div className="mt-2 flex justify-end">
+                      <span className="text-sm font-medium text-[var(--rentka-green)]">
+                        Details →
+                      </span>
+                    </div>
                   </div>
                 </div>
               </button>

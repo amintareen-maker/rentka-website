@@ -374,8 +374,7 @@ Please confirm availability.
 
             <p className="mt-3 text-xs text-slate-500 text-center">
               We respond within minutes during (8 AM – 8 PM).
-              Displayed prices are provided by rental partners. 
-              Advance payment is required after confirmation to proceed with booking.
+              Quick WhatsApp confirmation • No payment required now
             </p>
 
             <p className="mt-2 text-xs text-slate-500 text-center">
