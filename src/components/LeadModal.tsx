@@ -160,7 +160,7 @@ Please confirm availability.
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile) {
-      window.open(whatsappUrl, "_blank");
+      window.location.href = whatsappUrl;
 
       setTimeout(() => {
         setSuccess(false);
