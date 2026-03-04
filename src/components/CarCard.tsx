@@ -25,13 +25,14 @@ export default function CarCard({
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-lg transition-shadow flex flex-col">
-      <div className="relative h-40 mb-3 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
+      <div className="h-40 mb-3 bg-slate-100 rounded-lg flex items-center justify-center overflow-hidden">
         {car.imageURL && (
           <Image
             src={car.imageURL}
             alt={car.name}
-            fill
-            className="object-contain p-2"
+            width={300}
+            height={180}
+            className="max-h-full max-w-full object-contain"
           />
         )}
       </div>
