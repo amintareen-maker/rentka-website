@@ -344,12 +344,12 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                   }
                   className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
                 >
-                  <div className="aspect-[4/3] bg-slate-100 rounded-lg mb-4 overflow-hidden">
+                  <div className="aspect-[16/10] bg-slate-100 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
                     {m.imageURL && (
                       <img
                         src={m.imageURL}
                         alt={m.model}
-                        className="w-full h-full object-cover"
+                        className="max-w-full max-h-full object-contain p-4"
                       />
                     )}
                   </div>
