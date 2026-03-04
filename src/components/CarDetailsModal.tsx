@@ -185,13 +185,13 @@ export default function CarDetailsModal({
             {/* Left Column */}
             <div className="space-y-4">
               {/* Image */}
-              <div className="relative h-56 bg-slate-100 rounded-lg">
+              <div className="relative aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
                 {car.imageURL && (
                   <Image
                     src={car.imageURL}
                     alt={car.name}
                     fill
-                    className="object-contain"
+                    className="object-contain p-2"
                   />
                 )}
               </div>

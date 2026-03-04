@@ -1,8 +1,10 @@
 "use client";
 
+
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+
 
 /* ===============================
    🔗 GOOGLE SHEETS WEBHOOK
@@ -10,7 +12,9 @@ import { db } from "@/lib/firebase";
 const SHEETS_WEBHOOK =
   "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
 
+
 const WHATSAPP_NUMBER = "923048919511";
+
 
 /* ===============================
    Types
@@ -26,32 +30,39 @@ type LeadContext = {
   vendorId?: string | null;
 };
 
+
 type Props = {
   open: boolean;
   onClose: () => void;
   context: LeadContext;
 };
 
+
 export default function LeadModal({ open, onClose, context }: Props) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
+
   const [pickupDate, setPickupDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
+
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [desktopWhatsappUrl, setDesktopWhatsappUrl] = useState<string | null>(null);
 
+
   if (!open) return null;
+
 
   /* ===============================
      Derived values
      =============================== */
   const modelYearDisplay =
     context.modelYearLabel ?? context.modelYear ?? null;
+
 
   const serviceLabel =
     context.service === "selfDrive"
@@ -60,29 +71,35 @@ export default function LeadModal({ open, onClose, context }: Props) {
       ? "With Driver"
       : null;
 
+
   /* ===============================
      Submit handler
      =============================== */
   const handleSubmit = async () => {
     setError(null);
 
+
     if (!name.trim() || !phone.trim()) {
       setError("Name and phone number are required.");
       return;
     }
+
 
     if (!pickupDate || !preferredTime) {
       setError("Please select pickup date and preferred time.");
       return;
     }
 
+
     try {
       setLoading(true);
+
 
       /* 🔥 FIREBASE (SOURCE OF TRUTH) */
       const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
       const randomDigits = Math.floor(1000 + Math.random() * 9000);
       const leadId = `RK-${cityCode}-${randomDigits}`;
+
 
       await addDoc(collection(db, "leads"), {
         leadId,
@@ -103,6 +120,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
         createdAt: serverTimestamp(),
       });
 
+
       /* 🟢 GOOGLE SHEETS (NON-BLOCKING) */
       const formData = new URLSearchParams({
         name: name.trim(),
@@ -122,22 +140,29 @@ export default function LeadModal({ open, onClose, context }: Props) {
         status: "new", // ✅ ADD THIS
       });
 
+
       fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
         method: "POST",
       });
 
+
       setSuccess(true);
+
 
       /* ===============================
          📲 WHATSAPP REDIRECT
          =============================== */
 
+
       const message = `
 Hi RentKA,
 
+
 Lead ID: ${leadId}
 
+
 I just requested:
+
 
 Car: ${context.carName ?? "N/A"}
 Vendor: ${context.vendorName ?? "N/A"}
@@ -146,21 +171,28 @@ City: ${context.city ?? "N/A"}
 Pickup Date: ${pickupDate}
 Preferred Time: ${preferredTime}
 
+
 My Name: ${name}
 Phone: ${phone}
 
+
 Source: Website
+
 
 Please confirm availability.
 `;
 
+
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
+
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
 
       if (isMobile) {
       window.location.href = whatsappUrl;
+
 
       setTimeout(() => {
         setSuccess(false);
@@ -177,9 +209,13 @@ Please confirm availability.
     }
 
 
+
+
       /* ===============================
          Close modal normally
          =============================== */
+
+
 
 
     } catch (err) {
@@ -189,6 +225,7 @@ Please confirm availability.
       setLoading(false);
     }
   };
+
 
   /* ===============================
      Render
@@ -200,6 +237,7 @@ Please confirm availability.
         onClick={onClose}
       />
 
+
       <div className="relative bg-white w-full max-w-md mx-4 rounded-2xl p-8 z-10 shadow-xl border border-slate-200">
         <h2 className="text-xl font-semibold mb-4 text-[var(--rentka-blue)]">
           Request a Call
@@ -207,6 +245,7 @@ Please confirm availability.
         <p className="text-sm font-medium text-[var(--rentka-green)]">
           Fill form, Submit, Chat, Confirm
         </p>
+
 
         {(context.carName ||
           context.country ||
@@ -235,8 +274,10 @@ Please confirm availability.
           </div>
         )}
 
+
         {success ? (
           <div className="space-y-5">
+
 
             {/* Success Header */}
             <div className="text-center space-y-2">
@@ -249,11 +290,12 @@ Please confirm availability.
               </p>
             </div>
 
+
             {/* Summary Card */}
            <div className="flex items-center gap-2 text-xs text-slate-500 mt-2">
               <span className="text-[var(--rentka-green)]">✔</span>
               <span>No payment required at this stage</span>
-            </div> 
+            </div>
             <div className="rounded-xl border bg-gradient-to-br from-slate-50 to-slate-100 p-4 text-sm space-y-1 shadow-sm">
               {context.carName && (
                 <p><strong>Car:</strong> {context.carName}</p>
@@ -272,6 +314,7 @@ Please confirm availability.
               )}
             </div>
 
+
             {/* WhatsApp CTA */}
             {desktopWhatsappUrl && (
               <button
@@ -282,6 +325,7 @@ Please confirm availability.
               </button>
             )}
 
+
             {/* Reassurance */}
             <p className="text-xs text-center text-slate-400">
               You can also wait — our team will contact you shortly.
@@ -290,15 +334,18 @@ Please confirm availability.
               We will only use this number to confirm your booking.
             </p>
 
+
           </div>
         ) : (
           <>
             <div className="space-y-3">
 
+
               <div className="space-y-1">
               <label className="text-sm font-medium text-slate-600">
                 Pickup Date *
               </label>
+
 
               <div className="relative">
                 <input
@@ -309,17 +356,20 @@ Please confirm availability.
                   onChange={(e) => setPickupDate(e.target.value)}
                 />
 
+
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                   📅
                 </span>
               </div>
             </div>
 
+
             {/* Preferred Time */}
             <div className="space-y-1">
               <label className="text-sm font-medium text-slate-600">
                 Preferred Time *
               </label>
+
 
               <div className="relative">
                 <input
@@ -329,11 +379,13 @@ Please confirm availability.
                   onChange={(e) => setPreferredTime(e.target.value)}
                 />
 
+
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
                   🕒
                 </span>
               </div>
             </div>
+
 
               <input
                 type="text"
@@ -343,6 +395,7 @@ Please confirm availability.
                 onChange={(e) => setName(e.target.value)}
               />
 
+
               <input
                 type="tel"
                 placeholder="Phone number *"
@@ -350,6 +403,7 @@ Please confirm availability.
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
+
 
               <input
                 type="email"
@@ -360,9 +414,11 @@ Please confirm availability.
               />
             </div>
 
+
             {error && (
               <p className="text-sm text-red-600 mt-2">{error}</p>
             )}
+
 
             <button
               className="w-full mt-5 bg-[var(--rentka-green)] text-white py-3 rounded-lg hover:opacity-90 transition disabled:opacity-50 font-semibold shadow-sm hover:shadow-md"
@@ -372,10 +428,12 @@ Please confirm availability.
               {loading ? "Submitting..." : "Check Availability Now"}
             </button>
 
+
             <p className="mt-3 text-xs text-slate-500 text-center">
               We respond within minutes during (8 AM – 8 PM).
               Quick WhatsApp confirmation • No payment required now
             </p>
+
 
             <p className="mt-2 text-xs text-slate-500 text-center">
               By submitting, you agree to our{" "}
@@ -404,3 +462,4 @@ Please confirm availability.
     </div>
   );
 }
+
