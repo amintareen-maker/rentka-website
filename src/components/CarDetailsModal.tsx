@@ -348,7 +348,7 @@ export default function CarDetailsModal({
   </div>
   )}
   {outsideCity && (
-  <div className="pt-2">
+  <div className="pt-4 mt-3 border-t border-white/60">
     <p className="font-semibold text-slate-900">Outside City</p>
 
     {outsideCity?.daily && (
