@@ -143,10 +143,10 @@ export default function LeadModal({ open, onClose, context }: Props) {
 
       // 🔥 PACKAGE DATA
       serviceType: context.pricingType || "",
+      // PACKAGE DATA
       packageName: context.pricingType || "",
       packageDuration: context.duration || "",
       packagePrice: context.price ? String(context.price) : "",
-
       pickupDate,
       preferredTime,
 
