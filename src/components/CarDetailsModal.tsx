@@ -39,6 +39,13 @@ export default function CarDetailsModal({
     useState<ServiceType>(service);
 
   const [leadOpen, setLeadOpen] = useState(false);
+  
+  const [selectedPackage, setSelectedPackage] = useState<{
+    pricingType: "withinCity" | "outsideCity";
+    duration: "daily" | "weekly" | "monthly";
+    price: number;
+  } | null>(null);
+
 
   // ✅ Vendor state
   const [vendor, setVendor] = useState<Vendor | null>(null);
@@ -130,6 +137,9 @@ export default function CarDetailsModal({
     selectedService === "selfDrive"
       ? car.pricing?.selfDrive
       : car.pricing?.withDriver;
+  
+  const withinCity = pricing?.withinCity;
+  const outsideCity = pricing?.outsideCity; 
 
   const hasPricing =
     pricing?.withinCity || pricing?.outsideCity;
@@ -257,59 +267,167 @@ export default function CarDetailsModal({
                   </p>
                 )}
 
-                {pricing?.withinCity && (
-                  <div className="border-b border-slate-200 pb-2">
-                    <p className="font-semibold text-slate-900">
-                      Within City
-                    </p>
-                    {pricing.withinCity.daily && (
-                      <p>
-                        Daily: PKR{" "}
-                        {pricing.withinCity.daily.toLocaleString()}
-                      </p>
-                    )}
-                    {pricing.withinCity.weekly && (
-                      <p>
-                        Weekly: PKR{" "}
-                        {pricing.withinCity.weekly.toLocaleString()}
-                      </p>
-                    )}
-                    {pricing.withinCity.monthly && (
-                      <p>
-                        Monthly: PKR{" "}
-                        {pricing.withinCity.monthly.toLocaleString()}
-                      </p>
-                    )}
-                  </div>
-                )}
+                {withinCity && (
+  <div className="border-b border-slate-200 pb-2">
+    <p className="font-semibold text-slate-900">Within City</p>
 
-                {pricing?.outsideCity && (
-                  <div>
-                    <p className="font-semibold text-slate-900">
-                      Outside City
-                    </p>
-                    {pricing.outsideCity.daily && (
-                      <p>
-                        Daily: PKR{" "}
-                        {pricing.outsideCity.daily.toLocaleString()}
-                      </p>
-                    )}
-                    {pricing.outsideCity.weekly && (
-                      <p>
-                        Weekly: PKR{" "}
-                        {pricing.outsideCity.weekly.toLocaleString()}
-                      </p>
-                    )}
-                    {pricing.outsideCity.monthly && (
-                      <p>
-                        Monthly: PKR{" "}
-                        {pricing.outsideCity.monthly.toLocaleString()}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
+    {withinCity?.daily && (
+      <button
+        onClick={() =>
+          setSelectedPackage({
+            pricingType: "withinCity",
+            duration: "daily",
+            price: withinCity.daily!,
+          })
+        }
+        className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
+          selectedPackage?.pricingType === "withinCity" &&
+          selectedPackage?.duration === "daily"
+            ? "border-[var(--rentka-green)] bg-[var(--rentka-green)] text-white"
+            : "border-slate-300 hover:border-[var(--rentka-green)]"
+        }`}
+      >
+        <>
+          <span className="font-medium">Daily</span>
+          <span className="font-semibold">
+            PKR {withinCity.daily.toLocaleString()}
+          </span>
+        </>
+      </button>
+    )}
 
+    {withinCity?.weekly && (
+      <button
+        onClick={() =>
+          setSelectedPackage({
+            pricingType: "withinCity",
+            duration: "weekly",
+            price: withinCity.weekly!,
+          })
+        }
+        className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
+          selectedPackage?.pricingType === "withinCity" &&
+          selectedPackage?.duration === "weekly"
+            ? "border-[var(--rentka-green)] bg-[var(--rentka-green)] text-white"
+  : "border-slate-300 hover:border-[var(--rentka-green)]"
+        }`}
+      >
+        <>
+          <span className="font-medium">Weekly</span>
+          <span className="font-semibold">
+            PKR {withinCity.weekly.toLocaleString()}
+          </span>
+        </>
+        </button>
+    )}
+
+    {withinCity?.monthly && (
+      <button
+        onClick={() =>
+          setSelectedPackage({
+            pricingType: "withinCity",
+            duration: "monthly",
+            price: withinCity.monthly!,
+          })
+        }
+        className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
+          selectedPackage?.pricingType === "withinCity" &&
+          selectedPackage?.duration === "monthly"
+            ? "border-[var(--rentka-green)] bg-[var(--rentka-green)] text-white"
+            : "border-slate-300 hover:border-[var(--rentka-green)]"
+        }`}
+      >
+        <>
+          <span className="font-medium">Monthly</span>
+          <span className="font-semibold">
+            PKR {withinCity.monthly.toLocaleString()}
+          </span>
+        </>
+      </button>
+    )}
+  </div>
+  )}
+  {outsideCity && (
+  <div className="pt-2">
+    <p className="font-semibold text-slate-900">Outside City</p>
+
+    {outsideCity?.daily && (
+      <button
+        onClick={() =>
+          setSelectedPackage({
+            pricingType: "outsideCity",
+            duration: "daily",
+            price: outsideCity.daily!,
+          })
+        }
+        className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
+          selectedPackage?.pricingType === "outsideCity" &&
+          selectedPackage?.duration === "daily"
+            ? "border-[var(--rentka-green)] bg-[var(--rentka-green)] text-white"
+            : "border-slate-300 hover:border-[var(--rentka-green)]"
+        }`}
+      >
+        <>
+          <span className="font-medium">Daily</span>
+          <span className="font-semibold">
+            PKR {outsideCity.daily.toLocaleString()}
+          </span>
+        </>
+      </button>
+    )}
+
+    {outsideCity?.weekly && (
+      <button
+        onClick={() =>
+          setSelectedPackage({
+            pricingType: "outsideCity",
+            duration: "weekly",
+            price: outsideCity.weekly!,
+          })
+        }
+        className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
+          selectedPackage?.pricingType === "outsideCity" &&
+          selectedPackage?.duration === "weekly"
+            ? "border-[var(--rentka-green)] bg-[var(--rentka-green)] text-white"
+            : "border-slate-300 hover:border-[var(--rentka-green)]"
+        }`}
+      >
+        <>
+          <span className="font-medium">Weekly</span>
+          <span className="font-semibold">
+            PKR {outsideCity.weekly.toLocaleString()}
+          </span>
+        </>
+      </button>
+    )}
+
+    {outsideCity?.monthly && (
+      <button
+        onClick={() =>
+          setSelectedPackage({
+            pricingType: "outsideCity",
+            duration: "monthly",
+            price: outsideCity.monthly!,
+          })
+        }
+        className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${  
+          selectedPackage?.pricingType === "outsideCity" &&
+          selectedPackage?.duration === "monthly"
+            ? "border-[var(--rentka-green)] bg-[var(--rentka-green)] text-white"
+            : "border-slate-300 hover:border-[var(--rentka-green)]"
+        }`}
+      >
+        <>
+          <span className="font-medium">Monthly</span>
+          <span className="font-semibold">
+            PKR {outsideCity.monthly.toLocaleString()}
+          </span>
+        </>
+      </button>
+    )}
+  </div>
+)}
+                </div>
               {/* Mobile Charges Accordion */}
               {selectedService === "withDriver" && (
                 <div className="md:hidden mt-4">
@@ -332,10 +450,22 @@ export default function CarDetailsModal({
                   )}
                 </div>
               )}
-
+              {selectedPackage && (
+  <div className="mt-3 text-sm text-slate-700">
+    Selected:{" "}
+    <span className="font-semibold">
+      {selectedPackage.pricingType === "withinCity"
+        ? "Within City"
+        : "Outside City"}{" "}
+      • {selectedPackage.duration} • PKR{" "}
+      {selectedPackage.price.toLocaleString()}
+    </span>
+  </div>
+)}
               {/* CTA */}
               <button
-                className="w-full mt-5 bg-[var(--rentka-green)] text-white py-2 rounded-lg hover:opacity-90 transition"
+                disabled={!selectedPackage}
+                className="w-full mt-5 bg-[var(--rentka-green)] text-white py-2 rounded-lg transition hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                 onClick={() => {
                   track("request_call_clicked", {
                     car_id: car.id,
@@ -366,15 +496,18 @@ export default function CarDetailsModal({
         open={leadOpen}
         onClose={() => setLeadOpen(false)}
         context={{
-          carName: car.name,
-          modelYear: car.modelYear,
-          modelYearLabel: car.modelYearLabel,
-          country: car.country,
-          city,
-          service: selectedService,
-          vendorName: vendor?.name ?? null,
-          vendorId: car.vendorId ?? null,
-        }}
+            carName: car.name,
+            modelYear: car.modelYear,
+            modelYearLabel: car.modelYearLabel,
+            country: car.country,
+            city,
+            service: selectedService,
+            vendorName: vendor?.name ?? null,
+            vendorId: car.vendorId ?? null,
+            price: selectedPackage?.price ?? null,
+            pricingType: selectedPackage?.pricingType ?? null,
+            duration: selectedPackage?.duration ?? null,
+          }}
       />
     </>
   );

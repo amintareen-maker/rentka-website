@@ -28,6 +28,9 @@ type LeadContext = {
   modelYearLabel?: string;
   vendorName?: string | null;
   vendorId?: string | null;
+  price?: number | string | null;
+  pricingType?: string | null;
+  duration?: string | null;
 };
 
 
@@ -171,6 +174,9 @@ City: ${context.city ?? "N/A"}
 Pickup Date: ${pickupDate}
 Preferred Time: ${preferredTime}
 
+Selected Package:
+${context.pricingType ?? "N/A"} - ${context.duration ?? "N/A"}
+Price: ${context.price ? `PKR ${context.price}` : "To be confirmed"}
 
 My Name: ${name}
 Phone: ${phone}
