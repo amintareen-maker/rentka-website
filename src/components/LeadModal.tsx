@@ -126,22 +126,31 @@ export default function LeadModal({ open, onClose, context }: Props) {
 
       /* 🟢 GOOGLE SHEETS (NON-BLOCKING) */
       const formData = new URLSearchParams({
-        name: name.trim(),
-        phone: phone.trim(),
-        email: email.trim() || "",
-        carName: context.carName || "",
-        vendorName: context.vendorName || "",
-        vendorId: context.vendorId || "",
-        modelYear: String(modelYearDisplay || ""),
-        country: context.country || "",
-        city: context.city || "",
-        service: context.service || "",
-        pickupDate,
-        preferredTime,
-        source: "website",
-        leadId,
-        status: "new", // ✅ ADD THIS
-      });
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() || "",
+      carName: context.carName || "",
+      vendorName: context.vendorName || "",
+      vendorId: context.vendorId || "",
+      modelYear: String(modelYearDisplay || ""),
+      country: context.country || "",
+      city: context.city || "",
+
+      service: context.service || "",
+
+      // 🔥 PACKAGE DATA
+      serviceType: context.pricingType || "",
+      packageName: context.pricingType || "",
+      packageDuration: context.duration || "",
+      packagePrice: context.price ? String(context.price) : "",
+
+      pickupDate,
+      preferredTime,
+
+      source: "website",
+      leadId,
+      status: "new",
+    });
 
 
       fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
