@@ -260,21 +260,24 @@ export default function CarDetailsModal({
               </div>
 
               {/* Pricing */}
-              <div className="bg-slate-100 rounded-lg p-3 text-sm space-y-3 text-slate-900">
+              {/* Pricing */}
+            <div className="bg-slate-100 rounded-lg p-3 text-sm space-y-3 text-slate-900">
+
+              <div className="border-b border-slate-200 pb-2 mb-2">
+                <p className="text-sm font-semibold text-slate-900">
+                  Choose Your Rental Package
+                </p>
+
                 {!selectedPackage && (
-                  <p className="text-sm text-slate-700 font-medium">
+                  <p className="text-xs text-slate-600 mt-1">
                     Please select an option to proceed
                   </p>
                 )}
-                {!hasPricing && (
-                  <p className="text-slate-800">
-                    Pricing available on request.
-                  </p>
-                )}
+              </div>
 
                 {withinCity && (
-  <div className="border-b border-slate-200 pb-3 space-y-2">
-    <p className="font-semibold text-slate-900">Within City</p>
+                  <div className="border-b border-slate-200 pb-3 space-y-2">
+                    <p className="font-semibold text-slate-900">Within City</p>
 
     {withinCity?.daily && (
       <button
