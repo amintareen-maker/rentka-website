@@ -261,6 +261,11 @@ export default function CarDetailsModal({
 
               {/* Pricing */}
               <div className="bg-slate-100 rounded-lg p-3 text-sm space-y-3 text-slate-900">
+                {!selectedPackage && (
+                  <p className="text-sm text-slate-700 font-medium">
+                    Please select an option to proceed
+                  </p>
+                )}
                 {!hasPricing && (
                   <p className="text-slate-800">
                     Pricing available on request.
@@ -268,7 +273,7 @@ export default function CarDetailsModal({
                 )}
 
                 {withinCity && (
-  <div className="border-b border-slate-200 pb-2">
+  <div className="border-b border-slate-200 pb-3 space-y-2">
     <p className="font-semibold text-slate-900">Within City</p>
 
     {withinCity?.daily && (
@@ -348,7 +353,7 @@ export default function CarDetailsModal({
   </div>
   )}
   {outsideCity && (
-  <div className="pt-4 mt-3 border-t border-white/60">
+  <div className="pt-4 mt-3 border-t border-slate-200 space-y-2">
     <p className="font-semibold text-slate-900">Outside City</p>
 
     {outsideCity?.daily && (
@@ -477,7 +482,7 @@ export default function CarDetailsModal({
                   setLeadOpen(true);
                 }}
               >
-                Request a Call
+                Continue Booking
               </button>
 
               {selectedService === "withDriver" && (
