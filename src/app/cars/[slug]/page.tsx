@@ -7,23 +7,32 @@ import { useState } from "react";
 
 export default function ModelPage() {
   const params = useParams();
-  const model = decodeURIComponent(params.model as string);
 
-  // ⚠️ for now keep these simple (later sync with header filters)
+  // ✅ use slug instead of model
+  const slug = decodeURIComponent(params.slug as string);
+
+  // ✅ convert slug → model name
+  const model = slug.replace(/-/g, " ");
+
+  // ⚠️ temp defaults
   const country = "PK";
   const city = "islamabad";
   const service: "selfDrive" | "withDriver" = "selfDrive";
 
   const { cars, loading } = useCars({ country, city, service });
 
-  const modelCars = cars.filter((c) => c.model === model);
+  const modelCars = cars.filter(
+  (c) =>
+    c.model &&
+    c.model.toLowerCase() === model.toLowerCase()
+);
 
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
 
   return (
     <>
       <section className="max-w-6xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold mb-6">
+        <h1 className="text-2xl font-bold mb-6 capitalize">
           {model}
         </h1>
 
@@ -58,7 +67,6 @@ export default function ModelPage() {
         </div>
       </section>
 
-      {/* STEP 3 */}
       <CarDetailsModal
         open={Boolean(selectedCar)}
         car={selectedCar}

@@ -209,7 +209,10 @@ export default function CarsPage() {
             ? service
             : "selfDrive"
         }
-        onClose={() => setShowDetailsModal(false)}
+        onClose={() => {
+          setShowDetailsModal(false);
+          setDetailsCar(null);
+        }}
       />
 
       {/* ---------------- Lead Modal ---------------- */}
