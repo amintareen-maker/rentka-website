@@ -150,7 +150,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
     cars.forEach((car) => {
       if (!car.model) return;
 
-      const price = extractDailyPrice(car);
+      const price = extractDailyPrice(car, service);
 
       if (!map[car.model]) {
         map[car.model] = {
@@ -486,7 +486,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       <CarDetailsModal
         open={Boolean(selectedCar)}
         car={selectedCar}
-        service={service!}
+        service={service as "selfDrive" | "withDriver"}
         city={city}
         onClose={() => {
           setSelectedCar(null);   // close details
