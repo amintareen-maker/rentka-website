@@ -209,23 +209,28 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
      OPEN FROM URL
   ------------------------------ */
   useEffect(() => {
-    const handleBack = () => {
-      const path = window.location.pathname;
+  const handleBack = () => {
+    const path = window.location.pathname;
 
-      // CASE 1 → Back to homepage
-      if (path === "/") {
-        setSelectedCar(null);
-        setModelOpen(false);
-        return;
-      }
+    if (path === "/") {
+      setSelectedCar(null);
+      setModelOpen(false);
+      return;
+    }
 
-      // CASE 2 → Back to model list
-      const match = path.match(/^\/cars\/(.+)$/);
-      if (match) {
-        setSelectedCar(null);
-        setModelOpen(true);
-      }
-    };
+    const match = path.match(/^\/cars\/(.+)$/);
+    if (match) {
+      setSelectedCar(null);
+      setModelOpen(true);
+    }
+  };
+
+  window.addEventListener("popstate", handleBack);
+
+  return () => {
+    window.removeEventListener("popstate", handleBack);
+  };
+}, []);
 
     useEffect(() => {
         if (!city || !service) return;
@@ -245,12 +250,6 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
         }
       }, [pathname, models, city, service]);
 
-    window.addEventListener("popstate", handleBack);
-
-    return () => {
-      window.removeEventListener("popstate", handleBack);
-    };
-  }, []);
 
   return (
 
