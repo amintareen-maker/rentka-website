@@ -209,22 +209,30 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
      OPEN FROM URL
   ------------------------------ */
   useEffect(() => {
-    if (!city || !service) return;
+    const handleBack = () => {
+      const path = window.location.pathname;
 
-    const match = pathname.match(/^\/cars\/(.+)$/);
-    if (!match) return;
+      // CASE 1 → Back to homepage
+      if (path === "/") {
+        setSelectedCar(null);
+        setModelOpen(false);
+        return;
+      }
 
-    const slug = decodeURIComponent(match[1]).replace(/-/g, " ");
+      // CASE 2 → Back to model list
+      const match = path.match(/^\/cars\/(.+)$/);
+      if (match) {
+        setSelectedCar(null);
+        setModelOpen(true);
+      }
+    };
 
-    const found = models.find(
-      (m) => m.model.toLowerCase() === slug.toLowerCase()
-    );
+    window.addEventListener("popstate", handleBack);
 
-    if (found) {
-      setSelectedModel(found.model);
-      setModelOpen(true);
-    }
-  }, [pathname, models, city, service]);
+    return () => {
+      window.removeEventListener("popstate", handleBack);
+    };
+  }, []);
 
   return (
     <>
@@ -340,8 +348,12 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                           const slug = m.model
                             .toLowerCase()
                             .replace(/\s+/g, "-");
-                          window.history.pushState({}, "", `/cars/${slug}`);
-                          setSelectedModel(m.model);
+                          window.history.pushState(
+                          { model: m.model },
+                          "",
+                          `/cars/${slug}`
+                        );
+                                      setSelectedModel(m.model);
                           setModelOpen(true);
                         })()
                       : handleBlockedAction()
