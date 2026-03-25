@@ -123,19 +123,23 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
   /* -----------------------------
      PRICE EXTRACTION
   ------------------------------ */
-  const extractDailyPrice = (data: Car): number | undefined => {
-    if (data.supports?.withoutDriver) {
-      const p = data.pricing?.selfDrive?.withinCity?.daily;
-      if (typeof p === "number") return p;
-    }
+  const extractDailyPrice = (
+  data: Car,
+  service?: "selfDrive" | "withDriver"
+): number | undefined => {
 
-    if (data.supports?.withDriver) {
-      const p = data.pricing?.withDriver?.withinCity?.daily;
-      if (typeof p === "number") return p;
-    }
+  if (!service) return undefined;
 
-    return undefined;
-  };
+  if (service === "selfDrive") {
+    return data.pricing?.selfDrive?.withinCity?.daily;
+  }
+
+  if (service === "withDriver") {
+    return data.pricing?.withDriver?.withinCity?.daily;
+  }
+
+  return undefined;
+};
 
   /* -----------------------------
      DERIVE MODELS
