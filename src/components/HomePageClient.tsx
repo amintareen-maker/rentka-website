@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useCars, Car } from "@/lib/useCars";
 import { useCountries, useCities } from "@/lib/useLocations";
 import ModelListingsBottomSheet from "@/components/ModelListingsBottomSheet";
 import CarDetailsModal from "@/components/CarDetailsModal";
+
 
 /* =============================
    TYPES (MODEL CARD)
@@ -23,6 +25,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
      URL STATE
   ------------------------------ */
   const pathname = usePathname();
+  const router = useRouter();
 
   /* -----------------------------
      FILTER STATE
@@ -348,11 +351,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                           const slug = m.model
                             .toLowerCase()
                             .replace(/\s+/g, "-");
-                          window.history.pushState(
-                          { model: m.model },
-                          "",
-                          `/cars/${slug}`
-                        );
+                          router.push(`/cars/${slug}`);
                                       setSelectedModel(m.model);
                           setModelOpen(true);
                         })()
