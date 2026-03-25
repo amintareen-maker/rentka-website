@@ -245,8 +245,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Country
                 </label>
-                <select className="w-full rounded-lg border border-slate-300 px-4 py-3 
-                                  focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
+                <select className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
                   {countries.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -483,7 +482,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       <CarDetailsModal
         open={Boolean(selectedCar)}
         car={selectedCar}
-        service={service!}
+        service={service ?? "selfDrive"}
         city={city}
         onClose={() => {
           setSelectedCar(null);   // close details
