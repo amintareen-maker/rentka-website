@@ -256,10 +256,9 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
               </div>
 
               <div>
-                <label className="className=w-full rounded-lg border border-slate-300 px-4 py-3 
-                focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
-                  City/Area
-                </label>
+              <label className="block text-sm font-semibold text-slate-800 mb-2">
+                City/Area
+              </label>
                 <select
                   key={`city-${shakeKey}`}
                   value={city ?? ""}
@@ -269,10 +268,10 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                     setFilterError((p) => ({ ...p, city: false }));
                   }}
                   className={`w-full rounded-lg px-4 py-3 border ${
-                    filterError.city
-                      ? "border-red-500 ring-1 ring-red-500 shake"
-                      : "border-slate-400"
-                  }`}
+                  filterError.city
+                    ? "border-red-500 ring-1 ring-red-500 shake"
+                    : "border-slate-300 focus:border-[var(--rentka-green)]"
+                } focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)]`}
                 >
                   <option value="">Select city</option>
                   {cities.map((c) => (
@@ -284,8 +283,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
               </div>
 
               <div>
-                <label className="w-full rounded-lg border border-slate-300 px-4 py-3 
-                focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
+                <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Service
                 </label>
                 <select
@@ -300,10 +298,10 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                     setFilterError((p) => ({ ...p, service: false }));
                   }}
                   className={`w-full rounded-lg px-4 py-3 border ${
-                    filterError.service
-                      ? "border-red-500 ring-1 ring-red-500 shake"
-                      : "border-slate-400"
-                  }`}
+                  filterError.service
+                    ? "border-red-500 ring-1 ring-red-500 shake"
+                    : "border-slate-300 focus:border-[var(--rentka-green)]"
+                } focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)]`}
                 >
                   <option value="">Select service</option>
                   {availableServices.selfDrive && (
