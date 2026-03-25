@@ -144,6 +144,22 @@ export default function CarDetailsModal({
   const hasPricing =
     pricing?.withinCity || pricing?.outsideCity;
 
+    const handleBack = () => {
+  // If lead modal is open → go back to car details
+  if (leadOpen) {
+    setLeadOpen(false);
+    return;
+  }
+
+  // If package selected → reset selection
+  if (selectedPackage) {
+    setSelectedPackage(null);
+    return;
+  }
+
+  // Otherwise → close modal
+  onClose();
+};
   /* -----------------------------
      Render
   ------------------------------ */
@@ -160,29 +176,41 @@ export default function CarDetailsModal({
         {/* Content */}
         <div className="relative bg-white w-full max-w-3xl mx-4 rounded-xl shadow-lg p-6 z-10 max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h2 className="text-xl font-semibold text-slate-900">
-                {car.name}
-              </h2>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
 
-              {/* Vendor */}
-              <div className="flex items-center gap-2 mt-1">
-                {vendor?.logoUrl ? (
-                  <img
-                    src={vendor.logoUrl}
-                    alt={vendor.name}
-                    className="h-6 w-10 object-contain border rounded bg-white"
-                  />
-                ) : (
-                  <div className="h-6 w-10 bg-slate-100 rounded" />
-                )}
-                <span className="text-sm font-medium text-slate-800">
-                  {vendor?.name ?? "Verified Partner"}
-                </span>
+              {/* BACK BUTTON */}
+              <button
+                onClick={handleBack}
+                className="text-slate-700 hover:text-[var(--rentka-blue)] text-lg"
+              >
+                ←
+              </button>
+
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  {car.name}
+                </h2>
+
+                {/* Vendor */}
+                <div className="flex items-center gap-2 mt-1">
+                  {vendor?.logoUrl ? (
+                    <img
+                      src={vendor.logoUrl}
+                      alt={vendor.name}
+                      className="h-6 w-10 object-contain border rounded bg-white"
+                    />
+                  ) : (
+                    <div className="h-6 w-10 bg-slate-100 rounded" />
+                  )}
+                  <span className="text-sm font-medium text-slate-800">
+                    {vendor?.name ?? "Verified Partner"}
+                  </span>
+                </div>
               </div>
             </div>
 
+            {/* CLOSE BUTTON */}
             <button
               onClick={onClose}
               className="text-slate-700 hover:text-[var(--rentka-blue)]"
@@ -190,7 +218,6 @@ export default function CarDetailsModal({
               ✕
             </button>
           </div>
-
           <div className="grid md:grid-cols-2 gap-6 mt-4">
             {/* Left Column */}
             <div className="space-y-4">
