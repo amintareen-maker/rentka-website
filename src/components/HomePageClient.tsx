@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useCars, Car } from "@/lib/useCars";
@@ -25,8 +24,6 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
      URL STATE
   ------------------------------ */
   const pathname = usePathname();
-  const router = useRouter();
-
   /* -----------------------------
      FILTER STATE
   ------------------------------ */
@@ -230,6 +227,24 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       }
     };
 
+    useEffect(() => {
+        if (!city || !service) return;
+
+        const match = pathname.match(/^\/cars\/(.+)$/);
+        if (!match) return;
+
+        const slug = decodeURIComponent(match[1]).replace(/-/g, " ");
+
+        const found = models.find(
+          (m) => m.model.toLowerCase() === slug.toLowerCase()
+        );
+
+        if (found) {
+          setSelectedModel(found.model);
+          setModelOpen(true);
+        }
+      }, [pathname, models, city, service]);
+
     window.addEventListener("popstate", handleBack);
 
     return () => {
@@ -238,7 +253,11 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
   }, []);
 
   return (
+
+    
     <>
+
+    
       {/* FILTERS */}
       <section
         id="filters"
@@ -351,7 +370,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                           const slug = m.model
                             .toLowerCase()
                             .replace(/\s+/g, "-");
-                          router.push(`/cars/${slug}`);
+                          window.history.pushState({}, "", `/cars/${slug}`);
                                       setSelectedModel(m.model);
                           setModelOpen(true);
                         })()
