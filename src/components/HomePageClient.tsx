@@ -490,6 +490,21 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
         }}
       />
       
+      {/* ✅ LOADING OVERLAY */}
+      {loading && city && service && (
+      <div className="fixed inset-0 z-[60] bg-white/70 backdrop-blur-sm flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          
+          {/* Spinner */}
+          <div className="w-10 h-10 border-4 border-slate-300 border-t-[var(--rentka-green)] rounded-full animate-spin" />
+
+          {/* Text */}
+          <p className="text-sm text-slate-700 font-medium">
+            Loading available cars...
+          </p>
+        </div>
+      </div>
+    )}
       {/* WHATSAPP CHAT WIDGET */}
       <div className="fixed bottom-24 right-6 z-50">
 
