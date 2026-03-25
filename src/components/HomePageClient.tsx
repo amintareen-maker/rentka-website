@@ -245,7 +245,8 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                 <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Country
                 </label>
-                <select className="w-full rounded-lg border border-slate-400 px-4 py-3">
+                <select className="w-full rounded-lg border border-slate-300 px-4 py-3 
+                                  focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
                   {countries.map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
@@ -255,8 +256,9 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">
-                  City
+                <label className="className=w-full rounded-lg border border-slate-300 px-4 py-3 
+                focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
+                  City/Area
                 </label>
                 <select
                   key={`city-${shakeKey}`}
@@ -282,7 +284,8 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">
+                <label className="w-full rounded-lg border border-slate-300 px-4 py-3 
+                focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
                   Service
                 </label>
                 <select
