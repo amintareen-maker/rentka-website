@@ -199,7 +199,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
 
   const [selectedCar, setSelectedCar] =
     useState<Car | null>(null);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+
 
   /* -----------------------------
      OPEN FROM URL
@@ -472,22 +472,22 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
         service={service}
         onClose={() => {
           setModelOpen(false);
-          window.history.pushState({}, "", "/");
         }}
         onSelectCar={(car) => {
-          setSelectedCar(car);
+          setSelectedCar(car);   // 👈 THIS WAS MISSING
           setModelOpen(false);
-          setDetailsOpen(true);
         }}
-      />
-
+        />
       {/* STEP 3 */}
       <CarDetailsModal
-        open={detailsOpen}
+        open={Boolean(selectedCar)}
         car={selectedCar}
         service={service!}
         city={city}
-        onClose={() => setDetailsOpen(false)}
+        onClose={() => {
+          setSelectedCar(null);   // close details
+          setModelOpen(true);     // 👈 GO BACK TO LIST
+        }}
       />
       
       {/* WHATSAPP CHAT WIDGET */}
