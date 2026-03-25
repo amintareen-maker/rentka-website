@@ -482,7 +482,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       <CarDetailsModal
         open={Boolean(selectedCar)}
         car={selectedCar}
-        service={service ?? "selfDrive"}
+        service={service!}
         city={city}
         onClose={() => {
           setSelectedCar(null);   // close details
