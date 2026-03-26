@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useCars, Car } from "@/lib/useCars";
@@ -24,6 +25,8 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
      URL STATE
   ------------------------------ */
   const pathname = usePathname();
+  const router = useRouter();
+
   /* -----------------------------
      FILTER STATE
   ------------------------------ */
@@ -208,7 +211,8 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
   /* -----------------------------
      OPEN FROM URL
   ------------------------------ */
-  useEffect(() => {
+  // BACK BUTTON HANDLING
+useEffect(() => {
   const handleBack = () => {
     const path = window.location.pathname;
 
@@ -218,39 +222,41 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
       return;
     }
 
-    const match = path.match(/^\/cars\/(.+)$/);
-    if (match) {
+    if (/^\/cars\/[^/]+\/[^/]+\/[^/]+$/.test(path)) {
       setSelectedCar(null);
       setModelOpen(true);
     }
   };
 
   window.addEventListener("popstate", handleBack);
-
-  return () => {
-    window.removeEventListener("popstate", handleBack);
-  };
+  return () => window.removeEventListener("popstate", handleBack);
 }, []);
 
-    useEffect(() => {
-        if (!city || !service) return;
 
-        const match = pathname.match(/^\/cars\/(.+)$/);
-        if (!match) return;
+// URL → MODAL SYNC (SEPARATE HOOK)
+useEffect(() => {
+  if (!city || !service) return;
 
-        const slug = decodeURIComponent(match[1]).replace(/-/g, " ");
+  const match = pathname.match(/^\/cars\/([^/]+)\/([^/]+)\/([^/]+)$/);
+  
+  if (!match) return;
 
-        const found = models.find(
-          (m) => m.model.toLowerCase() === slug.toLowerCase()
-        );
+  const urlCity = match[2];
+  const urlService = match[3];
 
-        if (found) {
-          setSelectedModel(found.model);
-          setModelOpen(true);
-        }
-      }, [pathname, models, city, service]);
+  if (urlCity !== city) return;
 
+  const slug = decodeURIComponent(match[1]).replace(/-/g, " ");
 
+  const found = models.find(
+    (m) => m.model.toLowerCase() === slug.toLowerCase()
+  );
+
+  if (found) {
+    setSelectedModel(found.model);
+    setModelOpen(true);
+  }
+}, [pathname, models, city, service]);
   return (
 
     
@@ -366,13 +372,18 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
                   onClick={() =>
                     canBrowseModels
                       ? (() => {
-                          const slug = m.model
-                            .toLowerCase()
-                            .replace(/\s+/g, "-");
-                          window.history.pushState({}, "", `/cars/${slug}`);
-                                      setSelectedModel(m.model);
-                          setModelOpen(true);
-                        })()
+  const slug = m.model.toLowerCase().replace(/\s+/g, "-");
+
+const serviceSlug =
+  service === "withDriver" ? "with-driver" : "self-drive";
+
+const url = `/cars/${slug}/${city}/${serviceSlug}`;
+window.history.pushState({}, "", url);
+
+setSelectedModel(m.model);
+setModelOpen(true);
+
+})()
                       : handleBlockedAction()
                   }
                   className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
@@ -504,8 +515,9 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
         city={city}
         service={service}
         onClose={() => {
-          setModelOpen(false);
-        }}
+  setModelOpen(false);
+  window.history.pushState({}, "", "/");
+}}
         onSelectCar={(car) => {
           setSelectedCar(car);   // 👈 THIS WAS MISSING
           setModelOpen(false);
