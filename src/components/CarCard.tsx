@@ -25,7 +25,7 @@ export default function CarCard({
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-lg transition-shadow flex flex-col">
-      <div className="relative h-40 mb-3 bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
+      <div className="relative h-40 mb-3 bg-white rounded-lg overflow-hidden flex items-center justify-center border">
         {car.imageURL && (
           <Image
             src={car.imageURL}
