@@ -10,6 +10,7 @@ import { db } from "@/lib/firebase";
 
 export type Car = {
   id: string;
+  active?: boolean;
   name: string;
   category: string;
   imageURL: string;
@@ -23,6 +24,7 @@ export type Car = {
   modelYearLabel?: string;
   model?: string;
   vendorId?: string;
+
 
   pricing?: {
     selfDrive?: {
@@ -115,6 +117,8 @@ export function useCars(
 
         snap.forEach((doc) => {
           const data = doc.data() as Omit<Car, "id" | "country">;
+
+          if (data.active === false) return;
 
           // City filter
           if (city && data.cityList && !data.cityList.includes(city)) return;

@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import HeroBanner from "@/components/HeroBanner";
 import HomePageClient from "@/components/HomePageClient";
 import { collection, getDocs, query, limit } from "firebase/firestore";
