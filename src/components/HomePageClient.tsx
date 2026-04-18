@@ -388,12 +388,12 @@ setModelOpen(true);
                   }
                   className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
                 >
-                  <div className="aspect-[8/10] bg-white rounded-lg mb-4 overflow-hidden flex items-center justify-center border border-slate-200">
+                  <div className="aspect-[8/10] bg-slate-100 rounded-lg mb-4 overflow-hidden flex items-center justify-center">
                     {m.imageURL && (
                       <img
                         src={m.imageURL}
                         alt={m.model}
-                        className="max-w-full max-h-full object-contain p-2"
+                        className="max-w-full max-h-full object-contain p-4"
                       />
                     )}
                   </div>
