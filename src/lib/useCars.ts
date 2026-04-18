@@ -105,7 +105,7 @@ export function useCars(
         // 🔥 PERFORMANCE RULE
         // If city OR service not selected → limit to 20 cars
         if (!city || !service) {
-          q = query(ref, limit(20));
+          q = query(ref, limit(10));
         } else {
           // If both selected → fetch full collection
           q = ref;
