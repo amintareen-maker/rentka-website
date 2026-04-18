@@ -174,13 +174,13 @@ export default function ModelListingsBottomSheet({
               >
                 <div className="flex gap-4">
                   {/* Car Image */}
-                  <div className="relative w-28 h-20 bg-slate-100 rounded-lg overflow-hidden">
+                  <div className="relative w-28 h-20 bg-white border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
                     {car.imageURL && (
                       <Image
                         src={car.imageURL}
                         alt={car.name}
                         fill
-                        className="object-contain"
+                        className="object-contain p-2"
                       />
                     )}
                   </div>
