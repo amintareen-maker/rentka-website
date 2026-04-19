@@ -22,9 +22,18 @@ export default function ContactPage() {
             <h2 className="text-lg font-semibold text-slate-900">
               Email
             </h2>
+
             <p className="text-slate-700">
-              support@rentka.com
-              rentka.booking@gmail.com
+              <a href="mailto:support@rentka.com" className="hover:underline">
+                support@rentka.com
+              </a>
+            </p>
+
+            <p className="text-slate-700 font-semibold">
+              &{" "}
+              <a href="mailto:rentka.booking@gmail.com" className="hover:underline">
+                rentka.booking@gmail.com
+              </a>
             </p>
           </div>
 
