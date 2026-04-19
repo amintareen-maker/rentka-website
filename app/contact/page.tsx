@@ -24,6 +24,7 @@ export default function ContactPage() {
             </h2>
             <p className="text-slate-700">
               support@rentka.com
+              rentka.booking@gmail.com
             </p>
           </div>
 
@@ -32,7 +33,7 @@ export default function ContactPage() {
               Phone / WhatsApp
             </h2>
             <p className="text-slate-700">
-              +92-XXX-XXXXXXX
+              +92-302-0589999
             </p>
           </div>
 
