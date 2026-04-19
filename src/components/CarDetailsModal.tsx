@@ -223,7 +223,7 @@ export default function CarDetailsModal({
             {/* Left Column */}
             <div className="space-y-4">
               {/* Image */}
-              <div className="relative aspect-[4/3] bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
+              <div className="relative aspect-[4/3] bg-white border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
                 {car.imageURL && (
                   <Image
                     src={car.imageURL}
