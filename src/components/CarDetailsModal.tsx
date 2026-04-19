@@ -46,7 +46,8 @@ export default function CarDetailsModal({
     price: number;
   } | null>(null);
 
-
+  const [packageError, setPackageError] = useState(false);
+  
   // ✅ Vendor state
   const [vendor, setVendor] = useState<Vendor | null>(null);
 
@@ -288,19 +289,32 @@ export default function CarDetailsModal({
 
               {/* Pricing */}
               {/* Pricing */}
-            <div className="bg-slate-100 rounded-lg p-3 text-sm space-y-3 text-slate-900">
+            <div
+              id="pricing-section"
+              className={`rounded-lg p-3 text-sm space-y-3 text-slate-900 transition ${
+                packageError
+                  ? "bg-red-50 border-2 border-red-500"
+                  : "bg-slate-100"
+              }`}
+            >
 
               <div className="border-b border-slate-200 pb-2 mb-2">
                 <p className="text-sm font-semibold text-slate-900">
                   Choose Your Rental Package
                 </p>
 
-                {!selectedPackage && (
+                {!selectedPackage && !packageError && (
                   <p className="text-xs text-slate-600 mt-1">
                     Please select an option to proceed
                   </p>
                 )}
-              </div>
+
+                {packageError && (
+                  <p className="text-xs text-red-600 mt-1 font-medium">
+                    ⚠ Please select a package before continuing
+                  </p>
+                )}
+                </div>
 
                 {withinCity && (
                   <div className="border-b border-slate-200 pb-3 space-y-2">
@@ -308,13 +322,16 @@ export default function CarDetailsModal({
 
     {withinCity?.daily && (
       <button
-        onClick={() =>
+        onClick={() => {
           setSelectedPackage({
             pricingType: "withinCity",
             duration: "daily",
             price: withinCity.daily!,
-          })
-        }
+          });
+
+          setPackageError(false); // ✅ separate line
+        }}
+
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "withinCity" &&
           selectedPackage?.duration === "daily"
@@ -333,13 +350,15 @@ export default function CarDetailsModal({
 
     {withinCity?.weekly && (
       <button
-        onClick={() =>
+        onClick={() => {
           setSelectedPackage({
             pricingType: "withinCity",
             duration: "weekly",
             price: withinCity.weekly!,
-          })
-        }
+          });
+          setPackageError(false); // ✅ separate line
+        }}
+        
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "withinCity" &&
           selectedPackage?.duration === "weekly"
@@ -358,13 +377,15 @@ export default function CarDetailsModal({
 
     {withinCity?.monthly && (
       <button
-        onClick={() =>
+        onClick={() => {
           setSelectedPackage({
             pricingType: "withinCity",
             duration: "monthly",
             price: withinCity.monthly!,
-          })
-        }
+          });
+          setPackageError(false); // ✅ separate line
+        }}
+      
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "withinCity" &&
           selectedPackage?.duration === "monthly"
@@ -388,13 +409,16 @@ export default function CarDetailsModal({
 
     {outsideCity?.daily && (
       <button
-        onClick={() =>
+        onClick={() => {
           setSelectedPackage({
             pricingType: "outsideCity",
             duration: "daily",
             price: outsideCity.daily!,
-          })
-        }
+          });
+          
+          setPackageError(false); // ✅ separate line
+        }}
+        
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "outsideCity" &&
           selectedPackage?.duration === "daily"
@@ -413,13 +437,16 @@ export default function CarDetailsModal({
 
     {outsideCity?.weekly && (
       <button
-        onClick={() =>
+        onClick={() => {
           setSelectedPackage({
             pricingType: "outsideCity",
             duration: "weekly",
             price: outsideCity.weekly!,
-          })
-        }
+          });
+          
+          setPackageError(false); // ✅ separate line
+        }}
+        
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "outsideCity" &&
           selectedPackage?.duration === "weekly"
@@ -438,13 +465,16 @@ export default function CarDetailsModal({
 
     {outsideCity?.monthly && (
       <button
-        onClick={() =>
+        onClick={() => {
           setSelectedPackage({
             pricingType: "outsideCity",
             duration: "monthly",
             price: outsideCity.monthly!,
-          })
-        }
+          });
+
+          setPackageError(false); // ✅ separate line
+        }}
+        
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${  
           selectedPackage?.pricingType === "outsideCity" &&
           selectedPackage?.duration === "monthly"
@@ -499,9 +529,23 @@ export default function CarDetailsModal({
 )}
               {/* CTA */}
               <button
-                disabled={!selectedPackage}
-                className="w-full mt-5 bg-[var(--rentka-green)] text-white py-2 rounded-lg transition hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full mt-5 bg-[var(--rentka-green)] text-white py-2 rounded-lg transition hover:opacity-90"
                 onClick={() => {
+                  if (!selectedPackage) {
+                    setPackageError(true);
+
+                    document
+                      .getElementById("pricing-section")
+                      ?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                      });
+
+                    return;
+                  }
+
+                  setPackageError(false);
+
                   track("request_call_clicked", {
                     car_id: car.id,
                     service: selectedService,
@@ -514,7 +558,6 @@ export default function CarDetailsModal({
               >
                 Continue Booking
               </button>
-
               {selectedService === "withDriver" && (
                 <p className="text-xs text-slate-600 mt-2">
                   Driver service includes up to 10 hours per day.
