@@ -2,7 +2,7 @@
 
 
 import { useState } from "react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 
@@ -13,7 +13,7 @@ const SHEETS_WEBHOOK =
   "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
 
 
-const WHATSAPP_NUMBER = "923048919511";
+const WHATSAPP_NUMBER = "923020589999";
 
 
 /* ===============================
@@ -104,28 +104,41 @@ export default function LeadModal({ open, onClose, context }: Props) {
       const leadId = `RK-${cityCode}-${randomDigits}`;
 
 
-      await addDoc(collection(db, "leads"), {
-        leadId,
-        name: name.trim(),
-        phone: phone.trim(),
-        email: email.trim() || null,
-        carName: context.carName ?? null,
-        country: context.country ?? null,
-        city: context.city ?? null,
-        service: context.service ?? null,
-        modelYear: modelYearDisplay,
-        pickupDate,
-        preferredTime,
-        vendorName: context.vendorName ?? null,
-        vendorId: context.vendorId ?? null,
-        pricingType: context.pricingType ?? null,
-        duration: context.duration ?? null,
-        price: context.price ?? null,
-        source: "website",
-        status: "new",
-        createdAt: serverTimestamp(),
-      });
+      const reviewToken = Math.random().toString(36).substring(2, 10);
 
+const docRef = await addDoc(collection(db, "leads"), {
+  leadId,
+  name: name.trim(),
+  phone: phone.trim(),
+  email: email.trim() || null,
+  carName: context.carName ?? null,
+  country: context.country ?? null,
+  city: context.city ?? null,
+  service: context.service ?? null,
+  modelYear: modelYearDisplay,
+  pickupDate,
+  preferredTime,
+  vendorName: context.vendorName ?? null,
+  vendorId: context.vendorId ?? null,
+  pricingType: context.pricingType ?? null,
+  duration: context.duration ?? null,
+  price: context.price ?? null,
+
+  source: "website",
+  status: "new",
+
+  reviewSubmitted: false,
+  reviewSent: false,
+  reviewToken: reviewToken,
+
+  createdAt: serverTimestamp(),
+});
+
+  const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
+
+await updateDoc(docRef, {
+  reviewLink: reviewLink,
+});
 
       /* 🟢 GOOGLE SHEETS (NON-BLOCKING) */
       const formData = new URLSearchParams({
