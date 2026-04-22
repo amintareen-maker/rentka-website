@@ -15,9 +15,6 @@ import {
 export default function ReviewContent() {
   const searchParams = useSearchParams();
 
-  const leadId = searchParams.get("leadId");
-  const token = searchParams.get("token");
-
   const [loading, setLoading] = useState(true);
   const [valid, setValid] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -27,42 +24,53 @@ export default function ReviewContent() {
   const [comment, setComment] = useState("");
 
   useEffect(() => {
-    const validate = async () => {
-      if (!leadId || !token) {
-        setLoading(false);
-        return;
-      }
+    if (!searchParams) return;
 
-      const ref = doc(db, "leads", leadId);
-      const snap = await getDoc(ref);
+    const leadId = searchParams.get("leadId");
+    const token = searchParams.get("token");
 
-      if (!snap.exists()) {
-        setLoading(false);
-        return;
-      }
-
-      const data = snap.data();
-
-console.log("🔥 Data:", data);
-console.log("🔥 URL token:", token);
-console.log("🔥 DB token:", data.reviewToken);
-
-if (data.reviewSubmitted === true) {
-  setSubmitted(true);
-} else if (data.reviewToken !== token) {
-  setValid(false);
-} else {
-  setValid(true);
-  setLeadData(data);
-}
-
+    if (!leadId || !token) {
       setLoading(false);
+      return;
+    }
+
+    const validate = async () => {
+      try {
+        const ref = doc(db, "leads", leadId);
+        const snap = await getDoc(ref);
+
+        if (!snap.exists()) {
+          setLoading(false);
+          return;
+        }
+
+        const data = snap.data();
+
+        console.log("🔥 Data:", data);
+        console.log("🔥 URL token:", token);
+        console.log("🔥 DB token:", data.reviewToken);
+
+        if (data.reviewSubmitted === true) {
+          setSubmitted(true);
+        } else if (data.reviewToken !== token) {
+          setValid(false);
+        } else {
+          setValid(true);
+          setLeadData(data);
+        }
+      } catch (err) {
+        console.error("Error loading review:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     validate();
   }, [searchParams]);
 
   const handleSubmit = async () => {
+    const leadId = searchParams.get("leadId");
+
     if (!leadId || !leadData) return;
 
     await addDoc(collection(db, "reviews"), {
