@@ -54,7 +54,7 @@ export default function Header() {
 
             {/* CTA */}
             <a
-              href="https://wa.me/923048919511"
+              href="https://wa.me/923020589999"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-md bg-[var(--rentka-green)] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[var(--rentka-green-hover)] transition"

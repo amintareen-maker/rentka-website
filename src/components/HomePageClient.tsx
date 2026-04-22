@@ -563,7 +563,7 @@ setModelOpen(true);
             </p>
 
             <a
-              href="https://wa.me/923048919511?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
+              href="https://wa.me/923020589999?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
               target="_blank"
               rel="noopener noreferrer"
               className="block text-center bg-[var(--rentka-green)] hover:bg-[var(--rentka-green-hover)] text-white py-2 rounded-lg font-medium transition"
