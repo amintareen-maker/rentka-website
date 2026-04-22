@@ -43,22 +43,24 @@ export default function ReviewContent() {
 
       const data = snap.data();
 
-      if (
-        data.status === "completed" &&
-        data.reviewSubmitted === false &&
-        data.reviewToken === token
-      ) {
-        setValid(true);
-        setLeadData(data);
-      } else if (data.reviewSubmitted === true) {
-        setSubmitted(true);
-      }
+console.log("🔥 Data:", data);
+console.log("🔥 URL token:", token);
+console.log("🔥 DB token:", data.reviewToken);
+
+if (data.reviewSubmitted === true) {
+  setSubmitted(true);
+} else if (data.reviewToken !== token) {
+  setValid(false);
+} else {
+  setValid(true);
+  setLeadData(data);
+}
 
       setLoading(false);
     };
 
     validate();
-  }, [leadId, token]);
+  }, [searchParams]);
 
   const handleSubmit = async () => {
     if (!leadId || !leadData) return;
