@@ -1,3 +1,4 @@
+import Script from "next/script";
 import "./globals.css";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -19,7 +20,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
+  <head>
+    {/* Google Ads Global Tag */}
+    <Script
+      src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
+      strategy="afterInteractive"
+    />
+    <Script id="google-ads-gtag" strategy="afterInteractive">
+      {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'AW-18044696705');
+      `}
+    </Script>
+  </head>
+        
+        <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
         {/* Global Header */}
         <Header />
 
