@@ -78,13 +78,17 @@ export default function ReviewContent() {
     if (!leadId || !leadData) return;
 
     await addDoc(collection(db, "reviews"), {
-      leadId,
-      vendorId: leadData.vendorId,
-      vendorName: leadData.vendorName,
-      rating,
-      comment,
-      createdAt: serverTimestamp(),
-    });
+  leadDocId: leadId,              // 🔥 Firestore doc ID
+  leadCode: leadData.leadId,      // 🔥 Public ID (RK-XXX)
+
+  vendorId: leadData.vendorId,
+  vendorName: leadData.vendorName,
+
+  rating,
+  comment,
+
+  createdAt: serverTimestamp(),
+});
 
     await updateDoc(doc(db, "leads", leadId), {
       reviewSubmitted: true,
