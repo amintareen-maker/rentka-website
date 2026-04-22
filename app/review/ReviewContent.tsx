@@ -51,13 +51,17 @@ export default function ReviewContent() {
         console.log("🔥 DB token:", data.reviewToken);
 
         if (data.reviewSubmitted === true) {
-          setSubmitted(true);
-        } else if (data.reviewToken !== token) {
-          setValid(false);
-        } else {
-          setValid(true);
-          setLeadData(data);
-        }
+  setSubmitted(true);
+} else if (data.reviewToken !== token) {
+  setValid(false);
+} else if (data.status !== "completed") {
+  // 🚫 Block review if not completed
+  setValid(false);
+} else {
+  // ✅ All good
+  setValid(true);
+  setLeadData(data);
+}
       } catch (err) {
         console.error("Error loading review:", err);
       } finally {
