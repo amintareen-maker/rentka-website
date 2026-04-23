@@ -81,7 +81,22 @@ export default function ModelListingsBottomSheet({
           });
         });
 
-        setCars(results);
+        // ✅ SORT BY LOWEST PRICE FIRST
+const sorted = results.sort((a, b) => {
+  const priceA =
+    service === "withDriver"
+      ? a.pricing?.withDriver?.withinCity?.daily ?? Infinity
+      : a.pricing?.selfDrive?.withinCity?.daily ?? Infinity;
+
+  const priceB =
+    service === "withDriver"
+      ? b.pricing?.withDriver?.withinCity?.daily ?? Infinity
+      : b.pricing?.selfDrive?.withinCity?.daily ?? Infinity;
+
+  return priceA - priceB;
+});
+
+setCars(sorted);
       } finally {
         setLoading(false);
       }
@@ -215,8 +230,11 @@ export default function ModelListingsBottomSheet({
                     </div>
 
                     {price && (
-                      <p className="mt-1 text-[var(--rentka-blue)] font-semibold">
-                        PKR {price.toLocaleString()} / day
+                      <p className="mt-1 text-sm text-slate-600">
+                        <span className="font-bold text-[var(--rentka-green)] text-base">
+                          PKR {price.toLocaleString()}
+                        </span>
+                        <span className="text-slate-500"> / day</span>
                       </p>
                     )}
                     <div className="mt-2 flex justify-end">

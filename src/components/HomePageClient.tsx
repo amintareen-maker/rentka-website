@@ -403,12 +403,12 @@ setModelOpen(true);
                   </h3>
 
                   {typeof m.minPrice === "number" && (
-                    <p className="text-sm text-slate-700 mt-1">
+                    <p className="text-sm text-slate-600 mt-1">
                       Starting from{" "}
-                      <span className="font-semibold">
+                      <span className="font-bold text-[var(--rentka-green)]">
                         PKR {m.minPrice}
                       </span>
-                      /day
+                      <span className="text-slate-500"> /day</span>
                     </p>
                   )}
 

@@ -43,8 +43,11 @@ export default function CarListingClient({
                 </p>
 
                 {price && (
-                  <p className="text-green-700 font-semibold mt-3">
-                    PKR {price} / day
+                  <p className="mt-3 text-sm text-slate-600">
+                    <span className="font-bold text-[var(--rentka-green)] text-base">
+                      PKR {price}
+                    </span>
+                    <span className="text-slate-500"> / day</span>
                   </p>
                 )}
               </div>
@@ -53,7 +56,7 @@ export default function CarListingClient({
               <div className="flex items-center">
                 <button
                   onClick={() => setSelectedCar(car)}
-                  className="text-sm text-[var(--rentka-green)] font-medium hover:underline"
+                  className="text-sm bg-[var(--rentka-green)] text-white px-3 py-1.5 rounded-md hover:bg-[var(--rentka-green-hover)] transition"
                 >
                   View Details →
                 </button>
