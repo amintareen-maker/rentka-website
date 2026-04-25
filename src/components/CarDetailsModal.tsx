@@ -560,7 +560,7 @@ export default function CarDetailsModal({
               </button>
               {selectedService === "withDriver" && (
                 <p className="text-xs text-slate-600 mt-2">
-                  Driver service includes up to 10 hours per day.
+                  Driver service includes up to 12 hours per day.
                   Availability will be confirmed by the RentKA team after request submission.
                 </p>
               )}
