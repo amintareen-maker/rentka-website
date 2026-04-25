@@ -254,7 +254,7 @@ export default function CarDetailsModal({
             <div>
               <p className="text-slate-800 mb-3">
                 {car.category} · {car.transmission ?? "Automatic"}
-                {modelYearDisplay && ` · Model: ${modelYearDisplay}`}
+                {modelYearDisplay && ` · : ${modelYearDisplay}`}
                 {car.seatingCapacity && ` · ${car.seatingCapacity} seats`}
               </p>
 
