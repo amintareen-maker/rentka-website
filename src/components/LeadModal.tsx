@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { doc, runTransaction } from "firebase/firestore";
 
 
 /* ===============================
@@ -100,8 +101,25 @@ export default function LeadModal({ open, onClose, context }: Props) {
 
       /* 🔥 FIREBASE (SOURCE OF TRUTH) */
       const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
-      const randomDigits = Math.floor(1000 + Math.random() * 9000);
-      const leadId = `RK-${cityCode}-${randomDigits}`;
+
+const counterRef = doc(db, "meta", "counters");
+
+const newNumber = await runTransaction(db, async (transaction) => {
+  const counterDoc = await transaction.get(counterRef);
+
+  if (!counterDoc.exists()) {
+    throw new Error("Counter document does not exist!");
+  }
+
+  const current = counterDoc.data().leadCounter || 0;
+  const next = current + 1;
+
+  transaction.update(counterRef, { leadCounter: next });
+
+  return next;
+});
+
+const leadId = `RK-${cityCode}-${newNumber}`;
 
 
       const reviewToken = Math.random().toString(36).substring(2, 10);
