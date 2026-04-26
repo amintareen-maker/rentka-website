@@ -174,8 +174,6 @@ await updateDoc(docRef, {
       });
 
 
-      setSuccess(true);
-
       // ✅ GOOGLE ADS CONVERSION TRACKING
      if (typeof window !== "undefined" && (window as any).gtag) {
   (window as any).gtag("event", "conversion", {
@@ -184,6 +182,9 @@ await updateDoc(docRef, {
     currency: "PKR",
   });
 }
+
+setSuccess(true);
+
       /* ===============================
          📲 WHATSAPP REDIRECT
          =============================== */
@@ -229,22 +230,23 @@ Please confirm availability.
 
 
       if (isMobile) {
+  // 🔥 give conversion enough time to fire
   setTimeout(() => {
     window.location.href = whatsappUrl;
-  }, 800); // 🔥 IMPORTANT delay
+  }, 1000); // slightly safer
 
-
-      setTimeout(() => {
-        setSuccess(false);
-        setDesktopWhatsappUrl(null);
-        setName("");
-        setPhone("");
-        setEmail("");
-        setPickupDate("");
-        setPreferredTime("");
-        onClose();
-      }, 800);
-    } else {
+  // optional UI reset AFTER redirect
+  setTimeout(() => {
+    setSuccess(false);
+    setDesktopWhatsappUrl(null);
+    setName("");
+    setPhone("");
+    setEmail("");
+    setPickupDate("");
+    setPreferredTime("");
+    onClose();
+  }, 1500);
+} else {
       setDesktopWhatsappUrl(whatsappUrl);
     }
 
