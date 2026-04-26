@@ -77,10 +77,11 @@ export default async function Page({
 
   const cars: (Car & { vendor?: Vendor })[] = [];
 
-  for (const docItem of snapshot.docs) {
+// ✅ STEP 1: FILTER FIRST (NO API CALLS)
+const filteredCars = snapshot.docs.filter((docItem) => {
   const data = docItem.data() as Car;
 
-  if (!data.model || normalize(data.model) !== normalize(slug)) continue;
+  if (!data.model || normalize(data.model) !== normalize(slug)) return false;
 
   if (
     !data.cityList ||
@@ -88,49 +89,60 @@ export default async function Page({
       (c) => c.toLowerCase() === city.toLowerCase()
     )
   )
-    continue;
+    return false;
 
   if (
     selectedService === "withDriver" &&
     data.supports?.withDriver === false
   )
-    continue;
+    return false;
 
   if (
     selectedService === "selfDrive" &&
     data.supports?.withoutDriver === false
   )
-    continue;
+    return false;
 
-  // 🔥 FETCH VENDOR
-  let vendorData: Vendor | null = null;
+  return true;
+});
 
-  if (data.vendorId) {
-    try {
-      const vendorRef = doc(
-        db,
-        "countries",
-        country,
-        "vendors",
-        data.vendorId
-      );
+// 🚀 STEP 2: FETCH VENDORS IN PARALLEL (FAST)
+const carsWithVendors = await Promise.all(
+  filteredCars.map(async (docItem) => {
+    const data = docItem.data() as Car;
 
-      const vendorSnap = await getDoc(vendorRef);
+    let vendorData: Vendor | null = null;
 
-      if (vendorSnap.exists()) {
-        vendorData = vendorSnap.data() as Vendor;
+    if (data.vendorId) {
+      try {
+        const vendorRef = doc(
+          db,
+          "countries",
+          country,
+          "vendors",
+          data.vendorId
+        );
+
+        const vendorSnap = await getDoc(vendorRef);
+
+        if (vendorSnap.exists()) {
+          vendorData = vendorSnap.data() as Vendor;
+        }
+      } catch {
+        vendorData = null;
       }
-    } catch {
-      vendorData = null;
     }
-  }
 
-  cars.push({
-    ...data,
-    id: docItem.id,
-    vendor: vendorData || undefined,
-  });
-}
+    return {
+      ...data,
+      id: docItem.id,
+      vendor: vendorData || undefined,
+    };
+  })
+);
+
+// ✅ FINAL RESULT
+cars.push(...carsWithVendors);
 
   let minPrice: number | null = null;
 
@@ -226,6 +238,68 @@ const relatedModels: RelatedModel[] = [
           <li>✔ Dedicated customer support</li>
         </ul>
       </div>
+<div className="mt-16">
+  <h3 className="text-xl font-semibold mb-4">
+    Frequently Asked Questions
+  </h3>
+
+  <div className="space-y-4 text-sm text-slate-700">
+    <div>
+      <p className="font-medium">
+        What is the price of {carName} with driver in {city}?
+      </p>
+      <p>
+        Prices typically start from Rs {minPrice ?? "varies"}/day depending on vendor, duration, and availability.
+      </p>
+    </div>
+
+    <div>
+      <p className="font-medium">
+        Can I book instantly on RentKA?
+      </p>
+      <p>
+        Yes, you can submit your booking request online and confirm details via WhatsApp with our team.
+      </p>
+    </div>
+
+    <div>
+      <p className="font-medium">
+        Are there any hidden charges?
+      </p>
+      <p>
+        No, RentKA works with verified vendors and ensures transparent pricing before confirmation.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": `What is the price of ${carName} with driver in ${city}?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `Prices start from Rs ${minPrice ?? "varies"} per day depending on vendor and availability.`,
+          },
+        },
+        {
+          "@type": "Question",
+          "name": "Can I book online?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, bookings can be made online and confirmed via WhatsApp.",
+          },
+        },
+      ],
+    }),
+  }}
+/>
 
     </main>
   );
