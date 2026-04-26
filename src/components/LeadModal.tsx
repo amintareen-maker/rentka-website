@@ -101,13 +101,22 @@ export default function LeadModal({ open, onClose, context }: Props) {
     const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
     const counterRef = doc(db, "meta", "counters");
 
-// ✅ reuse SAME leadId from top
-const reviewToken = Math.random().toString(36).substring(2, 10);
+const newNumber = await runTransaction(db, async (transaction) => {
+  const counterDoc = await transaction.get(counterRef);
 
-const docRef = await addDoc(collection(db, "leads"), {
-  leadId, // 👈 THIS is the fix
-  ...
+  if (!counterDoc.exists()) {
+    throw new Error("Counter document does not exist!");
+  }
+
+  const current = counterDoc.data().leadCounter || 0;
+  const next = current + 1;
+
+  transaction.update(counterRef, { leadCounter: next });
+
+  return next;
 });
+
+const leadId = `RK-${cityCode}-${newNumber}`;
 
     // ===============================
     // 2️⃣ WHATSAPP MESSAGE
@@ -144,24 +153,18 @@ Please confirm availability.
     // ===============================
     // 3️⃣ 🔥 OPEN WHATSAPP IMMEDIATELY
     // ===============================
-    if (typeof window !== "undefined" && (window as any).gtag) {
-  (window as any).gtag("event", "conversion", {
-    send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-    value: 1.0,
-    currency: "PKR",
-    event_callback: () => {
-      window.location.href = whatsappUrl;
-    },
-  });
-
-  // fallback in case callback doesn't fire
-  setTimeout(() => {
     window.location.href = whatsappUrl;
-  }, 800);
 
-} else {
-  window.location.href = whatsappUrl;
-}
+    // ===============================
+    // 4️⃣ FIRE GOOGLE CONVERSION (NO WAIT)
+    // ===============================
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "conversion", {
+        send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+        value: 1.0,
+        currency: "PKR",
+      });
+    }
 
     // ===============================
     // 5️⃣ BACKEND (RUN IN BACKGROUND)
