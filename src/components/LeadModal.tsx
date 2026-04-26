@@ -99,7 +99,24 @@ export default function LeadModal({ open, onClose, context }: Props) {
     // 1️⃣ QUICK TEMP ID (NO DELAY)
     // ===============================
     const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
-    const tempLeadId = `RK-${cityCode}-XXXX`;
+    const counterRef = doc(db, "meta", "counters");
+
+const newNumber = await runTransaction(db, async (transaction) => {
+  const counterDoc = await transaction.get(counterRef);
+
+  if (!counterDoc.exists()) {
+    throw new Error("Counter document does not exist!");
+  }
+
+  const current = counterDoc.data().leadCounter || 0;
+  const next = current + 1;
+
+  transaction.update(counterRef, { leadCounter: next });
+
+  return next;
+});
+
+const leadId = `RK-${cityCode}-${newNumber}`;
 
     // ===============================
     // 2️⃣ WHATSAPP MESSAGE
@@ -109,7 +126,7 @@ Hi RentKA 👋
 
 I just submitted a request on your website.
 
-My booking reference: *${tempLeadId}*
+My booking reference: *${leadId}*
 
 🚗 Car: ${context.carName ?? "N/A"}
 🏢 Vendor: ${context.vendorName ?? "N/A"}
