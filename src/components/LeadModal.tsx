@@ -153,18 +153,24 @@ Please confirm availability.
     // ===============================
     // 3️⃣ 🔥 OPEN WHATSAPP IMMEDIATELY
     // ===============================
-    window.location.href = whatsappUrl;
-
-    // ===============================
-    // 4️⃣ FIRE GOOGLE CONVERSION (NO WAIT)
-    // ===============================
     if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "conversion", {
-        send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-        value: 1.0,
-        currency: "PKR",
-      });
-    }
+  (window as any).gtag("event", "conversion", {
+    send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+    value: 1.0,
+    currency: "PKR",
+    event_callback: () => {
+      window.location.href = whatsappUrl;
+    },
+  });
+
+  // fallback in case callback doesn't fire
+  setTimeout(() => {
+    window.location.href = whatsappUrl;
+  }, 800);
+
+} else {
+  window.location.href = whatsappUrl;
+}
 
     // ===============================
     // 5️⃣ BACKEND (RUN IN BACKGROUND)
