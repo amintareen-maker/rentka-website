@@ -96,31 +96,74 @@ export default function LeadModal({ open, onClose, context }: Props) {
     setLoading(true);
 
     // ===============================
-    // 1️⃣ QUICK TEMP ID (NO DELAY)
+    // 1️⃣ GENERATE LEAD ID (ONLY ONCE)
     // ===============================
     const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
     const counterRef = doc(db, "meta", "counters");
 
-const newNumber = await runTransaction(db, async (transaction) => {
-  const counterDoc = await transaction.get(counterRef);
+    const newNumber = await runTransaction(db, async (transaction) => {
+      const counterDoc = await transaction.get(counterRef);
 
-  if (!counterDoc.exists()) {
-    throw new Error("Counter document does not exist!");
-  }
+      if (!counterDoc.exists()) {
+        throw new Error("Counter document does not exist!");
+      }
 
-  const current = counterDoc.data().leadCounter || 0;
-  const next = current + 1;
+      const current = counterDoc.data().leadCounter || 0;
+      const next = current + 1;
 
-  transaction.update(counterRef, { leadCounter: next });
+      transaction.update(counterRef, { leadCounter: next });
 
-  return next;
-});
+      return next;
+    });
 
-const leadId = `RK-${cityCode}-${newNumber}`;
+    const leadId = `RK-${cityCode}-${newNumber}`;
+    const reviewToken = Math.random().toString(36).substring(2, 10);
 
     // ===============================
-    // 2️⃣ WHATSAPP MESSAGE
+    // 2️⃣ SAVE TO FIREBASE (CRITICAL)
     // ===============================
+    const docRef = await addDoc(collection(db, "leads"), {
+      leadId,
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() || null,
+      carName: context.carName ?? null,
+      country: context.country ?? null,
+      city: context.city ?? null,
+      service: context.service ?? null,
+      modelYear: context.modelYearLabel ?? context.modelYear ?? null,
+      pickupDate,
+      preferredTime,
+      vendorName: context.vendorName ?? null,
+      vendorId: context.vendorId ?? null,
+      pricingType: context.pricingType ?? null,
+      duration: context.duration ?? null,
+      price: context.price ?? null,
+
+      source: "website",
+      status: "new",
+
+      reviewSubmitted: false,
+      reviewSent: false,
+      reviewToken,
+
+      createdAt: serverTimestamp(),
+    });
+
+    const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
+
+    await updateDoc(docRef, { reviewLink });
+
+    // ===============================
+    // 3️⃣ PREPARE WHATSAPP MESSAGE
+    // ===============================
+    const serviceLabel =
+      context.service === "selfDrive"
+        ? "Self Drive"
+        : context.service === "withDriver"
+        ? "With Driver"
+        : "N/A";
+
     const message = `
 Hi RentKA 👋
 
@@ -131,7 +174,7 @@ My booking reference: *${leadId}*
 🚗 Car: ${context.carName ?? "N/A"}
 🏢 Vendor: ${context.vendorName ?? "N/A"}
 📍 City: ${context.city ?? "N/A"}
-🛞 Service: ${serviceLabel ?? "N/A"}
+🛞 Service: ${serviceLabel}
 
 📅 Pickup Date: ${pickupDate}
 ⏰ Time: ${preferredTime}
@@ -151,109 +194,54 @@ Please confirm availability.
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
     // ===============================
-    // 3️⃣ 🔥 OPEN WHATSAPP IMMEDIATELY
+    // 4️⃣ GOOGLE SHEETS (NON-BLOCKING)
     // ===============================
-    window.location.href = whatsappUrl;
+    const formData = new URLSearchParams({
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() || "",
+      carName: context.carName || "",
+      vendorName: context.vendorName || "",
+      vendorId: context.vendorId || "",
+      modelYear: String(context.modelYearLabel ?? context.modelYear ?? ""),
+      country: context.country || "",
+      city: context.city || "",
+      service: context.service || "",
+      serviceType: context.pricingType || "",
+      packageName: context.pricingType || "",
+      packageDuration: context.duration || "",
+      packagePrice: context.price ? String(context.price) : "",
+      pickupDate,
+      preferredTime,
+      source: "website",
+      leadId,
+      status: "new",
+    });
+
+    fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
+      method: "POST",
+    });
 
     // ===============================
-    // 4️⃣ FIRE GOOGLE CONVERSION (NO WAIT)
+    // 5️⃣ GOOGLE ADS + REDIRECT
     // ===============================
     if (typeof window !== "undefined" && (window as any).gtag) {
       (window as any).gtag("event", "conversion", {
         send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
         value: 1.0,
         currency: "PKR",
+        event_callback: () => {
+          window.location.href = whatsappUrl;
+        },
       });
+
+      // fallback safety
+      setTimeout(() => {
+        window.location.href = whatsappUrl;
+      }, 1000);
+    } else {
+      window.location.href = whatsappUrl;
     }
-
-    // ===============================
-    // 5️⃣ BACKEND (RUN IN BACKGROUND)
-    // ===============================
-    (async () => {
-      try {
-        const counterRef = doc(db, "meta", "counters");
-
-        const newNumber = await runTransaction(db, async (transaction) => {
-          const counterDoc = await transaction.get(counterRef);
-
-          if (!counterDoc.exists()) {
-            throw new Error("Counter document does not exist!");
-          }
-
-          const current = counterDoc.data().leadCounter || 0;
-          const next = current + 1;
-
-          transaction.update(counterRef, { leadCounter: next });
-
-          return next;
-        });
-
-        const leadId = `RK-${cityCode}-${newNumber}`;
-        const reviewToken = Math.random().toString(36).substring(2, 10);
-
-        const docRef = await addDoc(collection(db, "leads"), {
-          leadId,
-          name: name.trim(),
-          phone: phone.trim(),
-          email: email.trim() || null,
-          carName: context.carName ?? null,
-          country: context.country ?? null,
-          city: context.city ?? null,
-          service: context.service ?? null,
-          modelYear: modelYearDisplay,
-          pickupDate,
-          preferredTime,
-          vendorName: context.vendorName ?? null,
-          vendorId: context.vendorId ?? null,
-          pricingType: context.pricingType ?? null,
-          duration: context.duration ?? null,
-          price: context.price ?? null,
-
-          source: "website",
-          status: "new",
-
-          reviewSubmitted: false,
-          reviewSent: false,
-          reviewToken,
-
-          createdAt: serverTimestamp(),
-        });
-
-        const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
-
-        await updateDoc(docRef, { reviewLink });
-
-        // Google Sheets (non-blocking)
-        const formData = new URLSearchParams({
-          name: name.trim(),
-          phone: phone.trim(),
-          email: email.trim() || "",
-          carName: context.carName || "",
-          vendorName: context.vendorName || "",
-          vendorId: context.vendorId || "",
-          modelYear: String(modelYearDisplay || ""),
-          country: context.country || "",
-          city: context.city || "",
-          service: context.service || "",
-          serviceType: context.pricingType || "",
-          packageName: context.pricingType || "",
-          packageDuration: context.duration || "",
-          packagePrice: context.price ? String(context.price) : "",
-          pickupDate,
-          preferredTime,
-          source: "website",
-          leadId,
-          status: "new",
-        });
-
-        fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
-          method: "POST",
-        });
-
-      } catch (err) {
-        console.error("Background lead save failed:", err);
-      }
-    })();
 
   } catch (err) {
     console.error("Failed:", err);
