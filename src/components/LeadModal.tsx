@@ -179,20 +179,27 @@ if (typeof window !== "undefined" && (window as any).gtag) {
   console.log("🔥 Conversion trigger attempt");
 
   await new Promise<void>((resolve) => {
-    (window as any).gtag("event", "conversion", {
-      send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-      value: 1.0,
-      currency: "PKR",
-      event_callback: () => {
-        console.log("✅ Conversion confirmed by Google");
-        resolve();
-      },
-    });
+  let called = false;
 
-    // fallback (VERY IMPORTANT — avoids stuck UI)
-    setTimeout(resolve, 1200);
+  const done = () => {
+    if (!called) {
+      called = true;
+      resolve();
+    }
+  };
+
+  (window as any).gtag("event", "conversion", {
+    send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+    value: 1.0,
+    currency: "PKR",
+    event_callback: () => {
+      console.log("✅ Conversion confirmed by Google");
+      done();
+    },
   });
-}
+
+  setTimeout(done, 1200);
+});
 
 // ✅ STEP 3: THEN update UI
 setSuccess(true);
@@ -235,19 +242,17 @@ Please confirm availability.
 
 
       const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-
-      if (isMobile) {
-  // 🔥 give conversion enough time to fire
+if (isMobile) {
+  // redirect to WhatsApp
   setTimeout(() => {
-  window.location.href = whatsappUrl;
-}, 1500); // safer buffer
+    window.location.href = whatsappUrl;
+  }, 1500);
 
-  // optional UI reset AFTER redirect
+  // reset AFTER redirect
   setTimeout(() => {
     setSuccess(false);
     setDesktopWhatsappUrl(null);
@@ -258,28 +263,22 @@ Please confirm availability.
     setPreferredTime("");
     onClose();
   }, 1500);
+
 } else {
-      setDesktopWhatsappUrl(whatsappUrl);
-    }
+  // desktop → show button
+  setDesktopWhatsappUrl(whatsappUrl);
+}  // ✅ THIS LINE WAS MISSING
+}
+/* ===============================
+   Close modal normally
+   =============================== */
 
-
-
-
-      /* ===============================
-         Close modal normally
-         =============================== */
-
-
-
-
-    } catch (err) {
-      console.error("Failed to save lead:", err);
+} catch (err) {      console.error("Failed to save lead:", err);
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
-
 
   /* ===============================
      Render
@@ -516,4 +515,3 @@ Please confirm availability.
     </div>
   );
 }
-
