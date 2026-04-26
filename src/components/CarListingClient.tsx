@@ -39,7 +39,7 @@ export default function CarListingClient({
                 </h2>
 
                 <p className="text-sm text-slate-500">
-                  Verified Rental Partner
+                  {car.vendor?.name ?? "Verified Rental Partner"}
                 </p>
 
                 {price && (

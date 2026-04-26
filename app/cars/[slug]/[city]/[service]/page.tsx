@@ -1,6 +1,17 @@
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import CarListingClient from "@/components/CarListingClient";
+import { doc, getDoc } from "firebase/firestore";
+
+type Vendor = {
+  name?: string;
+  logoUrl?: string;
+};
+
+type RelatedModel = {
+  name: string;
+  slug: string;
+};
 
 // ✅ ADD THIS RIGHT HERE (below imports, above Page function)
 export async function generateMetadata({ params }: any) {
@@ -9,9 +20,10 @@ export async function generateMetadata({ params }: any) {
   const carName = slug.replace(/-/g, " ");
   const isDriver = service === "with-driver";
 
+
   return {
     title: `${carName} ${isDriver ? "with driver" : "for rent"} in ${city} | RentKA`,
-    description: `Book ${carName} ${isDriver ? "with driver" : "self drive"} in ${city}. Compare prices, verified vendors, and confirm your booking easily on WhatsApp.`,
+    description: `Rent ${carName} ${isDriver ? "with driver" : "for self drive"} in ${city}. Starting from affordable daily rates. Verified vendors, no hidden charges, and quick booking via WhatsApp.`,
   };
 }
 
@@ -63,35 +75,62 @@ export default async function Page({
   const normalize = (str?: string) =>
     (str || "").toLowerCase().replace(/\s+/g, "-");
 
-  const cars: Car[] = [];
+  const cars: (Car & { vendor?: Vendor })[] = [];
 
-  snapshot.forEach((doc) => {
-    const data = doc.data() as Car;
+  for (const docItem of snapshot.docs) {
+  const data = docItem.data() as Car;
 
-    if (!data.model || normalize(data.model) !== normalize(slug)) return;
+  if (!data.model || normalize(data.model) !== normalize(slug)) continue;
 
-    if (
-      !data.cityList ||
-      !data.cityList.some(
-        (c) => c.toLowerCase() === city.toLowerCase()
-      )
+  if (
+    !data.cityList ||
+    !data.cityList.some(
+      (c) => c.toLowerCase() === city.toLowerCase()
     )
-      return;
+  )
+    continue;
 
-    if (
-      selectedService === "withDriver" &&
-      data.supports?.withDriver === false
-    )
-      return;
+  if (
+    selectedService === "withDriver" &&
+    data.supports?.withDriver === false
+  )
+    continue;
 
-    if (
-      selectedService === "selfDrive" &&
-      data.supports?.withoutDriver === false
-    )
-      return;
+  if (
+    selectedService === "selfDrive" &&
+    data.supports?.withoutDriver === false
+  )
+    continue;
 
-    cars.push({ ...data, id: doc.id });
+  // 🔥 FETCH VENDOR
+  let vendorData: Vendor | null = null;
+
+  if (data.vendorId) {
+    try {
+      const vendorRef = doc(
+        db,
+        "countries",
+        country,
+        "vendors",
+        data.vendorId
+      );
+
+      const vendorSnap = await getDoc(vendorRef);
+
+      if (vendorSnap.exists()) {
+        vendorData = vendorSnap.data() as Vendor;
+      }
+    } catch {
+      vendorData = null;
+    }
+  }
+
+  cars.push({
+    ...data,
+    id: docItem.id,
+    vendor: vendorData || undefined,
   });
+}
 
   let minPrice: number | null = null;
 
@@ -110,6 +149,12 @@ cars.forEach((car) => {
 
 const isDriver = service?.toLowerCase() === "with-driver";
 const carName = slug ? slug.replace(/-/g, " ") : "Cars";
+
+const relatedModels: RelatedModel[] = [
+  { name: "Toyota Corolla", slug: "toyota-corolla" },
+  { name: "Toyota Hiace", slug: "toyota-hiace" },
+  { name: "Honda BR-V", slug: "honda-br-v" },
+];
 
   return (
     <main className="max-w-6xl mx-auto px-6 py-12">
@@ -143,6 +188,32 @@ const carName = slug ? slug.replace(/-/g, " ") : "Cars";
         service={selectedService}
         city={city}
       />
+
+      <div className="mt-12">
+  <h3 className="text-lg font-semibold mb-4">
+    Explore more options in {city}
+  </h3>
+
+  <div className="flex flex-wrap gap-3">
+    {relatedModels.map((model: RelatedModel) => {
+      // avoid linking to same page
+      if (model.slug === slug) return null;
+
+
+      return (
+        <a
+          key={model.slug}
+          href={`/cars/${model.slug}/${city}/${service}`}
+          className="text-sm px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 capitalize"
+        >
+          {model.name} {isDriver ? "with driver" : ""}
+        </a>
+      );
+    })}
+  </div>
+</div>
+
+
       {/* 🔥 TRUST SECTION */}
       <div className="mt-16 border-t pt-10">
         <h3 className="text-xl font-semibold mb-3">
