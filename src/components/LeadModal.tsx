@@ -101,22 +101,13 @@ export default function LeadModal({ open, onClose, context }: Props) {
     const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
     const counterRef = doc(db, "meta", "counters");
 
-const newNumber = await runTransaction(db, async (transaction) => {
-  const counterDoc = await transaction.get(counterRef);
+// ✅ reuse SAME leadId from top
+const reviewToken = Math.random().toString(36).substring(2, 10);
 
-  if (!counterDoc.exists()) {
-    throw new Error("Counter document does not exist!");
-  }
-
-  const current = counterDoc.data().leadCounter || 0;
-  const next = current + 1;
-
-  transaction.update(counterRef, { leadCounter: next });
-
-  return next;
+const docRef = await addDoc(collection(db, "leads"), {
+  leadId, // 👈 THIS is the fix
+  ...
 });
-
-const leadId = `RK-${cityCode}-${newNumber}`;
 
     // ===============================
     // 2️⃣ WHATSAPP MESSAGE
