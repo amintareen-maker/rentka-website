@@ -178,17 +178,21 @@ await updateDoc(docRef, {
 if (typeof window !== "undefined" && (window as any).gtag) {
   console.log("🔥 Conversion trigger attempt");
 
-  (window as any).gtag("event", "conversion", {
-    send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-    value: 1.0,
-    currency: "PKR",
+  await new Promise<void>((resolve) => {
+    (window as any).gtag("event", "conversion", {
+      send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+      value: 1.0,
+      currency: "PKR",
+      event_callback: () => {
+        console.log("✅ Conversion confirmed by Google");
+        resolve();
+      },
+    });
+
+    // fallback (VERY IMPORTANT — avoids stuck UI)
+    setTimeout(resolve, 1200);
   });
-
-  console.log("✅ Conversion event fired");
 }
-
-// ✅ STEP 2: HARD delay (CRITICAL)
-await new Promise((resolve) => setTimeout(resolve, 600));
 
 // ✅ STEP 3: THEN update UI
 setSuccess(true);
