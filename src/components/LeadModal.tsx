@@ -177,22 +177,12 @@ await updateDoc(docRef, {
       setSuccess(true);
 
       // ✅ GOOGLE ADS CONVERSION TRACKING
-     if (typeof window !== "undefined") {
-  console.log("🔥 Conversion trigger attempt");
-
-  if ((window as any).gtag) {
-    console.log("✅ gtag found");
-
-    (window as any).gtag("event", "conversion", {
-      send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-      value: 1.0,
-      currency: "PKR",
-    });
-
-    console.log("🚀 Conversion event fired");
-  } else {
-    console.log("❌ gtag NOT found");
-  }
+     if (typeof window !== "undefined" && (window as any).gtag) {
+  (window as any).gtag("event", "conversion", {
+    send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+    value: 1.0,
+    currency: "PKR",
+  });
 }
       /* ===============================
          📲 WHATSAPP REDIRECT
@@ -239,7 +229,9 @@ Please confirm availability.
 
 
       if (isMobile) {
-      window.location.href = whatsappUrl;
+  setTimeout(() => {
+    window.location.href = whatsappUrl;
+  }, 800); // 🔥 IMPORTANT delay
 
 
       setTimeout(() => {
