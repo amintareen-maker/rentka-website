@@ -217,7 +217,7 @@ Please confirm availability.
 // always redirect (even if gtag fails)
 setTimeout(() => {
   window.location.href = whatsappUrl;
-}, 2500);
+}, 1000);
 
     } catch (err) {
       console.error("Failed:", err);
