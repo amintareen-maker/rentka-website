@@ -238,7 +238,7 @@ Please confirm availability.
       // fallback safety
       setTimeout(() => {
         window.location.href = whatsappUrl;
-      }, 1000);
+      }, 2000);
     } else {
       window.location.href = whatsappUrl;
     }
