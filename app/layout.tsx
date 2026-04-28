@@ -23,17 +23,19 @@ export default function RootLayout({
   <head>
     {/* Google Ads Global Tag */}
     <Script
-      src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
-      strategy="afterInteractive"
-    />
-    <Script id="google-ads-gtag" strategy="afterInteractive">
-      {`
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'AW-18044696705');
-      `}
-    </Script>
+  src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
+  strategy="beforeInteractive"
+/>
+
+<Script id="google-ads-gtag" strategy="beforeInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', 'AW-18044696705');
+  `}
+</Script>
   </head>
         
         <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
