@@ -75,6 +75,24 @@ export default function LeadModal({ open, onClose, context }: Props) {
       ? "With Driver"
       : null;
 
+function gtag_report_conversion(url: string) {
+  const callback = function () {
+    if (url) {
+      window.location.href = url;
+    }
+  };
+
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("event", "conversion", {
+      send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+      value: 1.0,
+      currency: "PKR",
+      event_callback: callback,
+    });
+  }
+
+  return false;
+}
 
   /* ===============================
      Submit handler
@@ -226,29 +244,15 @@ Please confirm availability.
     // 5️⃣ GOOGLE ADS + REDIRECT
     // ===============================
     if (typeof window !== "undefined" && (window as any).gtag) {
-  let redirected = false;
+  gtag_report_conversion(whatsappUrl);
 
-  const redirect = () => {
-    if (!redirected) {
-      redirected = true;
-      window.location.href = whatsappUrl;
-    }
-  };
-
-  (window as any).gtag("event", "conversion", {
-    send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-    value: 1.0,
-    currency: "PKR",
-    event_callback: redirect,
-  });
-
-  // fallback (ONLY if callback fails)
-  setTimeout(redirect, 1500);
-
+  // fallback safety (in case callback fails)
+  setTimeout(() => {
+    window.location.href = whatsappUrl;
+  }, 2000);
 } else {
   window.location.href = whatsappUrl;
 }
-
   } catch (err) {
     console.error("Failed:", err);
     setError("Something went wrong. Please try again.");
