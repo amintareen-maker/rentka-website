@@ -244,15 +244,15 @@ Please confirm availability.
     // 5️⃣ GOOGLE ADS + REDIRECT
     // ===============================
     if (typeof window !== "undefined" && (window as any).gtag) {
-  gtag_report_conversion(whatsappUrl);
+  gtag_report_conversion("");
 
-  // fallback safety (in case callback fails)
-  setTimeout(() => {
-    window.location.href = whatsappUrl;
-  }, 2000);
+setTimeout(() => {
+  window.location.href = whatsappUrl;
+}, 2000);
 } else {
   window.location.href = whatsappUrl;
 }
+
   } catch (err) {
     console.error("Failed:", err);
     setError("Something went wrong. Please try again.");
