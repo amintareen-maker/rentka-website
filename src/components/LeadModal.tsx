@@ -1,11 +1,9 @@
 "use client";
 
-
 import { useState } from "react";
 import { addDoc, collection, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { doc, runTransaction } from "firebase/firestore";
-
 
 /* ===============================
    🔗 GOOGLE SHEETS WEBHOOK
@@ -13,9 +11,7 @@ import { doc, runTransaction } from "firebase/firestore";
 const SHEETS_WEBHOOK =
   "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
 
-
 const WHATSAPP_NUMBER = "923020589999";
-
 
 /* ===============================
    Types
@@ -34,39 +30,32 @@ type LeadContext = {
   duration?: string | null;
 };
 
-
 type Props = {
   open: boolean;
   onClose: () => void;
   context: LeadContext;
 };
 
-
 export default function LeadModal({ open, onClose, context }: Props) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-
   const [pickupDate, setPickupDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
-
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [desktopWhatsappUrl, setDesktopWhatsappUrl] = useState<string | null>(null);
 
-
   if (!open) return null;
-
 
   /* ===============================
      Derived values
      =============================== */
   const modelYearDisplay =
     context.modelYearLabel ?? context.modelYear ?? null;
-
 
   const serviceLabel =
     context.service === "selfDrive"
@@ -75,114 +64,95 @@ export default function LeadModal({ open, onClose, context }: Props) {
       ? "With Driver"
       : null;
 
-function gtag_report_conversion(url: string) {
-  const callback = function () {
-    if (url) {
-      window.location.href = url;
+  /* ===============================
+     🔥 GOOGLE ADS FUNCTION (FIXED)
+     =============================== */
+  function gtag_report_conversion() {
+    if (typeof window !== "undefined" && (window as any).gtag) {
+      (window as any).gtag("event", "conversion", {
+        send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+        value: 1.0,
+        currency: "PKR",
+      });
     }
-  };
-
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", "conversion", {
-      send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-      value: 1.0,
-      currency: "PKR",
-      event_callback: callback,
-    });
   }
-
-  return false;
-}
 
   /* ===============================
      Submit handler
      =============================== */
   const handleSubmit = async () => {
-  setError(null);
+    setError(null);
 
-  if (!name.trim() || !phone.trim()) {
-    setError("Name and phone number are required.");
-    return;
-  }
+    if (!name.trim() || !phone.trim()) {
+      setError("Name and phone number are required.");
+      return;
+    }
 
-  if (!pickupDate || !preferredTime) {
-    setError("Please select pickup date and preferred time.");
-    return;
-  }
+    if (!pickupDate || !preferredTime) {
+      setError("Please select pickup date and preferred time.");
+      return;
+    }
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // ===============================
-    // 1️⃣ GENERATE LEAD ID (ONLY ONCE)
-    // ===============================
-    const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
-    const counterRef = doc(db, "meta", "counters");
+      const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
+      const counterRef = doc(db, "meta", "counters");
 
-    const newNumber = await runTransaction(db, async (transaction) => {
-      const counterDoc = await transaction.get(counterRef);
+      const newNumber = await runTransaction(db, async (transaction) => {
+        const counterDoc = await transaction.get(counterRef);
 
-      if (!counterDoc.exists()) {
-        throw new Error("Counter document does not exist!");
-      }
+        if (!counterDoc.exists()) {
+          throw new Error("Counter document does not exist!");
+        }
 
-      const current = counterDoc.data().leadCounter || 0;
-      const next = current + 1;
+        const current = counterDoc.data().leadCounter || 0;
+        const next = current + 1;
 
-      transaction.update(counterRef, { leadCounter: next });
+        transaction.update(counterRef, { leadCounter: next });
 
-      return next;
-    });
+        return next;
+      });
 
-    const leadId = `RK-${cityCode}-${newNumber}`;
-    const reviewToken = Math.random().toString(36).substring(2, 10);
+      const leadId = `RK-${cityCode}-${newNumber}`;
+      const reviewToken = Math.random().toString(36).substring(2, 10);
 
-    // ===============================
-    // 2️⃣ SAVE TO FIREBASE (CRITICAL)
-    // ===============================
-    const docRef = await addDoc(collection(db, "leads"), {
-      leadId,
-      name: name.trim(),
-      phone: phone.trim(),
-      email: email.trim() || null,
-      carName: context.carName ?? null,
-      country: context.country ?? null,
-      city: context.city ?? null,
-      service: context.service ?? null,
-      modelYear: context.modelYearLabel ?? context.modelYear ?? null,
-      pickupDate,
-      preferredTime,
-      vendorName: context.vendorName ?? null,
-      vendorId: context.vendorId ?? null,
-      pricingType: context.pricingType ?? null,
-      duration: context.duration ?? null,
-      price: context.price ?? null,
+      const docRef = await addDoc(collection(db, "leads"), {
+        leadId,
+        name: name.trim(),
+        phone: phone.trim(),
+        email: email.trim() || null,
+        carName: context.carName ?? null,
+        country: context.country ?? null,
+        city: context.city ?? null,
+        service: context.service ?? null,
+        modelYear: context.modelYearLabel ?? context.modelYear ?? null,
+        pickupDate,
+        preferredTime,
+        vendorName: context.vendorName ?? null,
+        vendorId: context.vendorId ?? null,
+        pricingType: context.pricingType ?? null,
+        duration: context.duration ?? null,
+        price: context.price ?? null,
+        source: "website",
+        status: "new",
+        reviewSubmitted: false,
+        reviewSent: false,
+        reviewToken,
+        createdAt: serverTimestamp(),
+      });
 
-      source: "website",
-      status: "new",
+      const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
+      await updateDoc(docRef, { reviewLink });
 
-      reviewSubmitted: false,
-      reviewSent: false,
-      reviewToken,
+      const serviceLabel =
+        context.service === "selfDrive"
+          ? "Self Drive"
+          : context.service === "withDriver"
+          ? "With Driver"
+          : "N/A";
 
-      createdAt: serverTimestamp(),
-    });
-
-    const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
-
-    await updateDoc(docRef, { reviewLink });
-
-    // ===============================
-    // 3️⃣ PREPARE WHATSAPP MESSAGE
-    // ===============================
-    const serviceLabel =
-      context.service === "selfDrive"
-        ? "Self Drive"
-        : context.service === "withDriver"
-        ? "With Driver"
-        : "N/A";
-
-    const message = `
+      const message = `
 Hi RentKA 👋
 
 I just submitted a request on your website.
@@ -208,58 +178,54 @@ ${context.pricingType ?? "N/A"} - ${context.duration ?? "N/A"}
 Please confirm availability.
 `;
 
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
-    // ===============================
-    // 4️⃣ GOOGLE SHEETS (NON-BLOCKING)
-    // ===============================
-    const formData = new URLSearchParams({
-      name: name.trim(),
-      phone: phone.trim(),
-      email: email.trim() || "",
-      carName: context.carName || "",
-      vendorName: context.vendorName || "",
-      vendorId: context.vendorId || "",
-      modelYear: String(context.modelYearLabel ?? context.modelYear ?? ""),
-      country: context.country || "",
-      city: context.city || "",
-      service: context.service || "",
-      serviceType: context.pricingType || "",
-      packageName: context.pricingType || "",
-      packageDuration: context.duration || "",
-      packagePrice: context.price ? String(context.price) : "",
-      pickupDate,
-      preferredTime,
-      source: "website",
-      leadId,
-      status: "new",
-    });
+      const formData = new URLSearchParams({
+        name: name.trim(),
+        phone: phone.trim(),
+        email: email.trim() || "",
+        carName: context.carName || "",
+        vendorName: context.vendorName || "",
+        vendorId: context.vendorId || "",
+        modelYear: String(context.modelYearLabel ?? context.modelYear ?? ""),
+        country: context.country || "",
+        city: context.city || "",
+        service: context.service || "",
+        serviceType: context.pricingType || "",
+        packageName: context.pricingType || "",
+        packageDuration: context.duration || "",
+        packagePrice: context.price ? String(context.price) : "",
+        pickupDate,
+        preferredTime,
+        source: "website",
+        leadId,
+        status: "new",
+      });
 
-    fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
-      method: "POST",
-    });
+      fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
+        method: "POST",
+      });
 
-    // ===============================
-    // 5️⃣ GOOGLE ADS + REDIRECT
-    // ===============================
-    if (typeof window !== "undefined" && (window as any).gtag) {
-  gtag_report_conversion("");
-
-setTimeout(() => {
-  window.location.href = whatsappUrl;
-}, 2000);
-} else {
-  window.location.href = whatsappUrl;
+      /* ===============================
+         ✅ GOOGLE ADS + REDIRECT (FIXED)
+         =============================== */
+      if (typeof window !== "undefined" && (window as any).gtag) {
+  gtag_report_conversion();
 }
 
-  } catch (err) {
-    console.error("Failed:", err);
-    setError("Something went wrong. Please try again.");
-  } finally {
-    setLoading(false);
-  }
-};
+// always redirect (even if gtag fails)
+setTimeout(() => {
+  window.location.href = whatsappUrl;
+}, 2500);
+
+    } catch (err) {
+      console.error("Failed:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* ===============================
      Render
