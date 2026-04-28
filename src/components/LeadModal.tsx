@@ -226,22 +226,28 @@ Please confirm availability.
     // 5️⃣ GOOGLE ADS + REDIRECT
     // ===============================
     if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "conversion", {
-        send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-        value: 1.0,
-        currency: "PKR",
-        event_callback: () => {
-          window.location.href = whatsappUrl;
-        },
-      });
+  let redirected = false;
 
-      // fallback safety
-      setTimeout(() => {
-        window.location.href = whatsappUrl;
-      }, 2000);
-    } else {
+  const redirect = () => {
+    if (!redirected) {
+      redirected = true;
       window.location.href = whatsappUrl;
     }
+  };
+
+  (window as any).gtag("event", "conversion", {
+    send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+    value: 1.0,
+    currency: "PKR",
+    event_callback: redirect,
+  });
+
+  // fallback (ONLY if callback fails)
+  setTimeout(redirect, 1500);
+
+} else {
+  window.location.href = whatsappUrl;
+}
 
   } catch (err) {
     console.error("Failed:", err);
