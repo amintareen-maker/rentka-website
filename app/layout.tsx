@@ -21,22 +21,28 @@ export default function RootLayout({
   return (
     <html lang="en">
   <head>
-    {/* Google Ads Global Tag */}
-    <Script
-  src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
-  strategy="beforeInteractive"
-/>
+  {/* Google Tag (Ads + Analytics Combined) */}
+  <Script
+    src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
+    strategy="beforeInteractive"
+  />
 
-<Script id="google-ads-gtag" strategy="beforeInteractive">
-  {`
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    window.gtag = gtag;
-    gtag('js', new Date());
-    gtag('config', 'AW-18044696705');
-  `}
-</Script>
-  </head>
+  <Script id="google-tag" strategy="beforeInteractive">
+    {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      window.gtag = gtag;
+
+      gtag('js', new Date());
+
+      // Google Ads
+      gtag('config', 'AW-18044696705');
+
+      // Google Analytics
+      gtag('config', 'G-7DHBBGGMQ3');
+    `}
+  </Script>
+</head>
         
         <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
         {/* Global Header */}
