@@ -1,6 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+const trackEvent = (eventName: string, data: any = {}) => {
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("event", eventName, data);
+  }
+};
 import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useCars, Car } from "@/lib/useCars";
@@ -301,7 +306,13 @@ useEffect(() => {
                   key={`city-${shakeKey}`}
                   value={city ?? ""}
                   onChange={(e) => {
-                    setCity(e.target.value || undefined);
+                    const selectedCity = e.target.value || undefined;
+
+                    trackEvent("select_city", {
+                      city: selectedCity,
+                    });
+
+                    setCity(selectedCity);
                     setService(undefined);
                     setFilterError((p) => ({ ...p, city: false }));
                   }}
@@ -328,13 +339,17 @@ useEffect(() => {
                   key={`service-${shakeKey}`}
                   value={service ?? ""}
                   onChange={(e) => {
-                    setService(
-                      (e.target.value as
-                        | "selfDrive"
-                        | "withDriver") || undefined
-                    );
-                    setFilterError((p) => ({ ...p, service: false }));
-                  }}
+  const selectedService =
+    (e.target.value as "selfDrive" | "withDriver") || undefined;
+
+  trackEvent("select_service", {
+    service: selectedService,
+    city: city,
+  });
+
+  setService(selectedService);
+  setFilterError((p) => ({ ...p, service: false }));
+}}
                   className={`w-full rounded-lg px-4 py-3 border ${
                   filterError.service
                     ? "border-red-500 ring-1 ring-red-500 shake"
@@ -370,22 +385,29 @@ useEffect(() => {
                 <button
                   key={m.model}
                   onClick={() =>
-                    canBrowseModels
-                      ? (() => {
-  const slug = m.model.toLowerCase().replace(/\s+/g, "-");
+  canBrowseModels
+    ? (() => {
+        const slug = m.model.toLowerCase().replace(/\s+/g, "-");
 
-const serviceSlug =
-  service === "withDriver" ? "with-driver" : "self-drive";
+        const serviceSlug =
+          service === "withDriver" ? "with-driver" : "self-drive";
 
-const url = `/cars/${slug}/${city}/${serviceSlug}`;
-window.history.pushState({}, "", url);
+        const url = `/cars/${slug}/${city}/${serviceSlug}`;
 
-setSelectedModel(m.model);
-setModelOpen(true);
+        trackEvent("select_model", {
+          model: m.model,
+          city: city,
+          service: service,
+          price: m.minPrice || 0,
+        });
 
-})()
-                      : handleBlockedAction()
-                  }
+        window.history.pushState({}, "", url);
+
+        setSelectedModel(m.model);
+        setModelOpen(true);
+      })()
+    : handleBlockedAction()
+}
                   className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
                 >
                   <div className="aspect-[8/10] bg-white rounded-lg mb-4 overflow-hidden flex items-center justify-center border border-slate-200">
@@ -492,14 +514,18 @@ setModelOpen(true);
             Browse verified vehicles and let us handle the rest.
           </p>
           <button
-            onClick={() =>
-              document
-                .getElementById("filters")
-                ?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                })
-            }
+  onClick={() => {
+    trackEvent("browse_cars_click", {
+      location: "bottom_cta",
+    });
+
+    document
+      .getElementById("filters")
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+  }}
             className="bg-[var(--rentka-green)] text-white px-8 py-3 rounded-lg font-medium hover:bg-[var(--rentka-green-hover)] transition"
           >
             Browse Cars
@@ -563,7 +589,12 @@ setModelOpen(true);
             </p>
 
             <a
-              href="https://wa.me/923020589999?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
+  href="https://wa.me/923020589999?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
+  onClick={() => {
+    trackEvent("whatsapp_click", {
+      source: "homepage_chat",
+    });
+  }}
               target="_blank"
               rel="noopener noreferrer"
               className="block text-center bg-[var(--rentka-green)] hover:bg-[var(--rentka-green-hover)] text-white py-2 rounded-lg font-medium transition"
