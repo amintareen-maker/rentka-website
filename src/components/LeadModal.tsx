@@ -5,6 +5,12 @@ import { addDoc, collection, serverTimestamp, updateDoc } from "firebase/firesto
 import { db } from "@/lib/firebase";
 import { doc, runTransaction } from "firebase/firestore";
 
+const trackEvent = (eventName: string, data: any = {}) => {
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("event", eventName, data);
+  }
+};
+
 /* ===============================
    🔗 GOOGLE SHEETS WEBHOOK
    =============================== */
@@ -144,6 +150,13 @@ export default function LeadModal({ open, onClose, context }: Props) {
 
       const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
       await updateDoc(docRef, { reviewLink });
+      
+      trackEvent("lead_submitted", {
+  car_name: context.carName,
+  city: context.city,
+  service: context.service,
+  price: context.price,
+});
 
       const serviceLabel =
         context.service === "selfDrive"
