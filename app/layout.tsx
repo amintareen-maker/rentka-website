@@ -42,9 +42,10 @@ export default function RootLayout({
 
         {/* ✅ Microsoft Clarity */}
         <Script
-          src="https://www.clarity.ms/tag/wjs72cq7ak"
-          strategy="afterInteractive"
-        />
+  src="https://www.clarity.ms/tag/wjs72cq7ak"
+  strategy="afterInteractive"
+  onLoad={() => console.log("CLARITY LOADED")}
+/>
 
         <Header />
 
