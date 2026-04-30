@@ -4,9 +4,14 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Car } from "@/lib/useCars";
 import LeadModal from "@/components/LeadModal";
-import { track } from "@vercel/analytics";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+
+const trackEvent = (eventName: string, data: any = {}) => {
+  if (typeof window !== "undefined" && (window as any).gtag) {
+    (window as any).gtag("event", eventName, data);
+  }
+};
 
 type ServiceType = "selfDrive" | "withDriver";
 
@@ -88,7 +93,7 @@ export default function CarDetailsModal({
     };
 
     loadVendor();
-  }, [open, car]);
+}, [open, car]);
 
   /* -----------------------------
      Support flags
@@ -122,6 +127,17 @@ export default function CarDetailsModal({
   /* -----------------------------
      Render guard
   ------------------------------ */
+  useEffect(() => {
+  if (open && car) {
+    trackEvent("car_detail_view", {
+      car_name: car.name,
+      car_id: car.id,
+      city: city,
+      service: service,
+    });
+  }
+}, [open, car]);
+
   if (!open || !car) return null;
 
   /* -----------------------------
@@ -267,7 +283,15 @@ export default function CarDetailsModal({
                         ? "bg-[var(--rentka-blue)] text-white border-[var(--rentka-green)]"
                         : "border-slate-300 text-slate-800 hover:border-[var(--rentka-green)]"
                     }`}
-                    onClick={() => setSelectedService("selfDrive")}
+                    onClick={() => {
+  trackEvent("change_service", {
+    from: selectedService,
+    to: "selfDrive",
+    car_name: car.name,
+  });
+
+  setSelectedService("selfDrive");
+}}
                   >
                     Self Drive
                   </button>
@@ -280,7 +304,15 @@ export default function CarDetailsModal({
                         ? "bg-[var(--rentka-blue)] text-white border-[var(--rentka-green)]"
                         : "border-slate-300 text-slate-800 hover:border-[var(--rentka-green)]"
                     }`}
-                    onClick={() => setSelectedService("withDriver")}
+                    onClick={() => {
+  trackEvent("change_service", {
+    from: selectedService,
+    to: "withDriver",
+    car_name: car.name,
+  });
+
+  setSelectedService("withDriver");
+}}
                   >
                     With Driver
                   </button>
@@ -322,15 +354,22 @@ export default function CarDetailsModal({
 
     {withinCity?.daily && (
       <button
-        onClick={() => {
-          setSelectedPackage({
-            pricingType: "withinCity",
-            duration: "daily",
-            price: withinCity.daily!,
-          });
+          onClick={() => {
+  trackEvent("select_package", {
+    car_name: car.name,
+    pricing_type: "withinCity",
+    duration: "daily",
+    price: withinCity.daily,
+  });
 
-          setPackageError(false); // ✅ separate line
-        }}
+  setSelectedPackage({
+    pricingType: "withinCity",
+    duration: "daily",
+    price: withinCity.daily!,
+  });
+
+  setPackageError(false);
+}}
 
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "withinCity" &&
@@ -351,13 +390,21 @@ export default function CarDetailsModal({
     {withinCity?.weekly && (
       <button
         onClick={() => {
-          setSelectedPackage({
-            pricingType: "withinCity",
-            duration: "weekly",
-            price: withinCity.weekly!,
-          });
-          setPackageError(false); // ✅ separate line
-        }}
+  trackEvent("select_package", {
+    car_name: car.name,
+    pricing_type: "withinCity",
+    duration: "weekly",
+    price: withinCity.weekly,
+  });
+
+  setSelectedPackage({
+    pricingType: "withinCity",
+    duration: "weekly",
+    price: withinCity.weekly!,
+  });
+
+  setPackageError(false);
+}}
         
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "withinCity" &&
@@ -378,13 +425,21 @@ export default function CarDetailsModal({
     {withinCity?.monthly && (
       <button
         onClick={() => {
-          setSelectedPackage({
-            pricingType: "withinCity",
-            duration: "monthly",
-            price: withinCity.monthly!,
-          });
-          setPackageError(false); // ✅ separate line
-        }}
+  trackEvent("select_package", {
+    car_name: car.name,
+    pricing_type: "withinCity",
+    duration: "monthly",
+    price: withinCity.monthly,
+  });
+
+  setSelectedPackage({
+    pricingType: "withinCity",
+    duration: "monthly",
+    price: withinCity.monthly!,
+  });
+
+  setPackageError(false);
+}}
       
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "withinCity" &&
@@ -410,14 +465,21 @@ export default function CarDetailsModal({
     {outsideCity?.daily && (
       <button
         onClick={() => {
-          setSelectedPackage({
-            pricingType: "outsideCity",
-            duration: "daily",
-            price: outsideCity.daily!,
-          });
-          
-          setPackageError(false); // ✅ separate line
-        }}
+  trackEvent("select_package", {
+    car_name: car.name,
+    pricing_type: "outsideCity",
+    duration: "daily",
+    price: outsideCity.daily,
+  });
+
+  setSelectedPackage({
+    pricingType: "outsideCity",
+    duration: "daily",
+    price: outsideCity.daily!,
+  });
+
+  setPackageError(false);
+}}
         
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "outsideCity" &&
@@ -438,14 +500,21 @@ export default function CarDetailsModal({
     {outsideCity?.weekly && (
       <button
         onClick={() => {
-          setSelectedPackage({
-            pricingType: "outsideCity",
-            duration: "weekly",
-            price: outsideCity.weekly!,
-          });
-          
-          setPackageError(false); // ✅ separate line
-        }}
+  trackEvent("select_package", {
+    car_name: car.name,
+    pricing_type: "outsideCity",
+    duration: "weekly",
+    price: outsideCity.weekly,
+  });
+
+  setSelectedPackage({
+    pricingType: "outsideCity",
+    duration: "weekly",
+    price: outsideCity.weekly!,
+  });
+
+  setPackageError(false);
+}}
         
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${
           selectedPackage?.pricingType === "outsideCity" &&
@@ -466,14 +535,21 @@ export default function CarDetailsModal({
     {outsideCity?.monthly && (
       <button
         onClick={() => {
-          setSelectedPackage({
-            pricingType: "outsideCity",
-            duration: "monthly",
-            price: outsideCity.monthly!,
-          });
+  trackEvent("select_package", {
+    car_name: car.name,
+    pricing_type: "outsideCity",
+    duration: "monthly",
+    price: outsideCity.monthly,
+  });
 
-          setPackageError(false); // ✅ separate line
-        }}
+  setSelectedPackage({
+    pricingType: "outsideCity",
+    duration: "monthly",
+    price: outsideCity.monthly!,
+  });
+
+  setPackageError(false);
+}}
         
         className={`flex justify-between items-center w-full px-4 py-3 rounded-lg border transition ${  
           selectedPackage?.pricingType === "outsideCity" &&
@@ -531,30 +607,33 @@ export default function CarDetailsModal({
               <button
                 className="w-full mt-5 bg-[var(--rentka-green)] text-white py-2 rounded-lg transition hover:opacity-90"
                 onClick={() => {
-                  if (!selectedPackage) {
-                    setPackageError(true);
+  if (!selectedPackage) {
+    setPackageError(true);
 
-                    document
-                      .getElementById("pricing-section")
-                      ?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                      });
+    document
+      .getElementById("pricing-section")
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
 
-                    return;
-                  }
+    return;
+  }
 
-                  setPackageError(false);
+  setPackageError(false);
 
-                  track("request_call_clicked", {
-                    car_id: car.id,
-                    service: selectedService,
-                    country: car.country,
-                    city,
-                  });
+  trackEvent("booking_intent", {
+    car_name: car.name,
+    car_id: car.id,
+    city: city,
+    service: selectedService,
+    price: selectedPackage.price,
+    duration: selectedPackage.duration,
+    pricing_type: selectedPackage.pricingType,
+  });
 
-                  setLeadOpen(true);
-                }}
+  setLeadOpen(true);
+}}
               >
                 Continue Booking
               </button>
