@@ -20,40 +20,49 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+  <html lang="en">
   <head>
-  {/* 🔥 MICROSOFT CLARITY */}
-  <Script id="clarity" strategy="afterInteractive">
-  {`
-  (function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-  })(window, document, "clarity", "script", "wjs72cq7ak");
-  `}
-  </Script>
+    {/* Google Tag */}
+    <Script
+      src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
+      strategy="beforeInteractive"
+    />
 
-  {/* Google Tag (Ads + Analytics Combined) */}
-  <Script
-    src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
-    strategy="beforeInteractive"
-  />
+    <Script id="google-tag" strategy="beforeInteractive">
+      {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        window.gtag = gtag;
 
-  <Script id="google-tag" strategy="beforeInteractive">
-    {`
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      window.gtag = gtag;
+        gtag('js', new Date());
 
-      gtag('js', new Date());
+        gtag('config', 'AW-18044696705');
+        gtag('config', 'G-7DHBBGGMQ3');
+      `}
+    </Script>
+  </head>
 
-      // Google Ads
-      gtag('config', 'AW-18044696705');
+  <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
 
-      // Google Analytics
-      gtag('config', 'G-7DHBBGGMQ3');
-    `}
-  </Script>
-</head>
+    {/* ✅ MOVE CLARITY HERE */}
+    <Script id="clarity" strategy="afterInteractive">
+      {`
+        (function(c,l,a,r,i,t,y){
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "wjs72cq7ak");
+      `}
+    </Script>
+
+    <Header />
+    <main className="flex-1">{children}</main>
+
+    <footer>...</footer>
+
+    <Analytics />
+  </body>
+</html>
         
         <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
         {/* Global Header */}
