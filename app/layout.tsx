@@ -23,21 +23,20 @@ export default function RootLayout({
 
       {/* ✅ Google Tag */}
       <Script
-        src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
-        strategy="beforeInteractive"
-      />
+  src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
+  strategy="beforeInteractive"
+/>
 
-      <Script id="google-tag" strategy="beforeInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
+<Script id="google-tag" strategy="afterInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
 
-          gtag('js', new Date());
-          gtag('config', 'AW-18044696705');
-          gtag('config', 'G-7DHBBGGMQ3');
-        `}
-      </Script>
+    gtag('js', new Date());
+    gtag('config', 'AW-18044696705');
+    gtag('config', 'G-7DHBBGGMQ3');
+  `}
+</Script>
 
       <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
 
