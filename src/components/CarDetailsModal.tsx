@@ -6,6 +6,7 @@ import { Car } from "@/lib/useCars";
 import LeadModal from "@/components/LeadModal";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { track } from "@vercel/analytics";
 
 const trackEvent = (eventName: string, data: any = {}) => {
   if (typeof window !== "undefined" && (window as any).gtag) {

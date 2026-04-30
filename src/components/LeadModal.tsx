@@ -151,6 +151,10 @@ export default function LeadModal({ open, onClose, context }: Props) {
       const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
       await updateDoc(docRef, { reviewLink });
       
+      trackEvent("booking_intent", {
+  source: "lead_submit_fallback",
+});
+
       trackEvent("lead_submitted", {
   car_name: context.carName,
   city: context.city,
