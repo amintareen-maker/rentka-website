@@ -10,7 +10,7 @@ export const metadata = {
     template: "%s | RentKA",
   },
   description:
-    "Find reliable rental cars with clear pricing and flexible options,Affordable car rental with professional driver in Islamabad and Rawalpindi. Airport transfers, full-day bookings, and outstation trips available. Advance confirmation may apply.",
+    "Find reliable rental cars with clear pricing and flexible options, Affordable car rental with professional driver in Islamabad and Rawalpindi.",
 };
 
 export default function RootLayout({
@@ -20,42 +20,37 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* Google Tag */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
-          strategy="beforeInteractive"
-        />
 
-        <Script id="google-tag" strategy="beforeInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            window.gtag = gtag;
+      {/* ✅ Google Tag */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=AW-18044696705"
+        strategy="beforeInteractive"
+      />
 
-            gtag('js', new Date());
+      <Script id="google-tag" strategy="beforeInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
 
-            gtag('config', 'AW-18044696705');
-            gtag('config', 'G-7DHBBGGMQ3');
-          `}
-        </Script>
-      </head>
+          gtag('js', new Date());
+          gtag('config', 'AW-18044696705');
+          gtag('config', 'G-7DHBBGGMQ3');
+        `}
+      </Script>
 
       <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
 
-        {/* ✅ Clarity (correct placement) */}
+        {/* ✅ Microsoft Clarity */}
         <Script
-  src="https://www.clarity.ms/tag/wjs72cq7ak"
-  strategy="afterInteractive"
-/>
-         
-        {/* Header */}
+          src="https://www.clarity.ms/tag/wjs72cq7ak"
+          strategy="afterInteractive"
+        />
+
         <Header />
 
-        {/* Main */}
         <main className="flex-1">{children}</main>
 
-        {/* Footer */}
         <footer className="border-t bg-slate-50">
           <div className="mx-auto max-w-7xl px-4 py-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -64,26 +59,16 @@ export default function RootLayout({
               </p>
 
               <nav className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-                <Link href="/terms" className="text-slate-600 hover:text-slate-900">
-                  Terms
-                </Link>
-                <Link href="/privacy" className="text-slate-600 hover:text-slate-900">
-                  Privacy
-                </Link>
-                <Link href="/cancellation-policy" className="text-slate-600 hover:text-slate-900">
-                  Cancellation Policy
-                </Link>
-                <Link href="/contact" className="text-slate-600 hover:text-slate-900">
-                  Contact
-                </Link>
+                <Link href="/terms" className="text-slate-600 hover:text-slate-900">Terms</Link>
+                <Link href="/privacy" className="text-slate-600 hover:text-slate-900">Privacy</Link>
+                <Link href="/cancellation-policy" className="text-slate-600 hover:text-slate-900">Cancellation Policy</Link>
+                <Link href="/contact" className="text-slate-600 hover:text-slate-900">Contact</Link>
               </nav>
             </div>
           </div>
         </footer>
 
-        {/* Vercel Analytics */}
         <Analytics />
-
       </body>
     </html>
   );
