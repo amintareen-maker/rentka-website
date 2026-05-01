@@ -44,7 +44,6 @@ export default function RootLayout({
         <Script
   src="https://www.clarity.ms/tag/wjs72cq7ak"
   strategy="afterInteractive"
-  onLoad={() => console.log("CLARITY LOADED")}
 />
 
         <Header />
