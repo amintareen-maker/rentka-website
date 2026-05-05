@@ -275,7 +275,7 @@ useEffect(() => {
       >
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="mb-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--rentka-blue)] mb-2">
+            <h2 className="text-2xl md:text-3xl font-bold text-[var(--rentka-green)] mb-2">
   Choose Your City & Service
 </h2>
 
@@ -300,7 +300,7 @@ useEffect(() => {
               </div>
 
               <div>
-              <label className="block text-sm font-semibold text-[var(--rentka-green)] mb-2">
+              <label className="block text-sm font-semibold text-slate-800 mb-2">
                 City/Area
               </label>
                 <select
@@ -333,7 +333,7 @@ useEffect(() => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-[var(--rentka-green)] mb-2">
+                <label className="block text-sm font-semibold text-slate-800 mb-2">
                   Service
                 </label>
                 <select
