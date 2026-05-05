@@ -279,7 +279,7 @@ useEffect(() => {
   Choose Your City & Service
 </h2>
 
-<p className="text-slate-700">
+<p className="text-[var(--rentka-blue)">
   All bookings include a driver. Select your location to see available cars.
 </p>
           </div>
@@ -287,7 +287,7 @@ useEffect(() => {
           <div className="rounded-2xl bg-white p-5 md:p-8 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">
+                <label className="block text-sm font-semibold text-[var(--rentka-blue) mb-2">
                   Country
                 </label>
                 <select className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
@@ -300,7 +300,7 @@ useEffect(() => {
               </div>
 
               <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-2">
+              <label className="block text-sm font-semibold text-[var(--rentka-blue) mb-2">
                 City/Area
               </label>
                 <select
@@ -333,7 +333,7 @@ useEffect(() => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">
+                <label className="block text-sm font-semibold text-[var(--rentka-blue) mb-2">
                   Service
                 </label>
                 <select
