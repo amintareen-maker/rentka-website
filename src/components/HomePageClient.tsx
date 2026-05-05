@@ -280,7 +280,7 @@ useEffect(() => {
 </h2>
 
 <p className="text-[var(--rentka-blue)">
-  All bookings include a driver. Select your location to see available cars.
+  All bookings are with Driver . Select your location to see multiple options of your preffered car.
 </p>
           </div>
 
