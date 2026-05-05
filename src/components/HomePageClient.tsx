@@ -276,11 +276,12 @@ useEffect(() => {
         <div className="mx-auto max-w-7xl px-6 py-12">
           <div className="mb-8 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-[var(--rentka-blue)] mb-2">
-              Find the right car for your trip
-            </h2>
-            <p className="text-slate-700">
-              Select your city and service to see available cars
-            </p>
+  Choose Your City & Service
+</h2>
+
+<p className="text-slate-700">
+  All bookings include a driver. Select your location to see available cars.
+</p>
           </div>
 
           <div className="rounded-2xl bg-white p-5 md:p-8 shadow-lg">
