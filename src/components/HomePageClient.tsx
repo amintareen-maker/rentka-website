@@ -431,7 +431,7 @@ useEffect(() => {
                       <span className="font-bold text-[var(--rentka-green)]">
                         PKR {m.minPrice}
                       </span>
-                      <span className="text-slate-500"> /day</span>
+                      <span className="text-slate-500"> /day (Driver Included)</span>
                     </p>
                   )}
 
@@ -469,7 +469,9 @@ useEffect(() => {
             }`}
           >
             A considered rental experience, Dedicated support throughout your ride.
+             Simple, fast, and reliable car rental with driver in Islamabad.
           </p>
+          
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-left">
             {[
