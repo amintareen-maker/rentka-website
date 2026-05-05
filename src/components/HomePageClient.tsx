@@ -300,7 +300,7 @@ useEffect(() => {
               </div>
 
               <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-2">
+              <label className="block text-sm font-semibold text-[var(--rentka-green)] mb-2">
                 City/Area
               </label>
                 <select
@@ -333,7 +333,7 @@ useEffect(() => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">
+                <label className="block text-sm font-semibold text-[var(--rentka-green)] mb-2">
                   Service
                 </label>
                 <select
@@ -374,6 +374,13 @@ useEffect(() => {
               </p>
             )}
           </div>
+          <div className="text-center mt-6 mb-2">
+  <p className="text-sm text-slate-500">
+    <span className="text-[var(--rentka-green)] font-semibold">
+      Compare cars & prices
+    </span>
+  </p>
+</div>
         </div>
       </section>
 
@@ -585,10 +592,10 @@ useEffect(() => {
         {chatOpen && (
           <div className="bg-white w-72 rounded-2xl shadow-xl border border-slate-200 p-4 mb-3 animate-fade-in relative">
             <p className="text-sm font-semibold text-slate-900 mb-1">
-              👋 Need help?
+              👋 Need a car with driver?
             </p>
             <p className="text-sm text-slate-600 mb-3">
-              We can help you find the right car quickly.
+              Tell us your requirement — we’ll suggest the best option instantly.
             </p>
 
             <a
