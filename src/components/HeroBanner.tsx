@@ -74,7 +74,7 @@ export default function HeroBanner() {
           {/* LEFT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
-              Find the Right Rental Car — Without Calling 10 Different Vendors
+              Find the Right Car Rental — Without Calling 10 Different Vendors
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-xl">
@@ -87,8 +87,14 @@ export default function HeroBanner() {
 
             <Link href="#filters">
               <button className="mt-8 rounded-lg bg-[var(--rentka-green)] px-6 py-3 font-semibold text-white hover:bg-[var(--rentka-green-hover)] transition">
-                See available cars in your city
+                Compare Cars & Prices
               </button>
+              <div className="mt-6 flex flex-wrap gap-3 text-sm text-gray-600">
+              <span>✔ Verified Vendors</span>
+              <span>✔ SECP Registered</span>
+              <span>✔ NTN Registered</span>
+              <span>✔ No Hidden Charges</span>
+            </div>
             </Link>
           </div>
 
