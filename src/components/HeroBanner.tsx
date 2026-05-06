@@ -74,16 +74,15 @@ export default function HeroBanner() {
           {/* LEFT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
-              Rent a car from verified local partners — without confusion
+              Find the Right Rental Car — Without Calling 10 Different Vendors
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-xl">
-              We help you find the right car, confirm availability,
-              and coordinate with trusted rental partners in your city.
+              Browse verified rental cars with transparent pricing, trusted vendors, and quick booking support.
             </p>
 
             <p className="mt-4 text-gray-700 font-medium">
-              Real cars. Real owners. No hidden charges.
+              Multiple options, Multiple owners, Multiple Rates, No hidden charges.
             </p>
 
             <Link href="#filters">
