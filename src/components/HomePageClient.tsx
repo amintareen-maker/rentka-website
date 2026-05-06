@@ -36,7 +36,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
      FILTER STATE
   ------------------------------ */
   const [country] = useState<string>("PK");
-  const [city] = useState<string>("islamabad");
+  const [city, setCity] = useState<string>("islamabad");
   const [service, setService] =
     useState<"selfDrive" | "withDriver" | undefined>();
 
@@ -283,7 +283,7 @@ useEffect(() => {
   Choose Your City & Service
 </h2>
 
-<p className="text-[var(--rentka-blue)">
+<p className="text-[var(--rentka-blue)]">
   All bookings include a driver. Select your location to see available cars.
 </p>
           </div>
@@ -311,7 +311,7 @@ useEffect(() => {
                   key={`city-${shakeKey}`}
                   value={city ?? ""}
                   onChange={(e) => {
-                    const selectedCity = e.target.value || undefined;
+                    const selectedCity = e.target.value;
 
                     trackEvent("select_city", {
                       city: selectedCity,
@@ -327,14 +327,10 @@ useEffect(() => {
                     : "border-slate-300 focus:border-[var(--rentka-green)]"
                 } focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)]`}
                 >
-                  <option value="">Select city</option>
-                  {cities.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name === "Islamabad"
-                      ? "Islamabad / Rawalpindi"
-                      : c.name}
-                    </option>
-                  ))}
+                  <option value="islamabad">
+  Islamabad / Rawalpindi
+</option>
+                  
                 </select>
               </div>
 
