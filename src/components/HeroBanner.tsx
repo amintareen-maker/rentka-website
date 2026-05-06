@@ -74,7 +74,7 @@ export default function HeroBanner() {
           {/* LEFT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
-              Find the Right Car (withDriver Service) — Without Calling 4 Different Vendors
+              Find the Right Car (withDriver) — Without Calling 4 Different Vendors. 
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-xl">
