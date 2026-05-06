@@ -74,11 +74,11 @@ export default function HeroBanner() {
           {/* LEFT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
-              Find the Right Car Rental — Without Calling 10 Different Vendors
+              Find the Right Car (withDriver Service) — Without Calling 4 Different Vendors
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-xl">
-              Browse verified rental cars with transparent pricing, trusted vendors, and quick booking support.
+              Browse cars with transparent pricing, trusted vendors, and quick booking support.
             </p>
 
             <p className="mt-4 text-gray-700 font-medium">
