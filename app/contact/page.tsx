@@ -29,7 +29,7 @@ export default function ContactPage() {
               </a>
             </p>
 
-            <p className="text-slate-700 font-semibold">
+            <p className="text-slate-700">
               {" "}
               <a href="mailto:rentka.booking@gmail.com" className="hover:underline">
                 rentka.booking@gmail.com

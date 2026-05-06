@@ -74,12 +74,16 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
 
   // ✅ AUTO-OPEN CHAT AFTER 5 SECONDS (SEPARATE HOOK)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setChatOpen(true);
-    }, 8000);
+  if (!city) return;
 
-    return () => clearTimeout(timer);
-  }, []);
+  const timer = setTimeout(() => {
+    if (!service) {
+      setChatOpen(true);
+    }
+  }, 6000);
+
+  return () => clearTimeout(timer);
+}, [city, service]);
 
   /* -----------------------------
      LOCATIONS
@@ -592,10 +596,10 @@ useEffect(() => {
         {chatOpen && (
           <div className="bg-white w-72 rounded-2xl shadow-xl border border-slate-200 p-4 mb-3 animate-fade-in relative">
             <p className="text-sm font-semibold text-slate-900 mb-1">
-              👋 Need a car with driver?
+              👋 Need help choosing a car?
             </p>
             <p className="text-sm text-slate-600 mb-3">
-              Tell us your requirement — we’ll suggest the best option instantly.
+              Tell us your city & requirement — we’ll suggest the best option instantly.
             </p>
 
             <a
