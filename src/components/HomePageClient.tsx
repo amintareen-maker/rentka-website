@@ -36,7 +36,7 @@ export default function HomePageClient({ initialCars = [] }: { initialCars?: Car
      FILTER STATE
   ------------------------------ */
   const [country] = useState<string>("PK");
-  const [city, setCity] = useState<string>("islamabad");
+  const [city] = useState<string>("islamabad");
   const [service, setService] =
     useState<"selfDrive" | "withDriver" | undefined>();
 
@@ -331,8 +331,8 @@ useEffect(() => {
                   {cities.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name === "Islamabad"
-  ? "Islamabad / Rawalpindi"
-  : c.name}
+                      ? "Islamabad / Rawalpindi"
+                      : c.name}
                     </option>
                   ))}
                 </select>
