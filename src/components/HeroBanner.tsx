@@ -74,7 +74,7 @@ export default function HeroBanner() {
           {/* LEFT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
-              Find the Right Car (withDriver) — Without Calling 4 Different Vendors. 
+              Find the Right Car (With Driver) — Without Calling 4 Different Vendors. 
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-xl">
@@ -82,7 +82,7 @@ export default function HeroBanner() {
             </p>
 
             <p className="mt-4 text-gray-700 font-medium">
-              Multiple options, Multiple owners, Multiple Rates, No hidden charges.
+              One platform - Multiple options, Multiple owners, Multiple Rates, No hidden charges.
             </p>
 
             <Link href="#filters">
