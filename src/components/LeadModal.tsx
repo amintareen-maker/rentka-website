@@ -100,76 +100,39 @@ export default function LeadModal({ open, onClose, context }: Props) {
     }
 
     try {
-      setLoading(true);
+  setLoading(true);
 
-      const cityCode = (context.city ?? "GEN").substring(0, 3).toUpperCase();
-      const counterRef = doc(db, "meta", "counters");
+  const cityCode = (context.city ?? "GEN")
+    .substring(0, 3)
+    .toUpperCase();
 
-      const newNumber = await runTransaction(db, async (transaction) => {
-        const counterDoc = await transaction.get(counterRef);
+  const counterRef = doc(db, "meta", "counters");
 
-        if (!counterDoc.exists()) {
-          throw new Error("Counter document does not exist!");
-        }
+  const newNumber = await runTransaction(db, async (transaction) => {
+    const counterDoc = await transaction.get(counterRef);
 
-        const current = counterDoc.data().leadCounter || 0;
-        const next = current + 1;
+    if (!counterDoc.exists()) {
+      throw new Error("Counter document does not exist!");
+    }
 
-        transaction.update(counterRef, { leadCounter: next });
+    const current = counterDoc.data().leadCounter || 0;
+    const next = current + 1;
 
-        return next;
-      });
+    transaction.update(counterRef, { leadCounter: next });
 
-      const leadId = `RK-${cityCode}-${newNumber}`;
-      const reviewToken = Math.random().toString(36).substring(2, 10);
+    return next;
+  });
 
-      const docRef = await addDoc(collection(db, "leads"), {
-        leadId,
-        name: name.trim(),
-        phone: phone.trim(),
-        email: email.trim() || null,
-        carName: context.carName ?? null,
-        country: context.country ?? null,
-        city: context.city ?? null,
-        service: context.service ?? null,
-        modelYear: context.modelYearLabel ?? context.modelYear ?? null,
-        pickupDate,
-        preferredTime,
-        vendorName: context.vendorName ?? null,
-        vendorId: context.vendorId ?? null,
-        pricingType: context.pricingType ?? null,
-        duration: context.duration ?? null,
-        price: context.price ?? null,
-        source: "website",
-        status: "new",
-        reviewSubmitted: false,
-        reviewSent: false,
-        reviewToken,
-        createdAt: serverTimestamp(),
-      });
+  const leadId = `RK-${cityCode}-${newNumber}`;
 
-      const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
-      await updateDoc(docRef, { reviewLink });
-      
-      trackEvent("booking_intent", {
-  source: "lead_submit_fallback",
-});
+  const serviceLabel =
+    context.service === "selfDrive"
+      ? "Self Drive"
+      : context.service === "withDriver"
+      ? "With Driver"
+      : "N/A";
 
-      trackEvent("lead_submitted", {
-  car_name: context.carName,
-  city: context.city,
-  service: context.service,
-  price: context.price,
-});
-
-      const serviceLabel =
-        context.service === "selfDrive"
-          ? "Self Drive"
-          : context.service === "withDriver"
-          ? "With Driver"
-          : "N/A";
-
-      const message = `
+  const message = `
 Hi RentKA 👋
 
 I just submitted a request on your website.
@@ -187,7 +150,9 @@ My booking reference: *${leadId}*
 💼 Package:
 ${context.pricingType ?? "N/A"} - ${context.duration ?? "N/A"}
 
-💰 Price: ${context.price ? `PKR ${context.price}` : "To be confirmed"}
+💰 Price: ${
+    context.price ? `PKR ${context.price}` : "To be confirmed"
+  }
 
 👤 Name: ${name}
 📞 Phone: ${phone}
@@ -195,53 +160,110 @@ ${context.pricingType ?? "N/A"} - ${context.duration ?? "N/A"}
 Please confirm availability.
 `;
 
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+  const encodedMessage = encodeURIComponent(message);
 
-      const formData = new URLSearchParams({
-        name: name.trim(),
-        phone: phone.trim(),
-        email: email.trim() || "",
-        carName: context.carName || "",
-        vendorName: context.vendorName || "",
-        vendorId: context.vendorId || "",
-        modelYear: String(context.modelYearLabel ?? context.modelYear ?? ""),
-        country: context.country || "",
-        city: context.city || "",
-        service: context.service || "",
-        serviceType: context.pricingType || "",
-        packageName: context.pricingType || "",
-        packageDuration: context.duration || "",
-        packagePrice: context.price ? String(context.price) : "",
-        pickupDate,
-        preferredTime,
-        source: "website",
-        leadId,
-        status: "new",
-      });
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
-      fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
-        method: "POST",
-      });
+  /* ======================================
+     🚀 OPEN WHATSAPP IMMEDIATELY
+     ====================================== */
 
-      /* ===============================
-         ✅ GOOGLE ADS + REDIRECT (FIXED)
-         =============================== */
-      if (typeof window !== "undefined" && (window as any).gtag) {
+  window.open(whatsappUrl, "_blank");
+
+  /* ======================================
+     BACKGROUND TASKS
+     ====================================== */
+
+  const reviewToken = Math.random()
+    .toString(36)
+    .substring(2, 10);
+
+  const docRef = await addDoc(collection(db, "leads"), {
+    leadId,
+    name: name.trim(),
+    phone: phone.trim(),
+    email: email.trim() || null,
+    carName: context.carName ?? null,
+    country: context.country ?? null,
+    city: context.city ?? null,
+    service: context.service ?? null,
+    modelYear:
+      context.modelYearLabel ??
+      context.modelYear ??
+      null,
+    pickupDate,
+    preferredTime,
+    vendorName: context.vendorName ?? null,
+    vendorId: context.vendorId ?? null,
+    pricingType: context.pricingType ?? null,
+    duration: context.duration ?? null,
+    price: context.price ?? null,
+    source: "website",
+    status: "new",
+    reviewSubmitted: false,
+    reviewSent: false,
+    reviewToken,
+    createdAt: serverTimestamp(),
+  });
+
+  const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
+
+  await updateDoc(docRef, { reviewLink });
+
+  const formData = new URLSearchParams({
+    name: name.trim(),
+    phone: phone.trim(),
+    email: email.trim() || "",
+    carName: context.carName || "",
+    vendorName: context.vendorName || "",
+    vendorId: context.vendorId || "",
+    modelYear: String(
+      context.modelYearLabel ??
+      context.modelYear ??
+      ""
+    ),
+    country: context.country || "",
+    city: context.city || "",
+    service: context.service || "",
+    serviceType: context.pricingType || "",
+    packageName: context.pricingType || "",
+    packageDuration: context.duration || "",
+    packagePrice: context.price
+      ? String(context.price)
+      : "",
+    pickupDate,
+    preferredTime,
+    source: "website",
+    leadId,
+    status: "new",
+  });
+
+  fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
+    method: "POST",
+  });
+
+  trackEvent("booking_intent", {
+    source: "lead_submit_fallback",
+  });
+
+  trackEvent("lead_submitted", {
+    car_name: context.carName,
+    city: context.city,
+    service: context.service,
+    price: context.price,
+  });
+
   gtag_report_conversion();
+
+} catch (err) {
+  console.error("Failed:", err);
+
+  setError(
+    "Something went wrong. Please try again."
+  );
+} finally {
+  setLoading(false);
 }
-
-// always redirect (even if gtag fails)
-setTimeout(() => {
-  window.location.href = whatsappUrl;
-}, 300);
-
-    } catch (err) {
-      console.error("Failed:", err);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
   };
 
   /* ===============================
