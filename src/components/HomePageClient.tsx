@@ -377,11 +377,6 @@ useEffect(() => {
             )}
           </div>
           <div className="text-center mt-6 mb-2">
-  <p className="text-sm text-slate-500">
-    <span className="text-[var(--rentka-green)] font-semibold">
-      Compare cars & prices
-    </span>
-  </p>
 </div>
         </div>
       </section>

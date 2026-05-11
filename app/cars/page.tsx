@@ -1,44 +1,106 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import {
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
+
 import { db } from "@/lib/firebase";
 
-import CarCard from "@/components/CarCard";
 import LeadModal from "@/components/LeadModal";
 import CarDetailsModal from "@/components/CarDetailsModal";
 
 import { Car } from "@/lib/useCars";
 
-const COUNTRIES = ["PK", "BH"];
+const COUNTRIES = ["PK"];
 
-type ServiceType = "selfDrive" | "withDriver" | undefined;
+type ServiceType = "withDriver" | undefined;
+
+type VendorMap = Record<
+  string,
+  {
+    name?: string;
+    logoUrl?: string;
+  }
+>;
 
 export default function CarsPage() {
-  const [allCars, setAllCars] = useState<Car[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [country, setCountry] = useState<string>("all");
-  const [city, setCity] = useState<string>("all");
-  const [service, setService] = useState<string>("all"); // filter only
-
-  // 🔹 FINAL service chosen by user (modal authority)
-  const [finalService, setFinalService] = useState<ServiceType>(undefined);
-
-  // 🔹 Lead modal
-  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
-  const [showLeadModal, setShowLeadModal] = useState(false);
-
-  // 🔹 Details modal
-  const [detailsCar, setDetailsCar] = useState<Car | null>(null);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
-
-  // 🔴 Validation flags
-  const countryMissing = country === "all";
-  const cityMissing = !countryMissing && city === "all";
+  const searchParams = useSearchParams();
 
   /* -----------------------------
-     Load all cars
+     URL PARAMS
+  ------------------------------ */
+  const defaultCountry =
+    searchParams.get("country") || "PK";
+
+  const defaultCity =
+    searchParams.get("city")?.toLowerCase() ||
+    "islamabad";
+
+  const urlService =
+    searchParams.get("service") ===
+    "with-driver"
+      ? "withDriver"
+      : "withDriver";
+
+  const [allCars, setAllCars] = useState<Car[]>(
+    []
+  );
+
+  const [vendors, setVendors] =
+    useState<VendorMap>({});
+
+  const [loading, setLoading] =
+    useState(true);
+
+  /* -----------------------------
+     PRESELECTED FILTERS
+  ------------------------------ */
+  const [country, setCountry] =
+    useState<string>(defaultCountry);
+
+  const [city, setCity] =
+    useState<string>(defaultCity);
+
+  const [service, setService] =
+    useState<string>(urlService);
+
+  /* -----------------------------
+     FINAL SERVICE
+  ------------------------------ */
+  const [finalService, setFinalService] =
+    useState<ServiceType>(undefined);
+
+  /* -----------------------------
+     MODALS
+  ------------------------------ */
+  const [selectedCar, setSelectedCar] =
+    useState<Car | null>(null);
+
+  const [showLeadModal, setShowLeadModal] =
+    useState(false);
+
+  const [detailsCar, setDetailsCar] =
+    useState<Car | null>(null);
+
+  const [showDetailsModal, setShowDetailsModal] =
+    useState(false);
+
+  /* -----------------------------
+     VALIDATION
+  ------------------------------ */
+  const countryMissing = country === "all";
+
+  const cityMissing =
+    !countryMissing && city === "all";
+
+  /* -----------------------------
+     LOAD ALL CARS
   ------------------------------ */
   useEffect(() => {
     const fetchAllCars = async () => {
@@ -46,13 +108,19 @@ export default function CarsPage() {
         let cars: Car[] = [];
 
         for (const c of COUNTRIES) {
-          const ref = collection(db, "countries", c, "cars");
+          const ref = collection(
+            db,
+            "countries",
+            c,
+            "cars"
+          );
+
           const snap = await getDocs(ref);
 
-          snap.forEach((doc) => {
+          snap.forEach((docSnap) => {
             cars.push({
-              ...(doc.data() as Car),
-              id: doc.id,
+              ...(docSnap.data() as Car),
+              id: docSnap.id,
               country: c,
             });
           });
@@ -60,7 +128,10 @@ export default function CarsPage() {
 
         setAllCars(cars);
       } catch (error) {
-        console.error("Failed to load cars:", error);
+        console.error(
+          "Failed to load cars:",
+          error
+        );
       } finally {
         setLoading(false);
       }
@@ -70,164 +141,492 @@ export default function CarsPage() {
   }, []);
 
   /* -----------------------------
-     Cities by country
+     LOAD VENDORS
+  ------------------------------ */
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const vendorMap: VendorMap = {};
+
+        for (const c of COUNTRIES) {
+          const vendorsRef = collection(
+            db,
+            "countries",
+            c,
+            "vendors"
+          );
+
+          const vendorsSnap =
+            await getDocs(vendorsRef);
+
+          vendorsSnap.forEach((vendorDoc) => {
+            const data = vendorDoc.data();
+
+            vendorMap[vendorDoc.id] = {
+              name: data.name || "Vendor",
+              logoUrl:
+                data.logoUrl || "",
+            };
+          });
+        }
+
+        setVendors(vendorMap);
+      } catch (error) {
+        console.error(
+          "Failed to load vendors:",
+          error
+        );
+      }
+    };
+
+    fetchVendors();
+  }, []);
+
+  /* -----------------------------
+     CITIES BY COUNTRY
   ------------------------------ */
   const cities = useMemo(() => {
     if (country === "all") return [];
 
     const citySet = new Set<string>();
+
     allCars
       .filter((c) => c.country === country)
-      .forEach((c) => c.cityList?.forEach((ct) => citySet.add(ct)));
+      .forEach((c) =>
+        c.cityList?.forEach((ct) =>
+          citySet.add(ct.toLowerCase())
+        )
+      );
 
-    return Array.from(citySet);
+    return Array.from(citySet).sort();
   }, [country, allCars]);
 
   /* -----------------------------
-     Filtered cars
+     AUTO SELECT CITY
+  ------------------------------ */
+  useEffect(() => {
+    const cityParam =
+      searchParams.get("city")?.toLowerCase();
+
+    if (
+      cityParam &&
+      cities.includes(cityParam)
+    ) {
+      setCity(cityParam);
+    }
+  }, [cities, searchParams]);
+
+  /* -----------------------------
+     FILTERED CARS
   ------------------------------ */
   const filteredCars = useMemo(() => {
-    if (countryMissing || cityMissing) return [];
+    if (countryMissing || cityMissing)
+      return [];
 
     return allCars.filter((car) => {
-      if (car.country !== country) return false;
-      if (!car.cityList?.includes(city)) return false;
+      if (car.country !== country)
+        return false;
 
-      if (service === "selfDrive" && !car.supports?.withoutDriver) return false;
-      if (service === "withDriver" && !car.supports?.withDriver) return false;
+      const normalizedCities =
+        car.cityList?.map((c) =>
+          c.toLowerCase()
+        ) || [];
+
+      if (
+        !normalizedCities.includes(
+          city.toLowerCase()
+        )
+      )
+        return false;
+
+      if (!car.supports?.withDriver)
+        return false;
 
       return true;
     });
-  }, [allCars, country, city, service, countryMissing, cityMissing]);
+  }, [
+    allCars,
+    country,
+    city,
+    countryMissing,
+    cityMissing,
+  ]);
+
+  /* -----------------------------
+     GROUP BY MODEL
+  ------------------------------ */
+  const groupedCars = useMemo(() => {
+    const grouped: Record<string, Car[]> = {};
+
+    filteredCars.forEach((car) => {
+      const model =
+        car.model?.trim() ||
+        car.name?.trim() ||
+        "Other Cars";
+
+      if (!grouped[model]) {
+        grouped[model] = [];
+      }
+
+      grouped[model].push(car);
+    });
+
+    return Object.keys(grouped)
+      .sort()
+      .reduce((acc, key) => {
+        acc[key] = grouped[key];
+        return acc;
+      }, {} as Record<string, Car[]>);
+  }, [filteredCars]);
 
   return (
-    <section className="max-w-7xl mx-auto px-6 py-10">
-      <h1 className="text-2xl font-semibold mb-6">Browse Cars</h1>
+    <section className="max-w-7xl mx-auto px-4 py-10">
 
-      {/* ---------------- Filters ---------------- */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        {/* Country */}
+      {/* HEADER */}
+      <div className="mb-10">
+
+        <h1 className="text-3xl md:text-4xl font-bold text-[var(--rentka-blue)]">
+          Browse Rental Cars
+        </h1>
+
+        <p className="text-slate-600 mt-3 max-w-2xl leading-relaxed">
+          Browse verified rental cars in
+          Islamabad & Rawalpindi with
+          professional drivers and transparent
+          pricing — without unexpected
+          last-minute price changes.
+        </p>
+
+      </div>
+
+      {/* FILTERS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+
+        {/* COUNTRY */}
         <div>
           <select
-            className={`w-full rounded-lg px-3 py-2 border ${
-              countryMissing ? "border-red-500" : "border-slate-300"
-            }`}
+            className="w-full rounded-xl px-4 py-3 border border-slate-300 bg-white"
             value={country}
             onChange={(e) => {
               setCountry(e.target.value);
               setCity("all");
             }}
           >
-            <option value="all">Select Country *</option>
             {COUNTRIES.map((c) => (
-              <option key={c} value={c}>
+              <option
+                key={c}
+                value={c}
+              >
                 {c}
               </option>
             ))}
           </select>
-
-          {countryMissing && (
-            <p className="text-sm text-red-600 mt-1">
-              Please select a country to continue
-            </p>
-          )}
         </div>
 
-        {/* City */}
+                {/* CITY */}
         <div>
           <select
-            className={`w-full rounded-lg px-3 py-2 border ${
-              cityMissing ? "border-red-500" : "border-slate-300"
-            }`}
+            className="w-full rounded-xl px-4 py-3 border border-slate-300 bg-white"
             value={city}
-            onChange={(e) => setCity(e.target.value)}
-            disabled={country === "all"}
+            onChange={(e) =>
+              setCity(e.target.value)
+            }
           >
             <option value="all">
-              {country === "all" ? "Select country first" : "Select City *"}
+              Select City
             </option>
-            {cities.map((ct) => (
-              <option key={ct} value={ct}>
-                {ct}
-              </option>
-            ))}
+
+            {cities.map((ct) => {
+
+              const cityLabel =
+                ct.toLowerCase() === "islamabad"
+                  ? "Islamabad / Rawalpindi"
+                  : ct.charAt(0).toUpperCase() +
+                    ct.slice(1);
+
+              return (
+                <option
+                  key={ct}
+                  value={ct}
+                >
+                  {cityLabel}
+                </option>
+              );
+            })}
           </select>
-
-          {cityMissing && (
-            <p className="text-sm text-red-600 mt-1">
-              Please select a city to see available cars
-            </p>
-          )}
         </div>
 
-        {/* Service (filter only) */}
-        <select
-          className="border border-slate-300 rounded-lg px-3 py-2"
-          value={service}
-          onChange={(e) => setService(e.target.value)}
-        >
-          <option value="all">All Services</option>
-          <option value="selfDrive">Self Drive</option>
-          <option value="withDriver">With Driver</option>
-        </select>
+        {/* SERVICE */}
+        <div>
+          <select
+            className="w-full rounded-xl px-4 py-3 border border-slate-300 bg-white"
+            value={service}
+            onChange={(e) =>
+              setService(e.target.value)
+            }
+          >
+            <option value="withDriver">
+              With Driver
+            </option>
+          </select>
+        </div>
+
       </div>
 
-      {/* Guidance */}
-      {(countryMissing || cityMissing) && (
-        <div className="mb-6 text-slate-600">
-          <strong>Select location to view cars.</strong> Country and city are
-          required to show accurate availability and pricing.
+      {/* LOADING */}
+      {loading && (
+        <div className="py-10 text-slate-500">
+          Loading cars...
         </div>
       )}
 
-      {loading && <p className="text-slate-500">Loading cars...</p>}
+      {/* EMPTY */}
+      {!loading &&
+        filteredCars.length === 0 && (
+          <div className="py-10 text-slate-500">
+            No cars available for this
+            selection.
+          </div>
+        )}
 
-      {!loading && !countryMissing && !cityMissing && filteredCars.length === 0 && (
-        <p className="text-slate-500">No cars match your selection.</p>
-      )}
+      {/* GROUPED CARS */}
+      {!loading &&
+        Object.entries(groupedCars).map(
+          ([model, cars]) => {
 
-      {/* ---------------- Cars Grid ---------------- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCars.map((car) => (
-          <CarCard
-            key={`${car.country}_${car.id}`}
-            car={car}
-            onViewDetails={(selected) => {
-              setDetailsCar(selected);
-              setShowDetailsModal(true);
-            }}
-          />
-        ))}
-      </div>
+            const lowestPrice = Math.min(
+              ...cars.map(
+                (car) =>
+                  car.pricing?.withDriver
+                    ?.withinCity?.daily || 0
+              )
+            );
 
-      {/* ---------------- Car Details Modal ---------------- */}
+            return (
+              <div
+                key={model}
+                className="mb-16"
+              >
+
+                {/* MODEL HEADER */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+
+                  <div>
+
+                    <h2 className="text-2xl md:text-3xl font-bold text-[var(--rentka-blue)]">
+                      {model}
+                    </h2>
+
+                    <div className="flex flex-wrap items-center gap-3 mt-2">
+
+                      <p className="text-slate-500">
+                        {cars.length} vehicle
+                        {cars.length > 1
+                          ? "s"
+                          : ""}{" "}
+                        available
+                      </p>
+
+                      {lowestPrice > 0 && (
+                        <div className="rounded-full bg-[var(--rentka-green)]/10 px-3 py-1 text-sm font-semibold text-[var(--rentka-green)]">
+                          Starting from PKR{" "}
+                          {lowestPrice.toLocaleString()}
+                          /day
+                        </div>
+                      )}
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* CAR GRID */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                  {cars.map((car) => {
+
+                    const price =
+                      car.pricing?.withDriver
+                        ?.withinCity?.daily;
+
+                    const vendor =
+                      vendors[
+                        car.vendorId || ""
+                      ];
+
+                    const vendorName =
+                      vendor?.name ||
+                      "Verified Partner";
+
+                    const vendorLogo =
+                      vendor?.logoUrl;
+
+                    return (
+                      <div
+                        key={`${car.country}_${car.id}`}
+                        className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition"
+                      >
+
+                        {/* IMAGE */}
+                        {/* IMAGE */}
+<div className="relative h-[240px] rounded-2xl overflow-hidden bg-slate-100 mb-5 border border-slate-100">
+
+  {car.imageURL ? (
+    <Image
+      src={car.imageURL}
+      alt={car.name || ""}
+      fill
+      className="object-contain p-4 hover:scale-105 transition duration-300"
+      sizes="(max-width: 768px) 100vw, 33vw"
+      priority={false}
+    />
+  ) : (
+    <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">
+      No Image Available
+    </div>
+  )}
+
+  {/* subtle gradient */}
+  <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/5 to-transparent pointer-events-none" />
+
+</div>
+                        {/* INFO */}
+                        <div className="space-y-3">
+
+                          <div>
+
+                            <h3 className="text-lg font-bold text-slate-900">
+                              {car.name}
+                            </h3>
+
+                            <p className="text-sm text-slate-500">
+                              {car.category ||
+                                "Rental Car"}
+                            </p>
+
+                          </div>
+
+                          {/* MODEL */}
+                          {car.modelYearLabel && (
+                            <div className="inline-flex rounded-full bg-[var(--rentka-green)]/10 px-3 py-1 text-xs font-semibold text-[var(--rentka-green)]">
+                              Model:{" "}
+                              {car.modelYearLabel}
+                            </div>
+                          )}
+
+                          {/* PRICE */}
+                          {price && (
+                            <div>
+
+                              <p className="text-sm text-slate-500">
+                                Starting From
+                              </p>
+
+                              <p className="text-2xl font-bold text-[var(--rentka-blue)]">
+                                PKR{" "}
+                                {price.toLocaleString()}
+                              </p>
+
+                              <p className="text-xs text-slate-500">
+                                Per day with
+                                driver
+                              </p>
+
+                            </div>
+                          )}
+
+                          {/* VENDOR */}
+                          <div className="flex items-center gap-3 pt-2">
+
+                            {vendorLogo ? (
+                              <div className="relative w-10 h-10 rounded-full overflow-hidden border border-slate-200">
+
+                                <Image
+                                  src={vendorLogo}
+                                  alt={vendorName}
+                                  fill
+                                  className="object-cover"
+                                />
+
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-[var(--rentka-blue)] text-white flex items-center justify-center text-sm font-bold">
+                                {vendorName
+                                  .charAt(0)
+                                  .toUpperCase()}
+                              </div>
+                            )}
+
+                            <div>
+
+                              <p className="text-xs text-slate-500">
+                                Rental Partner
+                              </p>
+
+                              <p className="text-sm font-semibold text-slate-800">
+                                {vendorName}
+                              </p>
+
+                            </div>
+
+                          </div>
+
+                          {/* BUTTON */}
+                          <button
+                            onClick={() => {
+                              setDetailsCar(car);
+                              setShowDetailsModal(
+                                true
+                              );
+                            }}
+                            className="w-full mt-4 rounded-xl bg-[var(--rentka-blue)] px-4 py-3 text-white font-semibold hover:opacity-90 transition"
+                          >
+                            View Details
+                          </button>
+
+                        </div>
+
+                      </div>
+                    );
+                  })}
+
+                </div>
+
+              </div>
+            );
+          }
+        )}
+
+      {/* DETAILS MODAL */}
       <CarDetailsModal
         open={showDetailsModal}
         car={detailsCar}
-        service={
-          service === "selfDrive" || service === "withDriver"
-            ? service
-            : "selfDrive"
-        }
+        service="withDriver"
         onClose={() => {
           setShowDetailsModal(false);
           setDetailsCar(null);
         }}
       />
 
-      {/* ---------------- Lead Modal ---------------- */}
+      {/* LEAD MODAL */}
       <LeadModal
         open={showLeadModal}
-        onClose={() => setShowLeadModal(false)}
+        onClose={() =>
+          setShowLeadModal(false)
+        }
         context={{
           carName: selectedCar?.name,
           country,
           city,
           service: finalService,
-          modelYear: selectedCar?.modelYear,
-          modelYearLabel: selectedCar?.modelYearLabel,
+          modelYear:
+            selectedCar?.modelYear,
+          modelYearLabel:
+            selectedCar?.modelYearLabel,
         }}
       />
+
     </section>
   );
 }

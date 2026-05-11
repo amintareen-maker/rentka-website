@@ -41,9 +41,6 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-10">
             {/* NAV */}
             <nav className="flex items-center gap-8 text-sm font-medium text-slate-700">
-              <Link href="/rent-a-car-islamabad" className="hover:text-[var(--rentka-blue)] transition">
-                Islamabad Rental
-              </Link>
               <Link href="/about" className="hover:text-[var(--rentka-blue)] transition">
                 About Us
               </Link>
