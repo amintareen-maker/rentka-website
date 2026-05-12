@@ -94,7 +94,7 @@ export default function IslamabadRentalPage() {
               Compare Corolla, Civic, Prado, Hiace and more from verified rental
               partners in Islamabad & Rawalpindi. Book airport transfers, city
               rides, Murree trips, weddings and family travel with professional
-              drivers — without unexpected last-minute price changes.
+              drivers without unexpected last-minute price changes.
             </p>
 
           </div>
