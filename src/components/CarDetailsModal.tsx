@@ -9,8 +9,19 @@ import { db } from "@/lib/firebase";
 import { track } from "@vercel/analytics";
 
 const trackEvent = (eventName: string, data: any = {}) => {
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", eventName, data);
+  if (typeof window !== "undefined") {
+    window.dataLayer = window.dataLayer || [];
+
+    window.dataLayer.push({
+      event: eventName,
+      ...data,
+    });
+
+    console.log("GTM Event Fired:", {
+      event: eventName,
+      ...data,
+      
+    });
   }
 };
 
