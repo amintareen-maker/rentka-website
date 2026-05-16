@@ -5,9 +5,23 @@ import { addDoc, collection, serverTimestamp, updateDoc } from "firebase/firesto
 import { db } from "@/lib/firebase";
 import { doc, runTransaction } from "firebase/firestore";
 
-const trackEvent = (eventName: string, data: any = {}) => {
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", eventName, data);
+const trackEvent = (
+  eventName: string,
+  data: any = {}
+) => {
+  if (typeof window !== "undefined") {
+    (window as any).dataLayer =
+      (window as any).dataLayer || [];
+
+    (window as any).dataLayer.push({
+      event: eventName,
+      ...data,
+    });
+
+    console.log("GTM Event Fired:", {
+      event: eventName,
+      ...data,
+    });
   }
 };
 
@@ -74,14 +88,20 @@ export default function LeadModal({ open, onClose, context }: Props) {
      🔥 GOOGLE ADS FUNCTION (FIXED)
      =============================== */
   function gtag_report_conversion() {
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", "conversion", {
-        send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-        value: 1.0,
-        currency: "PKR",
-      });
-    }
+  if (typeof window !== "undefined") {
+    (window as any).dataLayer =
+      (window as any).dataLayer || [];
+
+    (window as any).dataLayer.push({
+      event: "google_ads_conversion",
+      send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
+      value: 1.0,
+      currency: "PKR",
+    });
+
+    console.log("Google Ads Conversion Fired");
   }
+}
 
   /* ===============================
      Submit handler
