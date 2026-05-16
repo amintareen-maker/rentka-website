@@ -165,10 +165,34 @@ Please confirm availability.
   const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
 
   /* ======================================
-     🚀 OPEN WHATSAPP IMMEDIATELY
-     ====================================== */
+   FIRE TRACKING FIRST
+   ====================================== */
 
-  window.open(whatsappUrl, "_blank");
+trackEvent("lead_submit", {
+  lead_id: leadId,
+  car_name: context.carName ?? null,
+  city: context.city ?? null,
+  service: context.service ?? null,
+  vendor_name: context.vendorName ?? null,
+  pricing_type: context.pricingType ?? null,
+  duration: context.duration ?? null,
+  price: context.price ?? null,
+  source: "website",
+});
+
+trackEvent("generate_lead", {
+  currency: "PKR",
+  value: context.price ? Number(context.price) : 1,
+});
+
+gtag_report_conversion();
+
+/* ======================================
+   OPEN WHATSAPP IMMEDIATELY
+   ====================================== */
+
+window.open(whatsappUrl, "_blank");
+
 
   /* ======================================
      BACKGROUND TASKS
@@ -246,24 +270,6 @@ Please confirm availability.
    GA4 + GOOGLE ADS TRACKING
    ====================================== */
 
-trackEvent("lead_submit", {
-  lead_id: leadId,
-  car_name: context.carName ?? null,
-  city: context.city ?? null,
-  service: context.service ?? null,
-  vendor_name: context.vendorName ?? null,
-  pricing_type: context.pricingType ?? null,
-  duration: context.duration ?? null,
-  price: context.price ?? null,
-  source: "website",
-});
-
-trackEvent("generate_lead", {
-  currency: "PKR",
-  value: context.price ? Number(context.price) : 1,
-});
-
-gtag_report_conversion();
 
 } catch (err) {
   console.error("Failed:", err);
