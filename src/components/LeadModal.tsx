@@ -242,18 +242,28 @@ Please confirm availability.
     method: "POST",
   });
 
-  trackEvent("booking_intent", {
-    source: "lead_submit_fallback",
-  });
+  /* ======================================
+   GA4 + GOOGLE ADS TRACKING
+   ====================================== */
 
-  trackEvent("lead_submitted", {
-    car_name: context.carName,
-    city: context.city,
-    service: context.service,
-    price: context.price,
-  });
+trackEvent("lead_submit", {
+  lead_id: leadId,
+  car_name: context.carName ?? null,
+  city: context.city ?? null,
+  service: context.service ?? null,
+  vendor_name: context.vendorName ?? null,
+  pricing_type: context.pricingType ?? null,
+  duration: context.duration ?? null,
+  price: context.price ?? null,
+  source: "website",
+});
 
-  gtag_report_conversion();
+trackEvent("generate_lead", {
+  currency: "PKR",
+  value: context.price ? Number(context.price) : 1,
+});
+
+gtag_report_conversion();
 
 } catch (err) {
   console.error("Failed:", err);
