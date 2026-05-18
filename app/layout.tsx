@@ -40,7 +40,7 @@ export default function RootLayout({
     </Script>
   </head>
 
-      <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col">
+      <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col pt-10">
 
 {/* Google Tag Manager (noscript) */}
 <noscript>
@@ -60,9 +60,9 @@ export default function RootLayout({
 
 {/* ✅ Eid Notice Bar */}
         <div className="fixed top-0 left-0 w-full z-[9999] bg-[#0F2B46] text-white text-center text-xs sm:text-sm px-3 py-2 shadow-md">
-          🚗 Book early for Eid travel — Prices and availability may vary from{" "}
+          🚗 Prices and availability may vary from{" "}
           <span className="font-semibold">24 May – 6 June 2026</span> due to
-          high demand.
+          high demand 🚗🚗🚗.
         </div>
 
         <Header />
