@@ -3,8 +3,19 @@
 import { useState, useEffect } from "react";
 
 const trackEvent = (eventName: string, data: any = {}) => {
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", eventName, data);
+  if (typeof window !== "undefined") {
+    window.dataLayer = window.dataLayer || [];
+
+    window.dataLayer.push({
+      event: eventName,
+      ...data,
+    });
+
+    if ((window as any).gtag) {
+      (window as any).gtag("event", eventName, data);
+    }
+
+    console.log("Tracked Event:", eventName, data);
   }
 };
 
