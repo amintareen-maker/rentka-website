@@ -87,7 +87,7 @@ export default function IslamabadRentalPage() {
           <div className="space-y-6">
 
             <h1 className="max-w-4xl text-5xl md:text-6xl xl:text-7xl font-extrabold leading-[1.05] tracking-[-0.03em] text-[var(--rentka-blue)]">
-              Rent a Car in Islamabad — Browse Verified Cars & Transparent Pricing
+              Rent a Car in Islamabad, Browse Verified Cars & Transparent Pricing
             </h1>
 
             <p className="max-w-2xl text-lg md:text-xl leading-relaxed text-slate-700">

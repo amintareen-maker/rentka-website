@@ -3,6 +3,7 @@ import "./globals.css";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { Analytics } from "@vercel/analytics/react";
+import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 export const metadata = {
   title: {
@@ -57,7 +58,10 @@ export default function RootLayout({
   strategy="afterInteractive"
 />
 
+
         <Header />
+
+        <WhatsAppWidget />
 
         <main className="flex-1">{children}</main>
 
