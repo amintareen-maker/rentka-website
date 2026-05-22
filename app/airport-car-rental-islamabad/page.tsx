@@ -4,9 +4,43 @@
 import Link from "next/link";
 
 export const metadata = {
-  title: "Islamabad Airport Transfer Service | RentKA",
+  title: "Islamabad Airport Transfer Service | Airport Pickup & Drop Islamabad | RentKA",
   description:
-    "Book reliable Islamabad airport transfer service with driver. Airport pickup and drop with fuel included, professional drivers, and transparent pricing in Islamabad.",
+    "Book reliable Islamabad airport transfer service with driver. Airport pickup and drop with fuel included, professional drivers, transparent pricing, and 24/7 airport transportation in Islamabad.",
+  keywords: [
+    "Islamabad airport transfer",
+    "Islamabad airport pickup",
+    "Islamabad airport drop service",
+    "airport transfer Islamabad",
+    "Islamabad airport taxi",
+    "airport pickup Islamabad",
+    "Islamabad airport car rental with driver",
+    "Islamabad airport chauffeur service",
+    "Islamabad airport transportation",
+    "Islamabad airport transfer service",
+    "Islamabad airport ride",
+    "Islamabad airport cab",
+    "airport pickup and drop Islamabad",
+    "airport car service Islamabad",
+    "Islamabad airport travel service",
+    "airport transfer Pakistan",
+    "Islamabad airport booking",
+    "Islamabad airport rent a car",
+    "Islamabad airport driver service",
+    "RentKA Islamabad airport transfer",
+  ],
+  alternates: {
+    canonical: "https://rentka.co/airport-transfer/islamabad",
+  },
+  openGraph: {
+    title: "Islamabad Airport Transfer Service | RentKA",
+    description:
+      "Professional airport pickup and drop service in Islamabad with driver, fuel included pricing, and 24/7 availability.",
+    url: "https://rentka.co/airport-transfer/islamabad",
+    siteName: "RentKA",
+    locale: "en_PK",
+    type: "website",
+  },
 };
 
 export default function IslamabadAirportTransferPage() {
@@ -81,7 +115,7 @@ export default function IslamabadAirportTransferPage() {
                 ✔ Family Friendly Service
               </div>
 
-              <div className="bg-[#5BAE4A] text-white p-1 md:p-3 rounded-2xl font-medium shadow-lg text-[6px] sm:text-sm md:text-base leading-relaxed">
+              <div className="bg-[#5BAE4A] text-white p-3 md:p-4 rounded-2xl font-medium shadow-lg text-[13px] sm:text-sm md:text-base leading-relaxed">
                 ✔ Fuel Included Rates
               </div>
 
@@ -90,104 +124,104 @@ export default function IslamabadAirportTransferPage() {
           </div>
 
           {/* PRICING CARD */}
-<div className="w-full">
+          <div className="w-full">
 
-  <a
-    href="https://wa.me/923020589999?text=Hi%20RentKA%2C%20I%20want%20to%20book%20Islamabad%20Airport%20Transfer."
-    target="_blank"
-    className="group block bg-white text-[#0F2B46] rounded-[32px] p-6 md:p-9 shadow-[0_20px_70px_rgba(0,0,0,0.25)] hover:shadow-[0_25px_90px_rgba(0,0,0,0.35)] hover:-translate-y-1 transition duration-300"
-  >
+            <a
+              href="https://wa.me/923020589999?text=Hi%20RentKA%2C%20I%20want%20to%20book%20Islamabad%20Airport%20Transfer."
+              target="_blank"
+              className="group block bg-white text-[#0F2B46] rounded-[32px] p-6 md:p-9 shadow-[0_20px_70px_rgba(0,0,0,0.25)] hover:shadow-[0_25px_90px_rgba(0,0,0,0.35)] hover:-translate-y-1 transition duration-300"
+            >
 
-    <div className="flex items-start justify-between gap-4 mb-7">
+              <div className="flex items-start justify-between gap-4 mb-7">
 
-      <div>
+                <div>
 
-        <span className="text-[#5BAE4A] font-bold text-xs md:text-sm uppercase tracking-[2px]">
-          Starting Rates
-        </span>
+                  <span className="text-[#5BAE4A] font-bold text-xs md:text-sm uppercase tracking-[2px]">
+                    Starting Rates
+                  </span>
 
-        <h2 className="text-3xl md:text-5xl font-black leading-tight mt-3 tracking-[-1px]">
-          Islamabad Airport Transfer
-        </h2>
+                  <h2 className="text-3xl md:text-5xl font-black leading-tight mt-3 tracking-[-1px]">
+                    Islamabad Airport Transfer
+                  </h2>
 
-      </div>
+                </div>
 
-      <span className="hidden md:block text-[#5BAE4A] text-3xl opacity-0 group-hover:opacity-100 transition">
-        →
-      </span>
+                <span className="hidden md:block text-[#5BAE4A] text-3xl opacity-0 group-hover:opacity-100 transition">
+                  →
+                </span>
 
-    </div>
+              </div>
 
-    <div className="space-y-5">
+              <div className="space-y-5">
 
-      <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
+                <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
 
-        <span className="font-semibold text-base md:text-xl">
-          Corolla
-        </span>
+                  <span className="font-semibold text-base md:text-xl">
+                    Corolla
+                  </span>
 
-        <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-          From Rs 5,000
-        </span>
+                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
+                    From Rs 5,000
+                  </span>
 
-      </div>
+                </div>
 
-      <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
+                <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
 
-        <span className="font-semibold text-base md:text-xl">
-          Honda Civic
-        </span>
+                  <span className="font-semibold text-base md:text-xl">
+                    Honda Civic
+                  </span>
 
-        <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-          From Rs 7,000
-        </span>
+                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
+                    From Rs 7,000
+                  </span>
 
-      </div>
+                </div>
 
-      <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
+                <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
 
-        <span className="font-semibold text-base md:text-xl">
-          Honda BR-V
-        </span>
+                  <span className="font-semibold text-base md:text-xl">
+                    Honda BR-V
+                  </span>
 
-        <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-          From Rs 8,000
-        </span>
+                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
+                    From Rs 8,000
+                  </span>
 
-      </div>
+                </div>
 
-      <div className="flex justify-between items-center gap-3">
+                <div className="flex justify-between items-center gap-3">
 
-        <span className="font-semibold text-base md:text-xl">
-          Prado
-        </span>
+                  <span className="font-semibold text-base md:text-xl">
+                    Prado
+                  </span>
 
-        <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-          From Rs 15,000
-        </span>
+                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
+                    From Rs 15,000
+                  </span>
 
-      </div>
+                </div>
 
-    </div>
+              </div>
 
-    <div className="mt-7 flex items-center justify-between gap-4">
+              <div className="mt-7 flex items-center justify-between gap-4">
 
-      <p className="text-sm md:text-base text-gray-500 leading-relaxed">
-        Airport transfer pricing may vary depending on route,
-        timing, luggage requirements, and vehicle availability.
-      </p>
+                <p className="text-sm md:text-base text-gray-500 leading-relaxed">
+                  Airport transfer pricing may vary depending on route,
+                  timing, luggage requirements, and vehicle availability.
+                </p>
 
-      <span className="hidden md:block text-sm font-semibold text-[#5BAE4A] whitespace-nowrap">
-        Tap to Book
-      </span>
+                <span className="hidden md:block text-sm font-semibold text-[#5BAE4A] whitespace-nowrap">
+                  Tap to Book
+                </span>
 
-    </div>
+              </div>
 
-  </a>
+            </a>
 
-</div>
+          </div>
 
-</div>
+        </div>
       </section>
 
       {/* VEHICLE SECTION */}
