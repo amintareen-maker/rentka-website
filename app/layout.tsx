@@ -71,11 +71,6 @@ export default function RootLayout({
                 "Islamabad",
                 "Rawalpindi"
               ],
-              serviceType: [
-                "Car Rental",
-                "Airport Transfer",
-                "Chauffeur Service"
-              ]
             }),
           }}
         />
