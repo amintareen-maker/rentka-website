@@ -5,6 +5,7 @@ import HeroBanner from "@/components/HeroBanner";
 import HomePageClient from "@/components/HomePageClient";
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import GoogleReviews from "@/components/GoogleReviews";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -158,6 +159,8 @@ export default async function Page() {
               </div>
             </div>
           </div>
+          {/* GOOGLE REVIEWS */}
+                <GoogleReviews />    
 
           <HomeCTA />
 
