@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import FAQSection from "@/components/FAQSection";
+import GoogleReviews from "@/components/GoogleReviews";
 
 export const metadata: Metadata = {
   title:
@@ -363,59 +365,9 @@ export default function IslamabadRentalPage() {
       </div>
 
       {/* FAQ */}
-      <div>
+<FAQSection city="Islamabad" />
 
-        <h2 className="mb-10 text-3xl font-bold text-[var(--rentka-blue)]">
-          Frequently Asked Questions
-        </h2>
-
-        <div className="space-y-8">
-
-          <div>
-            <h3 className="font-semibold text-slate-900">
-              Is driver included in the rental price?
-            </h3>
-
-            <p className="mt-2 text-slate-700">
-              Yes. All RentKA bookings include a professional driver.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-slate-900">
-              Do you offer self drive cars in Islamabad?
-            </h3>
-
-            <p className="mt-2 text-slate-700">
-              No. RentKA currently provides cars with professional drivers only.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-slate-900">
-              Can I book a car for Murree or northern trips?
-            </h3>
-
-            <p className="mt-2 text-slate-700">
-              Yes. Customers frequently book Prado, Hiace, Corolla and SUVs
-              for Murree, Nathia Gali and northern travel.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-slate-900">
-              Which areas do you cover?
-            </h3>
-
-            <p className="mt-2 text-slate-700">
-              We serve Islamabad, Rawalpindi, DHA, Bahria Town, Blue Area,
-              and surrounding sectors.
-            </p>
-          </div>
-
-        </div>
-
-      </div>
+<GoogleReviews />
 
     </section>
   );
