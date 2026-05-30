@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import GoogleReviews from "@/components/GoogleReviews";
 
 export const metadata: Metadata = {
   title:
@@ -453,6 +454,9 @@ export default function RawalpindiRentalPage() {
         </div>
 
       </div>
+
+      {/* GOOGLE REVIEWS */}
+      <GoogleReviews />      
 
     </section>
   );
