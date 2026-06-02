@@ -57,9 +57,119 @@ async function getInitialCars() {
 export default async function Page() {
   const initialCars = await getInitialCars();
 
+  const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How much does it cost to rent a car in Islamabad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RentKA offers affordable car rental services in Islamabad and Rawalpindi with prices starting from around PKR 4,500 per day for economy vehicles. Rates vary depending on vehicle category, trip type, duration, and travel requirements."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is fuel included in RentKA prices?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Most RentKA bookings are fuel excluded, allowing customers to pay only for the fuel used during their trip. Some fixed-route airport transfers and special packages may include fuel."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I book a Corolla with driver in Islamabad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Toyota Corolla is one of our most requested vehicles for airport transfers, business travel, family visits, city rides, and out-of-city trips including Murree and Nathiagali."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you provide airport pickup and drop?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other chauffeur-driven vehicles."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can tourists and overseas Pakistanis book a car?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. RentKA regularly serves overseas Pakistanis, tourists, business travelers, and international visitors arriving in Islamabad."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I pay?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RentKA accepts payments through JazzCash and online bank transfer to the official company account. A 20 percent advance is required to confirm the booking, while the remaining balance is paid before the journey begins."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do you provide Hiace rental for families?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. RentKA provides Toyota Hiace rental services for family trips, corporate transportation, weddings, tours, airport transfers, and group travel."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I book a car for Murree?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. We provide transportation from Islamabad and Rawalpindi to Murree, Nathiagali, Ayubia, Patriata, and other tourist destinations."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How far in advance should I book?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We recommend booking 24 to 48 hours in advance, especially during weekends, holidays, and peak travel seasons."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is driver included in the rental price?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. All RentKA rentals include a professional driver for a safe and hassle-free travel experience."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to pay in advance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A 20 percent advance payment is required to reserve your vehicle. The remaining balance is paid when the driver arrives at the pickup location before the journey begins."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which areas do you serve?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "RentKA serves Islamabad, Rawalpindi, Bahria Town, DHA, Chaklala, Blue Area, Islamabad International Airport, Murree, Nathiagali, and surrounding areas."
+      }
+    }
+  ]
+};
+
   return (
-    <>
-      <HeroBanner />
+  <>
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(faqSchema),
+      }}
+    />
+
+    <HeroBanner />
       <HomePageClient initialCars={initialCars} />
 
       {/* SEO Content Section */}
@@ -121,46 +231,98 @@ export default async function Page() {
               With experienced drivers and well-maintained vehicles, you can travel comfortably and safely.
             </p>
           </div>
+{/* GOOGLE REVIEWS */}
+                <GoogleReviews />
 
           <div>
-            <h2 className="text-2xl font-semibold mb-4">
-              Frequently Asked Questions
-            </h2>
+  <div className="text-center mb-8">
+    <span className="inline-block bg-[var(--rentka-green)]/10 text-[var(--rentka-green)] text-sm font-semibold px-4 py-2 rounded-full mb-3">
+      RENTKA FAQ
+    </span>
 
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-medium">
-                  Is driver included in the rental price?
-                </h3>
-                <p className="text-slate-700 mt-1">
-                  Yes, all listed rentals include a professional driver. Fuel is not included
-                  and is charged separately depending on usage.
-                </p>
-              </div>
+    <h2 className="text-3xl md:text-4xl font-bold text-[var(--rentka-blue)]">
+      Frequently Asked Questions
+    </h2>
 
-              <div>
-                <h3 className="font-medium">
-                  Do I need to pay in advance?
-                </h3>
-                <p className="text-slate-700 mt-1">
-                  Advance confirmation may be required depending on the booking type,
-                  especially for long-distance or peak-day reservations.
-                </p>
-              </div>
+    <p className="mt-3 text-slate-600 max-w-2xl mx-auto">
+      Everything you need to know about car rental in Islamabad, Rawalpindi,
+      airport transfers, Murree trips, pricing, and booking with RentKA.
+    </p>
+  </div>
 
-              <div>
-                <h3 className="font-medium">
-                  Which areas do you serve?
-                </h3>
-                <p className="text-slate-700 mt-1">
-                  We primarily operate in Islamabad and Rawalpindi, including airport
-                  transfers and outstation travel.
-                </p>
-              </div>
-            </div>
-          </div>
-          {/* GOOGLE REVIEWS */}
-                <GoogleReviews />    
+  <div className="space-y-4">
+
+    {[
+      {
+        q: "How much does it cost to rent a car in Islamabad?",
+        a: "RentKA offers affordable car rental services in Islamabad and Rawalpindi with prices starting from around PKR 4,500 per day for economy vehicles. Rates vary depending on vehicle category, trip type, duration, and travel requirements."
+      },
+      {
+        q: "Is fuel included in RentKA prices?",
+        a: "Most RentKA bookings are fuel excluded, allowing customers to pay only for the fuel used during their trip. Some fixed-route airport transfers and special packages may include fuel."
+      },
+      {
+        q: "Can I book a Corolla with driver in Islamabad?",
+        a: "Yes. Toyota Corolla is one of our most requested vehicles for airport transfers, business travel, family visits, city rides, and out-of-city trips including Murree and Nathiagali."
+      },
+      {
+        q: "Do you provide airport pickup and drop?",
+        a: "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other chauffeur-driven vehicles."
+      },
+      {
+        q: "Can tourists and overseas Pakistanis book a car?",
+        a: "Absolutely. RentKA regularly serves overseas Pakistanis, tourists, business travelers, and international visitors arriving in Islamabad."
+      },
+      {
+        q: "How do I pay?",
+        a: "RentKA accepts payments through JazzCash and online bank transfer to the official company account. For customer safety and payment transparency, we recommend avoiding cash payments to drivers. A 20% advance is required to confirm the booking, while the remaining balance can be paid before the journey begins. Fuel and other charges, when applicable, may be settled separately during the trip."
+      },
+      {
+        q: "Do you provide Hiace rental for families?",
+        a: "Yes. RentKA provides Toyota Hiace rental services for family trips, corporate transportation, weddings, tours, airport transfers, and group travel."
+      },
+      {
+        q: "Can I book a car for Murree?",
+        a: "Yes. We provide transportation from Islamabad and Rawalpindi to Murree, Nathiagali, Ayubia, Patriata, and other tourist destinations."
+      },
+      {
+        q: "How far in advance should I book?",
+        a: "We recommend booking 24–48 hours in advance, especially during weekends, holidays, and peak travel seasons."
+      },
+      {
+        q: "Is driver included in the rental price?",
+        a: "Yes. All RentKA rentals include a professional driver for a safe and hassle-free travel experience."
+      },
+      {
+        q: "Do I need to pay in advance?",
+        a: "A 20% advance payment is required to reserve your vehicle. The remaining balance is paid when the driver arrives at the pickup location before the journey begins. This booking process helps secure availability while maintaining transparency and convenience for customers."
+      },
+      {
+        q: "Which areas do you serve?",
+        a: "RentKA serves Islamabad, Rawalpindi, Bahria Town, DHA, Chaklala, Blue Area, Islamabad International Airport, Murree, Nathiagali, and surrounding areas."
+      }
+    ].map((faq, index) => (
+      <details
+        key={index}
+        className="group bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-[var(--rentka-green)] transition-all"
+      >
+        <summary className="cursor-pointer list-none flex items-center justify-between p-5 font-semibold text-[var(--rentka-blue)]">
+          {faq.q}
+
+          <span className="text-[var(--rentka-green)] text-xl transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
+
+        <div className="px-5 pb-5 text-slate-700 leading-relaxed border-t border-slate-100 pt-4">
+          {faq.a}
+        </div>
+      </details>
+    ))}
+
+  </div>
+</div>
+              
 
           <HomeCTA />
 
