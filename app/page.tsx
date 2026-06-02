@@ -6,6 +6,7 @@ import HomePageClient from "@/components/HomePageClient";
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import GoogleReviews from "@/components/GoogleReviews";
+import Script from "next/script";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -162,12 +163,13 @@ export default async function Page() {
 
   return (
   <>
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(faqSchema),
-      }}
-    />
+    <Script
+  id="faq-schema"
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(faqSchema),
+  }}
+/>
 
     <HeroBanner />
       <HomePageClient initialCars={initialCars} />
