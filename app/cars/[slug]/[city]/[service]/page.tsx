@@ -182,7 +182,7 @@ const carSchema = {
   areaServed: city,
   offers: {
     "@type": "Offer",
-    price: minPrice ?? "",
+    price: minPrice ?? 0,
     priceCurrency: "PKR",
     availability: "https://schema.org/InStock",
   },
@@ -275,7 +275,7 @@ const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   <div className="space-y-4 text-sm text-slate-700">
     <div>
       <p className="font-medium">
-        What is the price of {carName} with driver in {cityName}?
+        name: `What is the price of ${carName} with driver in ${city}?`,
       </p>
       <p>
         Prices typically start from Rs {minPrice ?? "varies"}/day depending on vendor, duration, and availability.
