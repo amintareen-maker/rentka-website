@@ -2,6 +2,7 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import CarListingClient from "@/components/CarListingClient";
 import { doc, getDoc } from "firebase/firestore";
+import Script from "next/script";
 
 type Vendor = {
   name?: string;
@@ -22,8 +23,8 @@ export async function generateMetadata({ params }: any) {
 
 
   return {
-    title: `${carName} ${isDriver ? "with driver" : "for rent"} in ${city} | RentKA`,
-    description: `Rent ${carName} ${isDriver ? "with driver" : "for self drive"} in ${city}. Starting from affordable daily rates. Verified vendors, no hidden charges, and quick booking via WhatsApp.`,
+    title: `${carName} with Driver Rental in ${city} | Price & Booking | RentKA`,
+    description: `Book ${carName} with driver in ${city}. Compare prices from verified vendors, airport transfers, city rides, Murree trips and instant WhatsApp booking with RentKA.`,
   };
 }
 
@@ -168,12 +169,39 @@ const relatedModels: RelatedModel[] = [
   { name: "Honda BR-V", slug: "honda-br-v" },
 ];
 
+const carSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: `${carName} with Driver Rental in ${city}`,
+  provider: {
+    "@type": "Organization",
+    name: "RentKA",
+    url: "https://www.rentka.co",
+  },
+  areaServed: city,
+  offers: {
+    "@type": "Offer",
+    price: minPrice ?? "",
+    priceCurrency: "PKR",
+  },
+};
+
   return (
+    <>
+  <Script
+  id="car-schema"
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(carSchema),
+  }}
+/>
+    
     <main className="max-w-6xl mx-auto px-6 py-12">
 
       {/* 🔥 SEO HEADING */}
       <h1 className="text-3xl md:text-4xl font-bold mb-4 capitalize">
-        {carName} {isDriver ? "with driver" : "for rent"} in {city} – Price & Booking | RentKA
+        const cityName = city.charAt(0).toUpperCase() + city.slice(1);
+        {carName} with Driver in {city} – Price & Booking | RentKA
       </h1>
 
       {/* 🔥 SEO PARAGRAPH */}
@@ -273,27 +301,36 @@ const relatedModels: RelatedModel[] = [
   </div>
 </div>
 
-<script
+<Script
+  id="faq-schema"
   type="application/ld+json"
   dangerouslySetInnerHTML={{
     __html: JSON.stringify({
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "mainEntity": [
+      mainEntity: [
         {
           "@type": "Question",
-          "name": `What is the price of ${carName} with driver in ${city}?`,
-          "acceptedAnswer": {
+          name: `What is the price of ${carName} with driver in ${city}?`,
+          acceptedAnswer: {
             "@type": "Answer",
-            "text": `Prices start from Rs ${minPrice ?? "varies"} per day depending on vendor and availability.`,
+            text: `Prices start from Rs ${minPrice ?? "varies"} per day depending on vendor and availability.`,
           },
         },
         {
           "@type": "Question",
-          "name": "Can I book online?",
-          "acceptedAnswer": {
+          name: "Can I book online?",
+          acceptedAnswer: {
             "@type": "Answer",
-            "text": "Yes, bookings can be made online and confirmed via WhatsApp.",
+            text: "Yes, bookings can be made online and confirmed via WhatsApp.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "Are there any hidden charges?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "No. RentKA works with verified vendors and provides transparent pricing before booking confirmation.",
           },
         },
       ],
@@ -301,6 +338,8 @@ const relatedModels: RelatedModel[] = [
   }}
 />
 
+  
     </main>
-  );
+</>
+);
 }
