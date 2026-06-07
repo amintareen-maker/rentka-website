@@ -162,6 +162,7 @@ cars.forEach((car) => {
 
 const isDriver = service?.toLowerCase() === "with-driver";
 const carName = slug ? slug.replace(/-/g, " ") : "Cars";
+const cityName = city.charAt(0).toUpperCase() + city.slice(1);
 
 const relatedModels: RelatedModel[] = [
   { name: "Toyota Corolla", slug: "toyota-corolla" },
@@ -187,7 +188,32 @@ const carSchema = {
     availability: "https://schema.org/InStock",
   },
 };
-const cityName = city.charAt(0).toUpperCase() + city.slice(1);
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://www.rentka.co",
+    },
+    {
+  "@type": "ListItem",
+  position: 2,
+  name: `Rent a Car ${cityName}`,
+  item: `https://www.rentka.co/rent-a-car-${city.toLowerCase()}`,
+},
+    {
+      "@type": "ListItem",
+      position: 3,
+      name: `${carName} With Driver`,
+      item: `https://www.rentka.co/cars/${slug}/${city}/${service}`,
+    },
+  ],
+};
+
+
   return (
     <>
   <Script
@@ -195,6 +221,13 @@ const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   type="application/ld+json"
   dangerouslySetInnerHTML={{
     __html: JSON.stringify(carSchema),
+  }}
+/>
+  <Script
+  id="breadcrumb-schema"
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify(breadcrumbSchema),
   }}
 />
     
@@ -275,7 +308,7 @@ const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   <div className="space-y-4 text-sm text-slate-700">
     <div>
       <p className="font-medium">
-        What is the price of ${carName} with driver in ${city}?,
+        What is the price of {carName} with driver in {city}?
       </p>
       <p>
         Prices typically start from Rs {minPrice ?? "varies"}/day depending on vendor, duration, and availability.
