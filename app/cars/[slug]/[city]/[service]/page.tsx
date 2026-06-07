@@ -173,6 +173,7 @@ const carSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: `${carName} with Driver Rental in ${city}`,
+   url: `https://www.rentka.co/cars/${slug}/${city}/${service}`,
   provider: {
     "@type": "Organization",
     name: "RentKA",
@@ -183,9 +184,10 @@ const carSchema = {
     "@type": "Offer",
     price: minPrice ?? "",
     priceCurrency: "PKR",
+    availability: "https://schema.org/InStock",
   },
 };
-
+const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   return (
     <>
   <Script
@@ -200,8 +202,7 @@ const carSchema = {
 
       {/* 🔥 SEO HEADING */}
       <h1 className="text-3xl md:text-4xl font-bold mb-4 capitalize">
-        const cityName = city.charAt(0).toUpperCase() + city.slice(1);
-        {carName} with Driver in {city} – Price & Booking | RentKA
+        {carName} with Driver in {cityName} – Price & Booking | RentKA
       </h1>
 
       {/* 🔥 SEO PARAGRAPH */}
@@ -274,7 +275,7 @@ const carSchema = {
   <div className="space-y-4 text-sm text-slate-700">
     <div>
       <p className="font-medium">
-        What is the price of {carName} with driver in {city}?
+        What is the price of {carName} with driver in {cityName}?
       </p>
       <p>
         Prices typically start from Rs {minPrice ?? "varies"}/day depending on vendor, duration, and availability.
