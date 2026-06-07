@@ -205,16 +205,22 @@
       AUTO SELECT CITY
     ------------------------------ */
     useEffect(() => {
-      const cityParam =
-        searchParams.get("city")?.toLowerCase();
+  const cityParam =
+    searchParams.get("city")?.toLowerCase();
 
-      if (
-        cityParam &&
-        cities.includes(cityParam)
-      ) {
-        setCity(cityParam);
-      }
-    }, [cities, searchParams]);
+  if (
+    cityParam &&
+    cities.includes(cityParam)
+  ) {
+    setCity(cityParam);
+  } else if (
+    cities.includes("islamabad")
+  ) {
+    setCity("islamabad");
+  } else if (cities.length > 0) {
+    setCity(cities[0]);
+  }
+}, [cities, searchParams]);
 
     /* -----------------------------
       FILTERED CARS
