@@ -202,7 +202,7 @@ const cityName = city.charAt(0).toUpperCase() + city.slice(1);
 
       {/* 🔥 SEO HEADING */}
       <h1 className="text-3xl md:text-4xl font-bold mb-4 capitalize">
-        {carName} with Driver in {cityName} – Price & Booking | RentKA
+        {carName} with Driver Rental in {cityName} – Price & Booking | RentKA
       </h1>
 
       {/* 🔥 SEO PARAGRAPH */}
@@ -275,7 +275,7 @@ const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   <div className="space-y-4 text-sm text-slate-700">
     <div>
       <p className="font-medium">
-        name: `What is the price of ${carName} with driver in ${city}?`,
+        What is the price of ${carName} with driver in ${city}?,
       </p>
       <p>
         Prices typically start from Rs {minPrice ?? "varies"}/day depending on vendor, duration, and availability.
