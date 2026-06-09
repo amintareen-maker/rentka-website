@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+  const pages: MetadataRoute.Sitemap = [
     {
       url: "https://www.rentka.co/",
       lastModified: new Date(),
@@ -27,4 +27,35 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
   ];
+
+  const models = [
+    "toyota-corolla",
+    "honda-civic",
+    "toyota-prado",
+    "toyota-hiace",
+    "honda-br-v",
+    "toyota-hilux",
+    "honda-city",
+    "suzuki-wagon-r",
+    "toyota-yaris",
+    "suzuki-alto",
+  ];
+
+  const cities = [
+    "islamabad",
+    "rawalpindi",
+  ];
+
+  models.forEach((model) => {
+    cities.forEach((city) => {
+      pages.push({
+        url: `https://www.rentka.co/cars/${model}/${city}/with-driver`,
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.8,
+      });
+    });
+  });
+
+  return pages;
 }
