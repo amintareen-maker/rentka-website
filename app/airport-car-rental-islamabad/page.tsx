@@ -449,14 +449,15 @@ export default function IslamabadAirportTransferPage() {
             </span>
 
             <h2 className="text-3xl md:text-5xl font-black mt-4 text-[#0F2B46] leading-tight tracking-[-1px]">
-              Popular Car Rentals In Islamabad
-            </h2>
+  Popular Car Rentals In Islamabad & Rawalpindi
+</h2>
 
-            <p className="text-gray-600 mt-5 max-w-3xl mx-auto leading-[1.8] text-base md:text-lg">
-              Browse verified rental options available in Islamabad with
-              professional drivers, transparent pricing and multiple
-              vehicle categories.
-            </p>
+<p className="text-gray-600 mt-5 max-w-3xl mx-auto leading-[1.8] text-base md:text-lg">
+  RentKA serves both Islamabad and Rawalpindi through a shared network
+  of verified rental partners. Most vehicles are available for customers
+  across both cities, including airport transfers, city travel, family
+  trips and corporate transportation.
+</p>
 
           </div>
 

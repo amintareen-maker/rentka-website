@@ -162,7 +162,12 @@ cars.forEach((car) => {
 
 const isDriver = service?.toLowerCase() === "with-driver";
 const carName = slug ? slug.replace(/-/g, " ") : "Cars";
-const cityName = city.charAt(0).toUpperCase() + city.slice(1);
+const cityName =
+  city.toLowerCase() === "islamabad"
+    ? "Islamabad & Rawalpindi"
+    : city.toLowerCase() === "rawalpindi"
+    ? "Rawalpindi & Islamabad"
+    : city.charAt(0).toUpperCase() + city.slice(1);
 
 const relatedModels: RelatedModel[] = [
   { name: "Toyota Corolla", slug: "toyota-corolla" },
