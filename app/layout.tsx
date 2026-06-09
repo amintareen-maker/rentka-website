@@ -37,43 +37,75 @@ export default function RootLayout({
         </Script>
 
         {/* Organization Schema */}
-        <Script
-          id="organization-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "RentKA",
-              url: "https://www.rentka.co",
-              logo: "https://www.rentka.co/logo.png",
-              telephone: "+923020589999",
-              sameAs: [
-                "https://www.linkedin.com/company/rentka/"
-              ]
-            }),
-          }}
-        />
+<Script
+  id="organization-schema"
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "RentKA",
+      url: "https://www.rentka.co",
+      logo: "https://www.rentka.co/logo.png",
+      telephone: "+923020589999",
+      contactPoint: {
+        "@type": "ContactPoint",
+        telephone: "+923020589999",
+        contactType: "customer service",
+        areaServed: "PK",
+        availableLanguage: ["English", "Urdu"],
+      },
+      sameAs: [
+        "https://www.linkedin.com/company/rentka/"
+      ]
+    }),
+  }}
+/>
 
-        {/* Local Business Schema */}
-        <Script
-          id="localbusiness-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "CarRental",
-              name: "RentKA",
-              image: "https://www.rentka.co/logo.png",
-              url: "https://www.rentka.co",
-              telephone: "+923020589999",
-              areaServed: [
-                "Islamabad",
-                "Rawalpindi"
-              ],
-            }),
-          }}
-        />
+        {/* Car Rental Business Schema */}
+<Script
+  id="localbusiness-schema"
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "CarRental",
+      name: "RentKA",
+      image: "https://www.rentka.co/logo.png",
+      url: "https://www.rentka.co",
+      telephone: "+923020589999",
+      areaServed: [
+        "Islamabad",
+        "Rawalpindi"
+      ],
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: "PK"
+      }
+    }),
+  }}
+/>
+
+{/* Website Schema */}
+<Script
+  id="website-schema"
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{
+    __html: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: "RentKA",
+      url: "https://www.rentka.co",
+      potentialAction: {
+        "@type": "SearchAction",
+        target:
+          "https://www.rentka.co/cars?city={city}",
+        "query-input":
+          "required name=city",
+      },
+    }),
+  }}
+/>
       </head>
 
       <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col pt-10">
