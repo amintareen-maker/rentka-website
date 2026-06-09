@@ -96,13 +96,6 @@ export default function RootLayout({
       "@type": "WebSite",
       name: "RentKA",
       url: "https://www.rentka.co",
-      potentialAction: {
-        "@type": "SearchAction",
-        target:
-          "https://www.rentka.co/cars?city={city}",
-        "query-input":
-          "required name=city",
-      },
     }),
   }}
 />

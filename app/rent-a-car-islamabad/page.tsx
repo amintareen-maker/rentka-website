@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import FAQSection from "@/components/FAQSection";
 import GoogleReviews from "@/components/GoogleReviews";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title:
@@ -78,7 +79,56 @@ const popularCars = [
 
 export default function IslamabadRentalPage() {
   return (
-    <section className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-16 space-y-24 overflow-hidden">
+    <>
+      <Script
+        id="breadcrumb-schema-islamabad"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://www.rentka.co",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Rent a Car Islamabad",
+                item: "https://www.rentka.co/rent-a-car-islamabad",
+              },
+            ],
+          }),
+        }}
+      />
+
+      <Script
+        id="service-schema-islamabad"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            serviceType: "Car Rental With Driver",
+            name: "Rent a Car Islamabad",
+            provider: {
+              "@type": "Organization",
+              name: "RentKA",
+              url: "https://www.rentka.co",
+            },
+            areaServed: [
+              "Islamabad",
+              "Rawalpindi"
+            ],
+            url: "https://www.rentka.co/rent-a-car-islamabad",
+          }),
+        }}
+      />
+      
+      <section className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-16 space-y-24 overflow-hidden">
 
       {/* HERO */}
       <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 xl:gap-16 items-start">
@@ -470,5 +520,6 @@ export default function IslamabadRentalPage() {
 <GoogleReviews />
 
     </section>
+    </>
   );
 }
