@@ -438,7 +438,105 @@ export default function IslamabadAirportTransferPage() {
           </div>
         </div>
       </section>
+      {/* RELATED CAR RENTAL LINKS */}
+      <section className="py-16 md:py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
 
+          <div className="text-center mb-12">
+
+            <span className="text-[#5BAE4A] font-bold uppercase tracking-[2px] text-xs md:text-sm">
+              Explore More Options
+            </span>
+
+            <h2 className="text-3xl md:text-5xl font-black mt-4 text-[#0F2B46] leading-tight tracking-[-1px]">
+              Popular Car Rentals In Islamabad
+            </h2>
+
+            <p className="text-gray-600 mt-5 max-w-3xl mx-auto leading-[1.8] text-base md:text-lg">
+              Browse verified rental options available in Islamabad with
+              professional drivers, transparent pricing and multiple
+              vehicle categories.
+            </p>
+
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <Link
+              href="/cars/toyota-corolla/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Toyota Corolla Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/honda-civic/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Honda Civic Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/toyota-prado/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Toyota Prado Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/toyota-hiace/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Toyota Hiace Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/honda-br-v/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Honda BR-V Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/toyota-hilux/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Toyota Hilux Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/honda-city/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Honda City Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/toyota-yaris/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Toyota Yaris Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/suzuki-alto/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Suzuki Alto Rental Islamabad →
+            </Link>
+
+            <Link
+              href="/cars/suzuki-wagon-r/islamabad/with-driver"
+              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
+            >
+              Suzuki Wagon R Rental Islamabad →
+            </Link>
+
+          </div>
+
+        </div>
+      </section>
+      
       {/* FAQ */}
       <section className="bg-[#F8FAFC] py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto">
