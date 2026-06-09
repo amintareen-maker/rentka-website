@@ -84,13 +84,27 @@ const filteredCars = snapshot.docs.filter((docItem) => {
 
   if (!data.model || normalize(data.model) !== normalize(slug)) return false;
 
-  if (
-    !data.cityList ||
-    !data.cityList.some(
-      (c) => c.toLowerCase() === city.toLowerCase()
-    )
-  )
-    return false;
+  // Islamabad & Rawalpindi share inventory
+
+const requestedCity = city.toLowerCase();
+
+const cityMatches =
+  requestedCity === "islamabad" ||
+  requestedCity === "rawalpindi"
+    ? data.cityList?.some((c) => {
+        const normalized = c.toLowerCase();
+
+        return (
+          normalized === "islamabad" ||
+          normalized === "rawalpindi"
+        );
+      })
+    : data.cityList?.some(
+        (c) =>
+          c.toLowerCase() === requestedCity
+      );
+
+if (!cityMatches) return false;
 
   if (
     selectedService === "withDriver" &&
