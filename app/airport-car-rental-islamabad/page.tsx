@@ -2,6 +2,7 @@
 // src/app/airport-transfer/islamabad/page.tsx
 
 import Link from "next/link";
+import Script from "next/script";
 
 export const metadata = {
   title: "Islamabad Airport Transfer Service | Airport Pickup & Drop Islamabad | RentKA",
@@ -45,7 +46,102 @@ export const metadata = {
 
 export default function IslamabadAirportTransferPage() {
   return (
-    <main className="bg-white text-[#0F2B46] overflow-x-hidden">
+    <>
+      <Script
+        id="breadcrumb-schema-airport"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Home",
+                item: "https://www.rentka.co",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Islamabad Airport Transfer",
+                item: "https://www.rentka.co/airport-transfer/islamabad",
+              },
+            ],
+          }),
+        }}
+      />
+
+      <Script
+        id="airport-service-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Service",
+            serviceType: "Airport Transfer Service",
+            name: "Islamabad Airport Transfer Service",
+            provider: {
+              "@type": "Organization",
+              name: "RentKA",
+              url: "https://www.rentka.co",
+            },
+            areaServed: [
+              "Islamabad",
+              "Rawalpindi",
+              "Islamabad International Airport",
+            ],
+            url: "https://www.rentka.co/airport-transfer/islamabad",
+          }),
+        }}
+      />
+
+      <Script
+        id="airport-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Do you provide late-night airport pickup?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes, RentKA provides 24/7 airport pickup and drop services.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Do you accept cash payments?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Customers can pay through bank transfer or JazzCash.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Can I book airport transfer directly on WhatsApp?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes, airport transfers can be booked directly through WhatsApp.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Does airport transfer pricing include fuel?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Yes, all airport transfer rates displayed on this page include fuel charges.",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
+      <main className="bg-white text-[#0F2B46] overflow-x-hidden">
 
       {/* HERO SECTION */}
       <section className="bg-[#0F2B46] text-white px-4 py-12 md:py-20">
@@ -634,5 +730,6 @@ export default function IslamabadAirportTransferPage() {
       </section>
 
     </main>
+    </>
   );
 }
