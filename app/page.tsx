@@ -277,7 +277,7 @@ export default async function Page() {
       },
       {
         q: "How do I pay?",
-        a: "RentKA accepts payments through JazzCash and online bank transfer to the official company account. For customer safety and payment transparency, we recommend avoiding cash payments to drivers. A 20% advance is required to confirm the booking, while the remaining balance can be paid before the journey begins. Fuel and other charges, when applicable, may be settled separately during the trip."
+        a: "RentKA accepts payments through JazzCash and online bank transfer to the official company account. For customer safety and payment transparency, we recommend avoiding cash payments to drivers. A 20% advance is required to confirm the booking, while the remaining balance can be paid before the journey begins. Fuel and other charges via Cash to Driver, when applicable, may be settled separately during the trip."
       },
       {
         q: "Do you provide Hiace rental for families?",
