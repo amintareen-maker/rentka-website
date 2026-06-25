@@ -205,6 +205,13 @@ trackEvent("generate_lead", {
   value: context.price ? Number(context.price) : 1,
 });
 
+if (typeof window !== "undefined" && (window as any).fbq) {
+  (window as any).fbq("track", "Lead", {
+    currency: "PKR",
+    value: context.price ? Number(context.price) : 1,
+  });
+}
+
 gtag_report_conversion();
 
 /* ======================================

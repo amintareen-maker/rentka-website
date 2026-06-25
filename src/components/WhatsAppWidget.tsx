@@ -49,6 +49,12 @@ export default function WhatsAppWidget() {
               trackEvent("whatsapp_click", {
                 source: "global_widget",
               });
+
+              if (typeof window !== "undefined" && (window as any).fbq) {
+                (window as any).fbq("track", "Contact", {
+                  content_name: "WhatsApp Widget",
+                });
+              }
             }}
             target="_blank"
             rel="noopener noreferrer"
