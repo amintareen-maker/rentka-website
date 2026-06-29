@@ -411,12 +411,13 @@ trackEvent("select_model", {
 if (typeof window !== "undefined" && (window as any).fbq) {
   (window as any).fbq("track", "ViewContent", {
     content_name: m.model,
-    content_category: "Car Model",
-    content_type: "car_model",
+    content_category: "Vehicle",
+    content_type: "Carmodel",
     city: city,
     service: service,
     value: m.minPrice || 0,
     currency: "PKR",
+    page_location: window.location.href,
   });
 }
         window.history.pushState({}, "", url);
