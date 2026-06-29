@@ -399,13 +399,26 @@ useEffect(() => {
 
         const url = `/cars/${slug}/${city}/${serviceSlug}`;
 
-        trackEvent("select_model", {
-          model: m.model,
-          city: city,
-          service: service,
-          price: m.minPrice || 0,
-        });
+        // Google Analytics
+trackEvent("select_model", {
+  model: m.model,
+  city: city,
+  service: service,
+  price: m.minPrice || 0,
+});
 
+// Meta Pixel
+if (typeof window !== "undefined" && (window as any).fbq) {
+  (window as any).fbq("track", "ViewContent", {
+    content_name: m.model,
+    content_category: "Car Model",
+    content_type: "car_model",
+    city: city,
+    service: service,
+    value: m.minPrice || 0,
+    currency: "PKR",
+  });
+}
         window.history.pushState({}, "", url);
 
         setSelectedModel(m.model);
