@@ -34,7 +34,7 @@ export default function RoundTripCTA() {
               <div className="mt-10 flex flex-wrap gap-4">
 
                 <a
-                  href="https://wa.me/923350052005"
+                  href="https://wa.me/923020589999"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-xl bg-[#5BAE4A] px-7 py-4 font-semibold text-white transition hover:opacity-90"

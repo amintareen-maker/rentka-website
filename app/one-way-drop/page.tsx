@@ -671,7 +671,7 @@ export default function OneWayDropPage() {
               <div className="mt-10 flex flex-wrap justify-center gap-5">
 
                 <a
-                  href="https://wa.me/923350052005"
+                  href="https://wa.me/923020589999"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-xl bg-[#5BAE4A] px-8 py-4 font-semibold text-white transition hover:opacity-90"

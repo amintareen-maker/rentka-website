@@ -77,7 +77,7 @@ export default function RouteGrid() {
             </div>
 
             <a
-              href="https://wa.me/923350052005"
+              href="https://wa.me/923020589999"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-xl bg-[#5BAE4A] px-8 py-4 font-semibold text-white transition hover:opacity-90"
