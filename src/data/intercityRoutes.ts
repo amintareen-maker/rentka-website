@@ -349,7 +349,7 @@ export const intercityRoutes: IntercityRoute[] = [
     vehicles: {
       corolla: {
         available: true,
-        price: 22000,
+        price: 28000,
         currency: "PKR",
         bookingType: "One Way",
         includesFuel: true,
@@ -379,7 +379,7 @@ export const intercityRoutes: IntercityRoute[] = [
     vehicles: {
       corolla: {
         available: true,
-        price: 22000,
+        price: 28000,
         currency: "PKR",
         bookingType: "One Way",
         includesFuel: true,
