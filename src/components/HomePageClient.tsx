@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 const trackEvent = (eventName: string, data: any = {}) => {
   if (typeof window !== "undefined" && (window as any).gtag) {
     (window as any).gtag("event", eventName, data);
@@ -342,122 +343,131 @@ useEffect(() => {
                   key={`service-${shakeKey}`}
                   value={service ?? ""}
                   onChange={(e) => {
-  const selectedService =
-    (e.target.value as "selfDrive" | "withDriver") || undefined;
+                  const selectedService =
+                    (e.target.value as "selfDrive" | "withDriver") || undefined;
 
-  trackEvent("select_service", {
-    service: selectedService,
-    city: city,
-  });
+                  trackEvent("select_service", {
+                    service: selectedService,
+                    city: city,
+                  });
 
-  setService(selectedService);
-  setFilterError((p) => ({ ...p, service: false }));
-}}
-                  className={`w-full rounded-lg px-4 py-3 border ${
-                  filterError.service
-                    ? "border-red-500 ring-1 ring-red-500 shake"
-                    : "border-slate-300 focus:border-[var(--rentka-green)]"
-                } focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)]`}
-                >
-                  <option value="">Select service</option>
-                  {availableServices.selfDrive && (
-                    <option value="selfDrive">Self Drive</option>
-                  )}
-                  {availableServices.withDriver && (
-                    <option value="withDriver">With Driver</option>
-                  )}
-                </select>
-              </div>
-            </div>
+                  setService(selectedService);
+                  setFilterError((p) => ({ ...p, service: false }));
+                }}
+                                  className={`w-full rounded-lg px-4 py-3 border ${
+                                  filterError.service
+                                    ? "border-red-500 ring-1 ring-red-500 shake"
+                                    : "border-slate-300 focus:border-[var(--rentka-green)]"
+                                } focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)]`}
+                                >
+                                  <option value="">Select service</option>
+                                  {availableServices.selfDrive && (
+                                    <option value="selfDrive">Self Drive</option>
+                                  )}
+                                  {availableServices.withDriver && (
+                                    <option value="withDriver">With Driver</option>
+                                  )}
+                                </select>
+                              </div>
+                            </div>
 
-            {(filterError.city || filterError.service) && (
-              <p className="mt-3 text-sm text-red-600">
-                Please select city and service to proceed
-              </p>
-            )}
-          </div>
-          <div className="text-center mt-6 mb-2">
-</div>
-        </div>
-      </section>
+                            {(filterError.city || filterError.service) && (
+                              <p className="mt-3 text-sm text-red-600">
+                                Please select city and service to proceed
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-center mt-6 mb-2">
+                </div>
+                        </div>
+                      </section>
 
-      {/* MODELS GRID */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          {!loading && models.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {models.map((m) => (
-                <button
-                  key={m.model}
-                  onClick={() =>
-  canBrowseModels
-    ? (() => {
-        const slug = m.model.toLowerCase().replace(/\s+/g, "-");
+                      {/* MODELS GRID */}
+                      <section className="bg-white py-16">
+                        <div className="mx-auto max-w-7xl px-6">
+                          {!loading && models.length > 0 && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                              {models.map((m) => {
+                  const slug = m.model.toLowerCase().replace(/\s+/g, "-");
 
-        const serviceSlug =
-          service === "withDriver" ? "with-driver" : "self-drive";
+                  const serviceSlug =
+                    service === "withDriver" ? "with-driver" : "self-drive";
 
-        const url = `/cars/${slug}/${city}/${serviceSlug}`;
+                  const url = `/cars/${slug}/${city}/${serviceSlug}`;
 
-        // Google Analytics
-trackEvent("select_model", {
-  model: m.model,
-  city: city,
-  service: service,
-  price: m.minPrice || 0,
-});
+                  return (
+                    <Link
+                      key={m.model}
+                      href={url}
+                      prefetch={true}
+                      onClick={(e) => {
+                        if (!canBrowseModels) {
+                          e.preventDefault();
+                          handleBlockedAction();
+                          return;
+                        }
 
-// Meta Pixel
-if (typeof window !== "undefined" && (window as any).fbq) {
-  (window as any).fbq("track", "ViewContent", {
-    content_name: m.model,
-    content_category: "Vehicle",
-    content_type: "Carmodel",
-    city: city,
-    service: service,
-    value: m.minPrice || 0,
-    currency: "PKR",
-    page_location: window.location.href,
-  });
-}
-        window.history.pushState({}, "", url);
+                        e.preventDefault();
 
-        setSelectedModel(m.model);
-        setModelOpen(true);
-      })()
-    : handleBlockedAction()
-}
-                  className="text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
-                >
-                  <div className="aspect-[8/10] bg-white rounded-lg mb-4 overflow-hidden flex items-center justify-center border border-slate-200">
-                    {m.imageURL && (
-                      <img
-                        src={m.imageURL}
-                        alt={m.model}
-                        className="max-w-full max-h-full object-contain p-2"
-                      />
-                    )}
-                  </div>
+                        // Google Analytics
+                        trackEvent("select_model", {
+                          model: m.model,
+                          city,
+                          service,
+                          price: m.minPrice || 0,
+                        });
 
-                  <h3 className="font-semibold text-slate-900 group-hover:text-[var(--rentka-blue)] transition">
-                    {m.model}
-                  </h3>
+                        // Meta Pixel
+                        if (typeof window !== "undefined" && (window as any).fbq) {
+                          (window as any).fbq("track", "ViewContent", {
+                            content_name: m.model,
+                            content_category: "Vehicle",
+                            content_type: "CarModel",
+                            city,
+                            service,
+                            value: m.minPrice || 0,
+                            currency: "PKR",
+                            page_location: window.location.href,
+                          });
+                        }
 
-                  {typeof m.minPrice === "number" && (
-                    <p className="text-sm text-slate-600 mt-1">
-                      Starting from{" "}
-                      <span className="font-bold text-[var(--rentka-green)]">
-                        PKR {m.minPrice}
-                      </span>
-                      <span className="text-slate-500"> /day (Driver Included)</span>
-                    </p>
-                  )}
+                        window.history.pushState({}, "", url);
 
-                  <p className="text-sm text-slate-500 mt-1">
-                    {m.count} option(s)
-                  </p>
-                </button>
-              ))}
+                        setSelectedModel(m.model);
+                        setModelOpen(true);
+                      }}
+                      className="block text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
+                    >
+                      <div className="aspect-[8/10] bg-white rounded-lg mb-4 overflow-hidden flex items-center justify-center border border-slate-200">
+                        {m.imageURL && (
+                          <img
+                            src={m.imageURL}
+                            alt={m.model}
+                            className="max-w-full max-h-full object-contain p-2"
+                          />
+                        )}
+                      </div>
+
+                      <h3 className="font-semibold text-slate-900 group-hover:text-[var(--rentka-blue)] transition">
+                        {m.model}
+                      </h3>
+
+                      {typeof m.minPrice === "number" && (
+                        <p className="text-sm text-slate-600 mt-1">
+                          Starting from{" "}
+                          <span className="font-bold text-[var(--rentka-green)]">
+                            PKR {m.minPrice}
+                          </span>
+                          <span className="text-slate-500"> /day (Driver Included)</span>
+                        </p>
+                      )}
+
+                      <p className="text-sm text-slate-500 mt-1">
+                        {m.count} option(s)
+                      </p>
+                    </Link>
+                  );
+                })}
             </div>
           )}
         </div>
