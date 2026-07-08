@@ -172,7 +172,74 @@ export default async function Page() {
 />
 
     <HeroBanner />
+    
       <HomePageClient initialCars={initialCars} />
+
+        {/* Intercity Travel Banner */}
+
+      <section className="bg-white py-10">
+  <div className="mx-auto max-w-7xl px-6">
+
+    <div className="overflow-hidden rounded-3xl bg-gradient-to-r from-[#0F2B46] via-[#123554] to-[#0F2B46] shadow-xl">
+
+      <div className="grid items-center gap-10 p-10 lg:grid-cols-2">
+
+        {/* Left */}
+
+        <div>
+
+          <span className="inline-flex rounded-full bg-[#5BAE4A]/20 px-4 py-2 text-sm font-semibold text-[#8DE27F]">
+            🚖 NEW SERVICE
+          </span>
+
+          <h2 className="mt-6 text-4xl font-bold text-white">
+            Intercity Travel
+          </h2>
+
+          <p className="mt-5 max-w-xl text-lg leading-8 text-slate-300">
+            Travel comfortably between cities with a professional driver.
+            Whether you need a One Way Drop or a Round Trip, we've got you covered.
+          </p>
+
+          <div className="mt-8 grid grid-cols-2 gap-3 text-white">
+
+            <div>✅ One Way Drop</div>
+
+            <div>✅ Round Trips</div>
+
+            <div>✅ Fuel Included</div>
+
+            <div>✅ Professional Driver</div>
+
+          </div>
+
+          <Link
+            href="/one-way-drop"
+            className="mt-10 inline-flex items-center rounded-2xl bg-[#5BAE4A] px-8 py-4 text-lg font-semibold text-white transition hover:bg-[#4b9b3d]"
+          >
+            Explore Intercity →
+          </Link>
+
+        </div>
+
+        {/* Right */}
+
+        <div className="hidden lg:flex justify-center">
+
+          <img
+            src="/cars/corolla-white.png"
+            alt="RentKA Intercity Travel"
+            className="max-h-[340px] object-contain"
+          />
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
 
       {/* SEO Content Section */}
       <section className="bg-white mx-auto max-w-5xl px-4 py-16">

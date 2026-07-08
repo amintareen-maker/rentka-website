@@ -86,9 +86,24 @@ export default function HeroBanner() {
             </p>
 
             <Link href="#filters">
-              <button className="mt-8 rounded-lg bg-[var(--rentka-green)] px-6 py-3 font-semibold text-white hover:bg-[var(--rentka-green-hover)] transition">
-                Compare Cars & Prices
-              </button>
+              <div className="mt-8 flex flex-wrap gap-4">
+
+  <Link
+    href="#filters"
+    className="rounded-lg bg-[var(--rentka-green)] px-6 py-3 font-semibold text-white transition hover:bg-[var(--rentka-green-hover)]"
+  >
+    Compare Cars & Prices
+  </Link>
+
+  <Link
+    href="/one-way-drop"
+    className="inline-flex items-center gap-2 rounded-lg border border-[var(--rentka-green)] bg-white px-6 py-3 font-semibold text-[var(--rentka-green)] transition hover:bg-[var(--rentka-green)] hover:text-white"
+  >
+    🚖 One Way & Round Trip
+    <span>→</span>
+  </Link>
+
+</div>
               <div className="mt-6 flex flex-wrap gap-3 text-sm text-gray-600">
               <span>✔ Verified Vendors</span>
               <span>✔ SECP Registered</span>
