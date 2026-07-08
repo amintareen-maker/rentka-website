@@ -257,7 +257,7 @@ window.open(whatsappUrl, "_blank");
     createdAt: serverTimestamp(),
   });
 
-  const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
+  const reviewLink = `https://www.rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
 
   await updateDoc(docRef, { reviewLink });
 
