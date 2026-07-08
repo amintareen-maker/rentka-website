@@ -85,8 +85,7 @@ export default function HeroBanner() {
               One platform - Multiple options, Multiple owners, Multiple Rates, No hidden charges.
             </p>
 
-            <Link href="#filters">
-              <div className="mt-8 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-4">
 
   <Link
     href="#filters"
@@ -104,13 +103,13 @@ export default function HeroBanner() {
   </Link>
 
 </div>
-              <div className="mt-6 flex flex-wrap gap-3 text-sm text-gray-600">
-              <span>✔ Verified Vendors</span>
-              <span>✔ SECP Registered</span>
-              <span>✔ NTN Registered</span>
-              <span>✔ No Hidden Charges</span>
-            </div>
-            </Link>
+
+<div className="mt-6 flex flex-wrap gap-3 text-sm text-gray-600">
+  <span>✔ Verified Vendors</span>
+  <span>✔ SECP Registered</span>
+  <span>✔ NTN Registered</span>
+  <span>✔ No Hidden Charges</span>
+</div>
           </div>
 
           {/* RIGHT CAROUSEL */}

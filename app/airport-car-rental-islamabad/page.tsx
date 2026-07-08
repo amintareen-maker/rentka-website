@@ -31,13 +31,13 @@ export const metadata = {
     "RentKA Islamabad airport transfer",
   ],
   alternates: {
-    canonical: "https://rentka.co/airport-transfer/islamabad",
+    canonical: "https://www.rentka.co/airport-transfer/islamabad",
   },
   openGraph: {
     title: "Islamabad Airport Transfer Service | RentKA",
     description:
       "Professional airport pickup and drop service in Islamabad with driver, fuel included pricing, and 24/7 availability.",
-    url: "https://rentka.co/airport-transfer/islamabad",
+    url: "https://www.rentka.co/airport-transfer/islamabad",
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",
