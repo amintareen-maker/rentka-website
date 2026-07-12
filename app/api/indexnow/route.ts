@@ -18,6 +18,8 @@ export async function POST(request: Request) {
 
     const urlList = body.urlList;
 
+console.log("Submitting URLs:", urlList);
+
     if (!urlList || !Array.isArray(urlList)) {
       return NextResponse.json(
         { error: "urlList is required" },
