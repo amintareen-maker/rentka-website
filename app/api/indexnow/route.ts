@@ -4,6 +4,14 @@ const HOST = "https://www.rentka.co";
 
 const KEY = "d42393107d3a4b5087e9e5cf362a4698";
 
+export async function GET() {
+  return NextResponse.json({
+    status: "IndexNow API is running",
+    service: "RentKA",
+    ready: true,
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
