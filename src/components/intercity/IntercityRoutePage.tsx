@@ -4,6 +4,8 @@ import {
   intercityRoutes,
 } from "@/data/intercityRoutes";
 
+import RouteBookingButton from "./RouteBookingButton";
+
 type Props = {
   route: IntercityRoute;
 };
@@ -98,14 +100,14 @@ export default function IntercityRoutePage({ route }: Props) {
 
           <div className="mt-10 flex flex-wrap gap-4">
 
-            <a
-              href="https://wa.me/923020589999"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-xl bg-[#5BAE4A] px-8 py-4 font-semibold text-white"
-            >
-              Book on WhatsApp
-            </a>
+            <RouteBookingButton
+  route={{
+    from: route.from,
+    to: route.to,
+    slug: route.slug,
+  }}
+  price={price}
+/>
 
             <Link
               href="/one-way-drop"
