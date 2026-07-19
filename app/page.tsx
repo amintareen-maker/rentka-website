@@ -6,6 +6,8 @@ import HomePageClient from "@/components/HomePageClient";
 import { collection, getDocs, query, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import GoogleReviews from "@/components/GoogleReviews";
+import RouteGrid from "@/components/intercity/RouteGrid";
+import ArticleGrid from "./blog/components/ArticleGrid";
 import Script from "next/script";
 
 import type { Metadata } from "next";
@@ -173,7 +175,41 @@ export default async function Page() {
 
     <HeroBanner />
     
-      <HomePageClient initialCars={initialCars} />
+      <HomePageClient initialCars={initialCars}>
+        <RouteGrid
+          limit={6}
+          showViewAll
+          heading="🚗 Popular One-Way Routes"
+          description="Transparent pricing • Fuel included • Professional driver"
+        />
+
+        <section className="bg-white py-20">
+          <div className="mx-auto max-w-7xl px-6">
+            <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="text-3xl font-extrabold tracking-tight text-[var(--rentka-blue)] sm:text-4xl">
+                  📖 Travel Guides & Tips
+                </h2>
+                <p className="mt-4 text-lg font-semibold text-slate-700">
+                  Planning your journey?
+                </p>
+                <p className="mt-1 max-w-2xl text-slate-600">
+                  Explore our latest travel guides, rental advice and destination tips across Pakistan.
+                </p>
+              </div>
+
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-2 font-semibold text-[#347A2A] transition hover:text-[var(--rentka-green)]"
+              >
+                View All Guides →
+              </Link>
+            </div>
+
+            <ArticleGrid limit={3} showHeading={false} />
+          </div>
+        </section>
+      </HomePageClient>
 
         {/* Intercity Travel Banner */}
 

@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { articles } from "./data";
+import ArticleGrid from "./components/ArticleGrid";
 import {
   ArrowRight,
-  Bookmark,
   CarFront,
   CheckCircle2,
   Clock3,
@@ -107,7 +107,7 @@ export default function BlogPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-end justify-between gap-6"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#347A2A]">Featured guide</p><h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[var(--rentka-blue)] sm:text-4xl">Plan a better rental experience</h2></div><span className="hidden text-sm font-medium text-slate-500 sm:block">New guides coming soon</span></div>
+        <div className="mb-8 flex items-end justify-between gap-6"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#347A2A]">Featured guide</p><h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[var(--rentka-blue)] sm:text-4xl">Pakistan Travel Guides & Car Rental Advice</h2></div><span className="hidden text-sm font-medium text-slate-500 sm:block">New guides coming soon</span></div>
         <article className="grid overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm lg:grid-cols-[1fr_1.05fr]">
           <div className="relative min-h-72 bg-[#0F2B46]"><Image src="/hero-3.webp" alt="RentKA vehicle ready for a journey" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover opacity-85" /><div className="absolute inset-0 bg-gradient-to-t from-[#0F2B46]/60 to-transparent" /><span className="absolute left-6 top-6 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[var(--rentka-blue)]">Coming soon</span></div>
           <div className="flex flex-col justify-center p-7 sm:p-10 lg:p-12"><div className="flex items-center gap-3 text-sm font-semibold text-slate-500">
@@ -142,18 +142,9 @@ export default function BlogPage() {
       </section>
 
       <section id="latest" className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><div className="mb-10"><p className="text-sm font-bold uppercase tracking-[0.16em] text-[#347A2A]">Explore the journal</p><h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[var(--rentka-blue)] sm:text-4xl">Latest articles</h2><p className="mt-3 max-w-2xl text-slate-600">Useful, locally relevant guidance for every stage of your journey.</p></div><div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {articles.map((article) => <article key={article.slug} className="group flex min-h-72 flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"><div className="flex items-start justify-between gap-4"><span className={`rounded-full px-3 py-1.5 text-xs font-bold ${article.accent}`}>{article.category}</span><Bookmark className="h-5 w-5 text-slate-300" aria-hidden="true" /></div><Link
-  href={`/blog/${article.slug}`}
-  className="mt-7 block text-xl font-bold leading-snug text-[var(--rentka-blue)] hover:text-[var(--rentka-green)] transition"
->
-  {article.title}
-</Link><p className="mt-3 text-sm leading-6 text-slate-600">{article.description}</p><div className="mt-auto flex items-center justify-between pt-6 text-sm font-semibold"><span className="inline-flex items-center gap-1.5 text-slate-500"><Clock3 className="h-4 w-4" aria-hidden="true" />{article.readTime}</span><Link
-  href={`/blog/${article.slug}`}
-  className="inline-flex items-center gap-1 text-[#347A2A] font-bold"
->
-  Read article <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" aria-hidden="true" /></Link></div></article>)}
-        </div></div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <ArticleGrid />
+        </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8"><div className="grid gap-8 rounded-[2rem] bg-[var(--rentka-blue)] p-8 text-white md:grid-cols-[1.2fr_0.8fr] md:p-12"><div><div className="inline-flex items-center gap-2 text-sm font-bold text-[#9AD08F]"><CarFront className="h-5 w-5" aria-hidden="true" />Need a car now?</div><h2 className="mt-4 max-w-xl text-3xl font-extrabold tracking-tight sm:text-4xl">Find a reliable ride for your next journey.</h2><p className="mt-4 max-w-xl leading-7 text-slate-300">Browse RentKA&apos;s verified car options for airport transfers, city travel, family trips and more.</p></div><div className="flex items-center md:justify-end"><Link href="/cars?city=islamabad&service=with-driver&country=PK" className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--rentka-green)] px-6 py-4 font-bold text-white transition hover:bg-[var(--rentka-green-hover)] md:w-auto">Browse available cars <ArrowRight className="h-5 w-5" aria-hidden="true" /></Link></div></div></section>

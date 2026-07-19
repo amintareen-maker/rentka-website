@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import type { ReactNode } from "react";
 const trackEvent = (eventName: string, data: any = {}) => {
   if (typeof window !== "undefined" && (window as any).gtag) {
     (window as any).gtag("event", eventName, data);
@@ -26,7 +27,13 @@ type CarModel = {
   minPrice?: number;
 };
 
-export default function HomePageClient({ initialCars = [] }: { initialCars?: Car[] }) {
+export default function HomePageClient({
+  initialCars = [],
+  children,
+}: {
+  initialCars?: Car[];
+  children?: ReactNode;
+}) {
   /* -----------------------------
      URL STATE
   ------------------------------ */
@@ -534,6 +541,8 @@ useEffect(() => {
           </div>
         </div>
       </section>
+
+      {children}
 
       {/* BOTTOM CTA */}
       <section className="bg-[var(--rentka-blue)] text-white py-16 md:py-24 overflow-visible">
