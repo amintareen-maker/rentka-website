@@ -41,13 +41,36 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-10">
             {/* NAV */}
             <nav className="flex items-center gap-8 text-sm font-medium text-slate-700">
-              <Link href="/about" className="hover:text-[var(--rentka-blue)] transition">
-                About Us
-              </Link>
-              <Link href="/contact" className="hover:text-[var(--rentka-blue)] transition">
-                Info
-              </Link>
-            </nav>
+
+  <Link
+    href="/one-way-drop"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    One-Way Trips
+  </Link>
+
+  <Link
+    href="/blog"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    Travel Guides
+  </Link>
+
+  <Link
+    href="/contact"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    Info
+  </Link>
+
+  <Link
+    href="/about"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    About Us
+  </Link>
+
+</nav>
 
             {/* CTA */}
             <a
@@ -63,16 +86,36 @@ export default function Header() {
 
         {/* ROW 2 — MOBILE ONLY */}
         <nav className="flex md:hidden items-center gap-6 pb-3 text-sm font-medium text-slate-700">
-          <Link href="/rent-a-car-islamabad" className="hover:text-[var(--rentka-blue)] transition">
-            Islamabad Rental
-          </Link>
-          <Link href="/about" className="hover:text-[var(--rentka-blue)] transition">
-            About Us
-          </Link>
-          <Link href="/contact" className="hover:text-[var(--rentka-blue)] transition">
-            Info
-          </Link>
-        </nav>
+
+  <Link
+    href="/one-way-drop"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    One-Way
+  </Link>
+
+  <Link
+    href="/blog"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    Guides
+  </Link>
+
+  <Link
+    href="/about"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    About
+  </Link>
+
+  <Link
+    href="/contact"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    Info
+  </Link>
+
+</nav>
 
       </div>
     </header>
