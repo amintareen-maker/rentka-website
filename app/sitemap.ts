@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { intercityRoutes } from "../src/data/intercityRoutes";
+import { articles } from "./blog/data";
 
 const BASE_URL = "https://www.rentka.co";
 const LAST_MODIFIED = new Date("2026-07-12");
@@ -14,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/rent-a-car-rawalpindi", priority: 0.9 },
     { path: "/airport-car-rental-islamabad", priority: 0.9 },
     { path: "/one-way-drop", priority: 0.9 },
+    { path: "/blog", priority: 0.8 },
     { path: "/about", priority: 0.7 },
     { path: "/contact", priority: 0.7 },
     { path: "/privacy", priority: 0.5 },
@@ -72,6 +74,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: route.featured ? 0.9 : 0.8,
       });
     });
+
+  // Blog articles
+  articles.forEach((article) => {
+    pages.push({
+      url: `${BASE_URL}/blog/${article.slug}`,
+      lastModified: LAST_MODIFIED,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+  });
 
   return pages;
 }
