@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Script from "next/script";
 
 export default function GoogleReviews() {
   const reviews = [
@@ -37,26 +36,6 @@ export default function GoogleReviews() {
 
   return (
     <>
-      <Script
-        id="rentka-aggregate-rating"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "LocalBusiness",
-            name: "RentKA",
-            url: "https://www.rentka.co",
-            telephone: "+923020589999",
-            areaServed: ["Islamabad", "Rawalpindi"],
-            aggregateRating: {
-              "@type": "AggregateRating",
-              ratingValue: "5.0",
-              reviewCount: "23",
-            },
-          }),
-        }}
-      />
-
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-4">
 

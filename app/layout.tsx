@@ -68,9 +68,14 @@ export default function RootLayout({
     __html: JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Organization",
+      "@id": "https://rentka.co/#organization",
       name: "RentKA",
-      url: "https://www.rentka.co",
-      logo: "https://www.rentka.co/logo.png",
+      legalName: "RentKA (SMC-PRIVATE) Limited",
+      url: "https://rentka.co",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://rentka.co/logo.png",
+      },
       telephone: "+923020589999",
       contactPoint: {
         "@type": "ContactPoint",
@@ -80,8 +85,12 @@ export default function RootLayout({
         availableLanguage: ["English", "Urdu"],
       },
       sameAs: [
-        "https://www.linkedin.com/company/rentka/"
-      ]
+        "https://www.facebook.com/RentKACarRental",
+        "https://www.instagram.com/rentka.co",
+        "https://www.linkedin.com/company/rentka",
+        "https://x.com/RentKACarRental",
+        "https://www.youtube.com/@RentKACarRental",
+      ],
     }),
   }}
 />
@@ -94,18 +103,35 @@ export default function RootLayout({
     __html: JSON.stringify({
       "@context": "https://schema.org",
       "@type": "CarRental",
+      "@id": "https://rentka.co/#car-rental",
       name: "RentKA",
-      image: "https://www.rentka.co/logo.png",
-      url: "https://www.rentka.co",
+      legalName: "RentKA (SMC-PRIVATE) Limited",
+      url: "https://rentka.co",
+      image: "https://rentka.co/logo.png",
+      logo: "https://rentka.co/logo.png",
       telephone: "+923020589999",
+      priceRange: "PKR",
+      parentOrganization: {
+        "@id": "https://rentka.co/#organization",
+      },
       areaServed: [
-        "Islamabad",
-        "Rawalpindi"
+        {
+          "@type": "City",
+          name: "Islamabad",
+        },
+        {
+          "@type": "City",
+          name: "Rawalpindi",
+        },
       ],
       address: {
         "@type": "PostalAddress",
-        addressCountry: "PK"
-      }
+        addressLocality: "Islamabad",
+        addressCountry: "PK",
+      },
+      hasMap: "https://www.google.com/maps/place/Rentka/@33.715213,73.0645139,17z/data=!3m1!4b1!4m6!3m5!1s0x293c5f8a2e952d73:0x934b9c0b3c707405!8m2!3d33.715213!4d73.0670888!16s%2Fg%2F11nhgw876j",
+      knowsLanguage: ["English", "Urdu"],
+      description: "RentKA provides chauffeur-driven car rental, airport transfer, intercity travel, corporate transport and outstation travel services in Islamabad and Rawalpindi.",
     }),
   }}
 />
@@ -118,8 +144,12 @@ export default function RootLayout({
     __html: JSON.stringify({
       "@context": "https://schema.org",
       "@type": "WebSite",
+      "@id": "https://rentka.co/#website",
       name: "RentKA",
-      url: "https://www.rentka.co",
+      url: "https://rentka.co",
+      publisher: {
+        "@id": "https://rentka.co/#organization",
+      },
     }),
   }}
 />

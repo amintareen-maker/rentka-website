@@ -3,6 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import CarListingClient from "@/components/CarListingClient";
 import { doc, getDoc } from "firebase/firestore";
 import Script from "next/script";
+import { notFound } from "next/navigation";
 
 type Vendor = {
   name?: string;
@@ -18,8 +19,16 @@ type RelatedModel = {
 export async function generateMetadata({ params }: any) {
   const { slug, city, service } = await params;
 
+  if (service !== "with-driver") {
+    return {
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
   const carName = slug.replace(/-/g, " ");
-  const isDriver = service === "with-driver";
 
 
   return {
@@ -59,15 +68,16 @@ export default async function Page({
   }>;
 }) {
  const { slug, city, service } = await params;
+
+  if (service !== "with-driver") {
+    notFound();
+  }
   
 
   const country = "PK";
 
   
-  const selectedService =
-  service?.toLowerCase() === "with-driver"
-    ? "withDriver"
-    : "selfDrive";
+  const selectedService = "withDriver";
 
   const snapshot = await getDocs(
     collection(db, "countries", country, "cars")
@@ -109,12 +119,6 @@ if (!cityMatches) return false;
   if (
     selectedService === "withDriver" &&
     data.supports?.withDriver === false
-  )
-    return false;
-
-  if (
-    selectedService === "selfDrive" &&
-    data.supports?.withoutDriver === false
   )
     return false;
 
@@ -162,10 +166,7 @@ cars.push(...carsWithVendors);
   let minPrice: number | null = null;
 
 cars.forEach((car) => {
-  const price =
-    selectedService === "withDriver"
-      ? car.pricing?.withDriver?.withinCity?.daily
-      : car.pricing?.selfDrive?.withinCity?.daily;
+  const price = car.pricing?.withDriver?.withinCity?.daily;
 
   if (price && price > 0) {
     if (minPrice === null || price < minPrice) {
@@ -193,11 +194,11 @@ const carSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: `${carName} with Driver Rental in ${city}`,
-   url: `https://www.rentka.co/cars/${slug}/${city}/${service}`,
+   url: `https://rentka.co/cars/${slug}/${city}/${service}`,
   provider: {
     "@type": "Organization",
     name: "RentKA",
-    url: "https://www.rentka.co",
+    url: "https://rentka.co",
   },
   areaServed: city,
   offers: {
@@ -215,19 +216,19 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://www.rentka.co",
+      item: "https://rentka.co",
     },
     {
   "@type": "ListItem",
   position: 2,
   name: `Rent a Car ${cityName}`,
-  item: `https://www.rentka.co/rent-a-car-${city.toLowerCase()}`,
+  item: `https://rentka.co/rent-a-car-${city.toLowerCase()}`,
 },
     {
       "@type": "ListItem",
       position: 3,
       name: `${carName} With Driver`,
-      item: `https://www.rentka.co/cars/${slug}/${city}/${service}`,
+      item: `https://rentka.co/cars/${slug}/${city}/${service}`,
     },
   ],
 };

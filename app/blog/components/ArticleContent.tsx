@@ -170,7 +170,7 @@ export default function ArticleContent({
         <div className="mt-10">
 
           <a
-            href="https://wa.me/923171111552?text=Hi%20RentKA,%20I'd%20like%20to%20book%20a%20car."
+            href="https://wa.me/923020589999?text=Hi%20RentKA,%20I'd%20like%20to%20book%20a%20car."
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex rounded-xl bg-[#5BAE4A] px-8 py-4 text-lg font-semibold text-white transition hover:opacity-90"

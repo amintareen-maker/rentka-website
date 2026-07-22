@@ -92,13 +92,13 @@ export default function IslamabadRentalPage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://www.rentka.co",
+                item: "https://rentka.co",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Rent a Car Islamabad",
-                item: "https://www.rentka.co/rent-a-car-islamabad",
+                item: "https://rentka.co/rent-a-car-islamabad",
               },
             ],
           }),
@@ -117,13 +117,13 @@ export default function IslamabadRentalPage() {
             provider: {
               "@type": "Organization",
               name: "RentKA",
-              url: "https://www.rentka.co",
+              url: "https://rentka.co",
             },
             areaServed: [
               "Islamabad",
               "Rawalpindi"
             ],
-            url: "https://www.rentka.co/rent-a-car-islamabad",
+            url: "https://rentka.co/rent-a-car-islamabad",
           }),
         }}
       />

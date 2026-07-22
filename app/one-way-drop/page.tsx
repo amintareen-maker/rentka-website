@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   ],
 
   alternates: {
-    canonical: "https://www.rentka.co/one-way-drop",
+    canonical: "https://rentka.co/one-way-drop",
   },
 
   openGraph: {
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
       "Professional one-way intercity transport with fuel included and transparent pricing.",
 
     url:
-      "https://www.rentka.co/one-way-drop",
+      "https://rentka.co/one-way-drop",
 
     siteName: "RentKA",
 
@@ -74,7 +74,7 @@ export default function OneWayDropPage() {
 
         name: "One Way Drop",
 
-        url: "https://www.rentka.co/one-way-drop",
+        url: "https://rentka.co/one-way-drop",
 
         description:
           "One Way Drop and Intercity Car Rental Services in Pakistan.",
@@ -93,7 +93,7 @@ export default function OneWayDropPage() {
 
           name: "RentKA",
 
-          url: "https://www.rentka.co",
+          url: "https://rentka.co",
 
         },
 
@@ -138,7 +138,7 @@ export default function OneWayDropPage() {
 
             name: "Home",
 
-            item: "https://www.rentka.co",
+            item: "https://rentka.co",
           },
 
           {
@@ -149,7 +149,7 @@ export default function OneWayDropPage() {
             name: "One Way Drop",
 
             item:
-              "https://www.rentka.co/one-way-drop",
+              "https://rentka.co/one-way-drop",
           },
 
         ],

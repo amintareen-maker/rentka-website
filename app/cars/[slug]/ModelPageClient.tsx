@@ -17,7 +17,7 @@ export default function ModelPage() {
   // ⚠️ temp defaults
   const country = "PK";
   const city = "islamabad";
-  const service: "selfDrive" | "withDriver" = "selfDrive";
+  const service: "selfDrive" | "withDriver" = "withDriver";
 
   const { cars, loading } = useCars({ country, city, service });
 
@@ -57,9 +57,9 @@ export default function ModelPage() {
                 </p>
               )}
 
-              {car.pricing?.selfDrive?.withinCity?.daily && (
+              {car.pricing?.withDriver?.withinCity?.daily && (
                 <p className="text-green-700 font-medium mt-2">
-                  PKR {car.pricing.selfDrive.withinCity.daily} / day
+                  PKR {car.pricing.withDriver.withinCity.daily} / day
                 </p>
               )}
             </button>

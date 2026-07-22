@@ -32,7 +32,7 @@ export const metadata: Metadata = {
       "Rent a Car in Islamabad & Rawalpindi with Driver | RentKA",
     description:
       "Book affordable with-driver car rental in Islamabad and Rawalpindi. Airport pickup, full-day city rides, and Murree trips available.",
-    url: "https://www.rentka.co",
+    url: "https://rentka.co",
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",

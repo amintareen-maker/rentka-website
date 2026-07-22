@@ -541,12 +541,6 @@ export const rentCarIslamabadRawalpindi = {
   },
 
   {
-    question: "Do you provide self-drive car rental?",
-    answer:
-      "RentKA currently specializes in chauffeur-driven transportation services. Self-drive availability depends on operational policies and service offerings."
-  },
-
-  {
     question: "Can I pay after completing my journey?",
     answer:
       "Most bookings require an advance payment for confirmation. Remaining payment arrangements are communicated during the booking process."

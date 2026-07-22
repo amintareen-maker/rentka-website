@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 type Car = {
   id: string;

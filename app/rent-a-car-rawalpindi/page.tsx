@@ -91,13 +91,13 @@ export default function RawalpindiRentalPage() {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://www.rentka.co",
+          item: "https://rentka.co",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Rent a Car Rawalpindi",
-          item: "https://www.rentka.co/rent-a-car-rawalpindi",
+          item: "https://rentka.co/rent-a-car-rawalpindi",
         },
       ],
     }),
@@ -116,13 +116,13 @@ export default function RawalpindiRentalPage() {
       provider: {
         "@type": "Organization",
         name: "RentKA",
-        url: "https://www.rentka.co",
+        url: "https://rentka.co",
       },
       areaServed: [
         "Rawalpindi",
         "Islamabad"
       ],
-      url: "https://www.rentka.co/rent-a-car-rawalpindi",
+      url: "https://rentka.co/rent-a-car-rawalpindi",
     }),
   }}
 />
@@ -565,16 +565,6 @@ export default function RawalpindiRentalPage() {
 
             <p className="mt-2 text-slate-700">
               Yes. All RentKA bookings include a professional driver.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-slate-900">
-              Do you offer self drive cars in Rawalpindi?
-            </h3>
-
-            <p className="mt-2 text-slate-700">
-              No. RentKA currently provides cars with professional drivers only.
             </p>
           </div>
 

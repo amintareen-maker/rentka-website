@@ -31,13 +31,13 @@ export const metadata = {
     "RentKA Islamabad airport transfer",
   ],
   alternates: {
-    canonical: "https://www.rentka.co/airport-transfer/islamabad",
+    canonical: "https://rentka.co/airport-car-rental-islamabad",
   },
   openGraph: {
     title: "Islamabad Airport Transfer Service | RentKA",
     description:
       "Professional airport pickup and drop service in Islamabad with driver, fuel included pricing, and 24/7 availability.",
-    url: "https://www.rentka.co/airport-transfer/islamabad",
+    url: "https://rentka.co/airport-car-rental-islamabad",
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",
@@ -59,13 +59,13 @@ export default function IslamabadAirportTransferPage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://www.rentka.co",
+                item: "https://rentka.co",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Islamabad Airport Transfer",
-                item: "https://www.rentka.co/airport-transfer/islamabad",
+                item: "https://rentka.co/airport-car-rental-islamabad",
               },
             ],
           }),
@@ -84,14 +84,14 @@ export default function IslamabadAirportTransferPage() {
             provider: {
               "@type": "Organization",
               name: "RentKA",
-              url: "https://www.rentka.co",
+              url: "https://rentka.co",
             },
             areaServed: [
               "Islamabad",
               "Rawalpindi",
               "Islamabad International Airport",
             ],
-            url: "https://www.rentka.co/airport-transfer/islamabad",
+            url: "https://rentka.co/airport-car-rental-islamabad",
           }),
         }}
       />

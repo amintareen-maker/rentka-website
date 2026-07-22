@@ -10,6 +10,8 @@ import Image from "next/image";
 import LeadModal from "@/components/LeadModal";
 import { Car } from "@/lib/useCars";
 
+const SELF_DRIVE_ENABLED = false;
+
 export default function CarDetailPage() {
   const params = useParams<{ country: string; carId: string }>();
   const { country, carId } = params;
@@ -63,7 +65,7 @@ export default function CarDetailPage() {
 
           <h2 className="font-semibold mb-2">Indicative Pricing</h2>
 
-          {car.pricing?.selfDrive && (
+          {SELF_DRIVE_ENABLED && car.pricing?.selfDrive && (
             <pre className="bg-slate-50 p-2 rounded text-sm">
               {JSON.stringify(car.pricing.selfDrive, null, 2)}
             </pre>

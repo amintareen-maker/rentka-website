@@ -26,6 +26,7 @@ const trackEvent = (eventName: string, data: any = {}) => {
 };
 
 type ServiceType = "selfDrive" | "withDriver";
+const SELF_DRIVE_ENABLED = false;
 
 type Vendor = {
   name?: string;
@@ -53,7 +54,9 @@ export default function CarDetailsModal({
   const [showCharges, setShowCharges] = useState(false);
   
   const [selectedService, setSelectedService] =
-    useState<ServiceType>(service);
+    useState<ServiceType>(
+      SELF_DRIVE_ENABLED && service === "selfDrive" ? "selfDrive" : "withDriver"
+    );
 
   const [leadOpen, setLeadOpen] = useState(false);
   
@@ -72,7 +75,9 @@ export default function CarDetailsModal({
      Sync service from parent
   ------------------------------ */
   useEffect(() => {
-    setSelectedService(service);
+    setSelectedService(
+      SELF_DRIVE_ENABLED && service === "selfDrive" ? "selfDrive" : "withDriver"
+    );
   }, [service]);
 
   /* -----------------------------
@@ -110,7 +115,8 @@ export default function CarDetailsModal({
   /* -----------------------------
      Support flags
   ------------------------------ */
-  const supportsSelfDrive = car?.supports?.withoutDriver !== false;
+  const supportsSelfDrive =
+    SELF_DRIVE_ENABLED && car?.supports?.withoutDriver !== false;
   const supportsWithDriver = car?.supports?.withDriver !== false;
 
   /* -----------------------------

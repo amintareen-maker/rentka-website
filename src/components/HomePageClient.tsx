@@ -11,7 +11,7 @@ const trackEvent = (eventName: string, data: any = {}) => {
 import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useCars, Car } from "@/lib/useCars";
-import { useCountries, useCities } from "@/lib/useLocations";
+import { useCountries } from "@/lib/useLocations";
 import ModelListingsBottomSheet from "@/components/ModelListingsBottomSheet";
 import CarDetailsModal from "@/components/CarDetailsModal";
 
@@ -46,7 +46,7 @@ export default function HomePageClient({
   const [country] = useState<string>("PK");
   const [city, setCity] = useState<string>("islamabad");
   const [service, setService] =
-    useState<"selfDrive" | "withDriver" | undefined>();
+    useState<"selfDrive" | "withDriver">("withDriver");
 
   const [filterError, setFilterError] = useState<{
     city?: boolean;
@@ -94,41 +94,9 @@ export default function HomePageClient({
 }, [city, service]);
 
   /* -----------------------------
-     LOCATIONS
+  LOCATIONS
   ------------------------------ */
   const countries = useCountries();
-  const cities = useCities(country);
-  const selectedCity = cities.find((c) => c.id === city);
-
-  const availableServices = {
-    selfDrive: selectedCity?.supports?.serviceWithoutDriver,
-    withDriver: selectedCity?.supports?.serviceWithDriver,
-  };
-
-  /* -----------------------------
-     AUTO-SELECT SERVICE
-  ------------------------------ */
-  useEffect(() => {
-    if (!selectedCity) {
-      setService(undefined);
-      return;
-    }
-
-    const supportsSelf =
-      selectedCity.supports?.serviceWithoutDriver;
-    const supportsDriver =
-      selectedCity.supports?.serviceWithDriver;
-
-    if (supportsSelf && !supportsDriver) {
-      setService("selfDrive");
-      setFilterError((prev) => ({ ...prev, service: false }));
-    }
-
-    if (!supportsSelf && supportsDriver) {
-      setService("withDriver");
-      setFilterError((prev) => ({ ...prev, service: false }));
-    }
-  }, [selectedCity]);
 
   /* -----------------------------
      CARS
@@ -326,7 +294,7 @@ useEffect(() => {
                     });
 
                     setCity(selectedCity);
-                    setService(undefined);
+                    setService("withDriver");
                     setFilterError((p) => ({ ...p, city: false }));
                   }}
                   className={`w-full rounded-lg px-4 py-3 border ${
@@ -346,35 +314,15 @@ useEffect(() => {
                 <label className="block text-sm font-semibold text-[var(--rentka-blue) mb-2">
                   Service
                 </label>
-                <select
-                  key={`service-${shakeKey}`}
-                  value={service ?? ""}
-                  onChange={(e) => {
-                  const selectedService =
-                    (e.target.value as "selfDrive" | "withDriver") || undefined;
-
-                  trackEvent("select_service", {
-                    service: selectedService,
-                    city: city,
-                  });
-
-                  setService(selectedService);
-                  setFilterError((p) => ({ ...p, service: false }));
-                }}
-                                  className={`w-full rounded-lg px-4 py-3 border ${
+                <div
+                  className={`w-full rounded-lg px-4 py-3 border ${
                                   filterError.service
                                     ? "border-red-500 ring-1 ring-red-500 shake"
                                     : "border-slate-300 focus:border-[var(--rentka-green)]"
-                                } focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)]`}
+                                }`}
                                 >
-                                  <option value="">Select service</option>
-                                  {availableServices.selfDrive && (
-                                    <option value="selfDrive">Self Drive</option>
-                                  )}
-                                  {availableServices.withDriver && (
-                                    <option value="withDriver">With Driver</option>
-                                  )}
-                                </select>
+                                  With Driver
+                                </div>
                               </div>
                             </div>
 
@@ -397,8 +345,7 @@ useEffect(() => {
                               {models.map((m) => {
                   const slug = m.model.toLowerCase().replace(/\s+/g, "-");
 
-                  const serviceSlug =
-                    service === "withDriver" ? "with-driver" : "self-drive";
+                  const serviceSlug = "with-driver";
 
                   const url = `/cars/${slug}/${city}/${serviceSlug}`;
 

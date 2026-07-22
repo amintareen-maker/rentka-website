@@ -25,7 +25,7 @@ export const articles: Article[] = [
       "rentka",
     ],
 
-    image: "/blog/blog-cover1.webp",
+    image: "/blog/motorway-road-trip.png",
 
     accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -60,7 +60,7 @@ export const articles: Article[] = [
       "rentka",
     ],
 
-    image: "/blog/blog-cover1.webp",
+    image: "/blog/motorway-road-trip.png",
 
     accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -96,7 +96,7 @@ export const articles: Article[] = [
     "rentka",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/airport-transfer.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -131,7 +131,7 @@ export const articles: Article[] = [
     "rentka",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/motorway-road-trip.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -165,7 +165,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/murree-road-trip.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -200,7 +200,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/motorway-road-trip.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -234,7 +234,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/Islamabad to Naran Car Rental Guide.webp",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -269,7 +269,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/islamabad to skardu.webp",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -304,7 +304,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/islamabad to hunza.webp",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -338,7 +338,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/northern-pakistan-road-trip.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -361,7 +361,7 @@ export const articles: Article[] = [
   metaDescription:
     "Complete guide to travelling from Islamabad to Neelum Valley including travel time, road conditions, vehicle recommendations, pricing and booking tips.",
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/northern-pakistan-road-trip.png",
 
     description:
     "Everything you need to know before renting a car from Islamabad to Neelum Valley.",
@@ -407,7 +407,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/northern-pakistan-road-trip.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -443,7 +443,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/northern-pakistan-road-trip.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -478,7 +478,7 @@ export const articles: Article[] = [
     "RentKA",
   ],
 
-  image: "/blog/blog-cover1.webp",
+  image: "/blog/northern-pakistan-road-trip.png",
 
   accent: "bg-[#E9F4E6] text-[#347A2A]",
 
@@ -488,6 +488,671 @@ export const articles: Article[] = [
 
   readTime: "10 min read",
 },
+
+  {
+    slug: "islamabad-to-nathia-gali-car-rental-guide",
+
+    category: "Hill Station Travel Guide",
+
+    title: "Islamabad to Nathia Gali Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Nathia Gali Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Plan chauffeur-driven travel from Islamabad to Nathia Gali with route details, vehicle options, road conditions, pricing factors and booking tips.",
+
+    description:
+      "Everything you need to know before booking a chauffeur-driven car from Islamabad to Nathia Gali.",
+
+    keywords: [
+      "Islamabad to Nathia Gali car rental",
+      "Nathia Gali chauffeur service",
+      "Nathia Gali transport",
+      "Galiyat car rental",
+      "RentKA",
+    ],
+
+    image: "/blog/murree-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "19 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-ayubia-car-rental-guide",
+
+    category: "Hill Station Travel Guide",
+
+    title: "Islamabad to Ayubia Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Ayubia Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Complete chauffeur-driven car rental guide from Islamabad to Ayubia covering travel time, road conditions, vehicles, pricing and booking advice.",
+
+    description:
+      "Everything you need to know before booking a chauffeur-driven car from Islamabad to Ayubia.",
+
+    keywords: [
+      "Islamabad to Ayubia car rental",
+      "Ayubia chauffeur service",
+      "Ayubia transport",
+      "Galiyat travel",
+      "RentKA",
+    ],
+
+    image: "/blog/murree-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "19 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-chitral-car-rental-guide",
+
+    category: "Northern Areas Travel Guide",
+
+    title: "Islamabad to Chitral Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Chitral Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Travel from Islamabad to Chitral with a chauffeur. Compare vehicle options and learn about distance, Lowari Tunnel road conditions, pricing and booking.",
+
+    description:
+      "A practical guide to chauffeur-driven transportation from Islamabad to Chitral.",
+
+    keywords: [
+      "Islamabad to Chitral car rental",
+      "Chitral chauffeur service",
+      "Islamabad Chitral transport",
+      "Lowari Tunnel travel",
+      "RentKA",
+    ],
+
+    image: "/blog/northern-pakistan-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "19 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-kalash-valley-car-rental-guide",
+
+    category: "Northern Areas Travel Guide",
+
+    title: "Islamabad to Kalash Valley Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Kalash Valley Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Plan a chauffeur-driven journey from Islamabad to Kalash Valley with route information, recommended vehicles, travel time, pricing and booking tips.",
+
+    description:
+      "Everything you need to plan chauffeur-driven travel from Islamabad to Kalash Valley.",
+
+    keywords: [
+      "Islamabad to Kalash Valley car rental",
+      "Kalash Valley transport",
+      "Kalash chauffeur service",
+      "Chitral Kalash tour",
+      "RentKA",
+    ],
+
+    image: "/blog/northern-pakistan-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "19 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-kumrat-valley-car-rental-guide",
+
+    category: "Northern Areas Travel Guide",
+
+    title: "Islamabad to Kumrat Valley Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Kumrat Valley Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Complete guide to chauffeur-driven travel from Islamabad to Kumrat Valley, including distance, vehicles, road conditions, seasons and pricing factors.",
+
+    description:
+      "Plan a comfortable chauffeur-driven journey from Islamabad to Kumrat Valley.",
+
+    keywords: [
+      "Islamabad to Kumrat Valley car rental",
+      "Kumrat transport",
+      "Kumrat chauffeur service",
+      "Upper Dir travel",
+      "RentKA",
+    ],
+
+    image: "/blog/northern-pakistan-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "19 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-peshawar-car-rental-guide",
+
+    category: "Intercity Travel Guide",
+
+    title: "Islamabad to Peshawar Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Peshawar Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Book chauffeur-driven transportation from Islamabad to Peshawar with guidance on motorway travel time, vehicle options, prices and reservations.",
+
+    description:
+      "Everything you need to know about chauffeur-driven travel from Islamabad to Peshawar.",
+
+    keywords: [
+      "Islamabad to Peshawar car rental",
+      "Peshawar chauffeur service",
+      "Islamabad Peshawar transport",
+      "M1 motorway travel",
+      "RentKA",
+    ],
+
+    image: "/blog/motorway-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "20 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-faisalabad-car-rental-guide",
+
+    category: "Intercity Travel Guide",
+
+    title: "Islamabad to Faisalabad Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Faisalabad Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Plan chauffeur-driven travel from Islamabad to Faisalabad with motorway route details, vehicle recommendations, pricing factors and booking tips.",
+
+    description:
+      "A complete chauffeur-driven car rental guide from Islamabad to Faisalabad.",
+
+    keywords: [
+      "Islamabad to Faisalabad car rental",
+      "Faisalabad chauffeur service",
+      "Islamabad Faisalabad transport",
+      "corporate travel Pakistan",
+      "RentKA",
+    ],
+
+    image: "/blog/motorway-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "20 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-multan-car-rental-guide",
+
+    category: "Intercity Travel Guide",
+
+    title: "Islamabad to Multan Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Multan Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Complete chauffeur-driven guide from Islamabad to Multan covering motorway travel time, best vehicles, pricing factors and booking advice.",
+
+    description:
+      "Everything you need to plan chauffeur-driven travel from Islamabad to Multan.",
+
+    keywords: [
+      "Islamabad to Multan car rental",
+      "Multan chauffeur service",
+      "Islamabad Multan transport",
+      "intercity car rental Pakistan",
+      "RentKA",
+    ],
+
+    image: "/blog/motorway-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "20 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "islamabad-to-abbottabad-car-rental-guide",
+
+    category: "Hill Station Travel Guide",
+
+    title: "Islamabad to Abbottabad Car Rental Guide",
+
+    seoTitle:
+      "Islamabad to Abbottabad Car Rental Guide | RentKA",
+
+    metaDescription:
+      "Travel from Islamabad to Abbottabad with a chauffeur. Learn about Hazara Motorway timing, vehicle options, pricing, road conditions and booking.",
+
+    description:
+      "A practical guide to chauffeur-driven transportation from Islamabad to Abbottabad.",
+
+    keywords: [
+      "Islamabad to Abbottabad car rental",
+      "Abbottabad chauffeur service",
+      "Hazara Motorway travel",
+      "Abbottabad transport",
+      "RentKA",
+    ],
+
+    image: "/blog/murree-road-trip.png",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "20 July 2026",
+
+    readTime: "10 min read",
+  },
+
+  {
+    slug: "corporate-car-rental-islamabad",
+
+    category: "Corporate Travel Guide",
+
+    title: "Corporate Car Rental Islamabad",
+
+    seoTitle:
+      "Corporate Car Rental Islamabad | Chauffeur Service | RentKA",
+
+    metaDescription:
+      "Corporate car rental in Islamabad for executives, teams, airport transfers and business travel with professional chauffeurs and clear quotations.",
+
+    description:
+      "Guide to professional chauffeur-driven corporate transportation in Islamabad.",
+
+    keywords: [
+      "corporate car rental Islamabad",
+      "executive car service Islamabad",
+      "business chauffeur Islamabad",
+      "company transport Islamabad",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "20 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "monthly-car-rental-islamabad",
+
+    category: "Long-Term Rental Guide",
+
+    title: "Monthly Car Rental Islamabad",
+
+    seoTitle:
+      "Monthly Car Rental Islamabad with Chauffeur | RentKA",
+
+    metaDescription:
+      "Learn how monthly chauffeur-driven car rental works in Islamabad, including vehicle options, schedules, pricing factors and booking requirements.",
+
+    description:
+      "Complete guide to monthly chauffeur-driven car rental in Islamabad.",
+
+    keywords: [
+      "monthly car rental Islamabad",
+      "long term car rental Islamabad",
+      "car with driver monthly",
+      "corporate monthly transport",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "21 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "wedding-car-rental-islamabad",
+
+    category: "Wedding Transportation Guide",
+
+    title: "Wedding Car Rental Islamabad",
+
+    seoTitle:
+      "Wedding Car Rental Islamabad with Chauffeur | RentKA",
+
+    metaDescription:
+      "Plan wedding car rental in Islamabad for the couple, family and guests with chauffeur-driven vehicles, scheduling tips and transparent pricing.",
+
+    description:
+      "Guide to chauffeur-driven wedding transportation in Islamabad.",
+
+    keywords: [
+      "wedding car rental Islamabad",
+      "bridal car Islamabad",
+      "wedding chauffeur service",
+      "wedding guest transport",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "21 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "luxury-car-rental-islamabad",
+
+    category: "Premium Travel Guide",
+
+    title: "Luxury Car Rental Islamabad",
+
+    seoTitle:
+      "Luxury Car Rental Islamabad with Chauffeur | RentKA",
+
+    metaDescription:
+      "Explore luxury chauffeur-driven car rental in Islamabad for executives, weddings, airport reception and premium intercity transportation.",
+
+    description:
+      "A practical guide to premium chauffeur-driven transportation in Islamabad.",
+
+    keywords: [
+      "luxury car rental Islamabad",
+      "Toyota Prado rental Islamabad",
+      "executive chauffeur Islamabad",
+      "premium airport transfer",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "21 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "chauffeur-service-islamabad",
+
+    category: "Chauffeur Service Guide",
+
+    title: "Chauffeur Service Islamabad",
+
+    seoTitle:
+      "Professional Chauffeur Service Islamabad | RentKA",
+
+    metaDescription:
+      "Book a professional chauffeur service in Islamabad for airport, city, daily and intercity travel with suitable vehicles and transparent quotations.",
+
+    description:
+      "Everything you need to know about chauffeur-driven transportation in Islamabad.",
+
+    keywords: [
+      "chauffeur service Islamabad",
+      "car with driver Islamabad",
+      "private driver Islamabad",
+      "airport chauffeur Islamabad",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "21 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "car-rental-for-foreign-tourists-in-pakistan",
+
+    category: "Tourist Transportation Guide",
+
+    title: "Car Rental for Foreign Tourists in Pakistan",
+
+    seoTitle:
+      "Car Rental for Foreign Tourists in Pakistan | RentKA",
+
+    metaDescription:
+      "Chauffeur-driven car rental guide for foreign tourists in Pakistan, covering airport pickup, itineraries, vehicle choice, pricing and booking tips.",
+
+    description:
+      "Plan comfortable chauffeur-driven travel across Pakistan as an international visitor.",
+
+    keywords: [
+      "car rental Pakistan for foreigners",
+      "tourist chauffeur Pakistan",
+      "Pakistan private tour transport",
+      "airport pickup Pakistan",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "21 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "family-car-rental-islamabad",
+
+    category: "Family Travel Guide",
+
+    title: "Family Car Rental Islamabad",
+
+    seoTitle:
+      "Family Car Rental Islamabad with Chauffeur | RentKA",
+
+    metaDescription:
+      "Family car rental in Islamabad with professional chauffeurs for airport pickups, events, city travel and holidays across Pakistan.",
+
+    description:
+      "Guide to comfortable chauffeur-driven family transportation in Islamabad.",
+
+    keywords: [
+      "family car rental Islamabad",
+      "family chauffeur Islamabad",
+      "car with driver for family",
+      "family tour transport Pakistan",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "22 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "toyota-corolla-rental-islamabad-guide",
+
+    category: "Vehicle Rental Guide",
+
+    title: "Toyota Corolla Rental Islamabad Guide",
+
+    seoTitle:
+      "Toyota Corolla Rental Islamabad with Chauffeur | RentKA",
+
+    metaDescription:
+      "Complete Toyota Corolla rental guide for Islamabad covering chauffeur-driven city, airport, corporate and intercity travel, pricing and booking.",
+
+    description:
+      "Everything you need to know before booking a chauffeur-driven Toyota Corolla in Islamabad.",
+
+    keywords: [
+      "Toyota Corolla rental Islamabad",
+      "Corolla with driver Islamabad",
+      "sedan rental Islamabad",
+      "chauffeur car Islamabad",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "22 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "toyota-prado-rental-islamabad-guide",
+
+    category: "Vehicle Rental Guide",
+
+    title: "Toyota Prado Rental Islamabad Guide",
+
+    seoTitle:
+      "Toyota Prado Rental Islamabad with Chauffeur | RentKA",
+
+    metaDescription:
+      "Book a chauffeur-driven Toyota Prado in Islamabad for premium airport, executive, wedding and northern areas travel. Learn pricing and booking tips.",
+
+    description:
+      "Complete guide to chauffeur-driven Toyota Prado rental in Islamabad.",
+
+    keywords: [
+      "Toyota Prado rental Islamabad",
+      "Prado with driver Islamabad",
+      "luxury SUV rental Islamabad",
+      "Prado northern areas tour",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "22 July 2026",
+
+    readTime: "9 min read",
+  },
+
+  {
+    slug: "toyota-hiace-rental-islamabad-guide",
+
+    category: "Vehicle Rental Guide",
+
+    title: "Toyota Hiace Rental Islamabad Guide",
+
+    seoTitle:
+      "Toyota Hiace Rental Islamabad with Chauffeur | RentKA",
+
+    metaDescription:
+      "Toyota Hiace rental guide for chauffeur-driven group, family, corporate, wedding and tour transportation from Islamabad.",
+
+    description:
+      "Everything you need to know about chauffeur-driven Toyota Hiace rental in Islamabad.",
+
+    keywords: [
+      "Toyota Hiace rental Islamabad",
+      "Hiace with driver Islamabad",
+      "group transport Islamabad",
+      "van rental Islamabad",
+      "RentKA",
+    ],
+
+    image: "/blog/blog-cover1.webp",
+
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+
+    author: "RentKA Editorial Team",
+
+    date: "22 July 2026",
+
+    readTime: "9 min read",
+  },
 
 ];
 

@@ -14,11 +14,6 @@ export default function FAQSection({
         "Yes. All RentKA bookings include a professional driver.",
     },
     {
-      question: `Do you offer self drive cars in ${city}?`,
-      answer:
-        "No. RentKA currently provides cars with professional drivers only.",
-    },
-    {
       question: `Can I book a car for Murree or northern trips from ${city}?`,
       answer:
         "Yes. Customers frequently book Prado, Hiace, Corolla and SUVs for Murree, Nathia Gali, Naran and northern travel.",

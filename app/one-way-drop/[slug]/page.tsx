@@ -38,7 +38,7 @@ export async function generateMetadata({
 
   const description = `Book a one-way car rental from ${route.from} to ${route.to} with RentKA. Professional chauffeur, fuel included and transparent pricing.`;
 
-  const url = `https://www.rentka.co/one-way-drop/${route.slug}`;
+  const url = `https://rentka.co/one-way-drop/${route.slug}`;
 
   return {
     title,

@@ -1,4 +1,16 @@
-"use client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About RentKA | Chauffeur-Driven Car Rental Islamabad",
+  description:
+    "Learn about RentKA, a chauffeur-driven car rental company based in Islamabad providing reliable transport across Islamabad, Rawalpindi and intercity Pakistan.",
+  alternates: {
+    canonical: "https://rentka.co/about",
+  },
+  openGraph: {
+    url: "https://rentka.co/about",
+  },
+};
 
 export default function AboutPage() {
   return (
@@ -11,7 +23,7 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-6 py-24 text-center">
 
           <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 mb-6">
-            Trusted Car Rental Marketplace in Pakistan
+            Chauffeur-Driven Car Rental Company in Islamabad
           </span>
 
           <h1 className="text-5xl md:text-6xl font-bold text-slate-900 tracking-tight mb-6">
@@ -23,9 +35,9 @@ export default function AboutPage() {
           </h1>
 
           <p className="max-w-3xl mx-auto text-lg text-slate-600 leading-8">
-            RentKA helps customers compare and book vehicles from verified
-            rental partners across Pakistan. No confusing pricing, no endless
-            calls, and no uncertainty about who you're renting from.
+            RentKA is a professionally managed chauffeur-driven car rental
+            company headquartered in Islamabad, providing reliable transport
+            across Islamabad, Rawalpindi and intercity Pakistan.
           </p>
         </div>
       </section>
@@ -41,7 +53,7 @@ export default function AboutPage() {
             <div className="text-center border rounded-2xl p-6">
               <div className="text-3xl font-bold text-slate-900">100%</div>
               <div className="text-slate-600 mt-2">
-                Verified Rental Partners
+                Verified Vehicles
               </div>
             </div>
 
@@ -145,8 +157,7 @@ export default function AboutPage() {
                 Verified Vehicles
               </h3>
               <p className="text-slate-600">
-                Cars are sourced from trusted rental businesses and reviewed
-                before listing.
+                Vehicle options are carefully selected for reliable journeys.
               </p>
             </div>
 
@@ -173,8 +184,7 @@ export default function AboutPage() {
                 One Point of Contact
               </h3>
               <p className="text-slate-600">
-                We coordinate with partners so customers enjoy a smoother
-                experience.
+                Our team provides clear communication throughout your journey.
               </p>
             </div>
 
@@ -193,10 +203,11 @@ export default function AboutPage() {
           </h2>
 
           <p className="text-lg text-slate-600 leading-9 max-w-4xl mx-auto">
-            RentKA is a Pakistani car rental marketplace built to simplify the
-            rental experience. We connect customers with verified rental
-            providers while helping them compare options, understand pricing,
-            and book with greater confidence.
+            RentKA (SMC-PRIVATE) Limited is a professionally managed
+            chauffeur-driven car rental company headquartered in Islamabad.
+            We provide airport transfers, corporate transport, monthly rentals
+            and one-way intercity travel across Islamabad, Rawalpindi and
+            destinations throughout Pakistan.
           </p>
 
         </div>
@@ -215,7 +226,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-3 gap-6">
 
             <div className="border rounded-2xl p-6 text-center">
-              Islamabad
+              Islamabad Headquarters
             </div>
 
             <div className="border rounded-2xl p-6 text-center">
@@ -227,11 +238,11 @@ export default function AboutPage() {
             </div>
 
             <div className="border rounded-2xl p-6 text-center">
-              Murree Trips
+              One-Way Intercity Travel
             </div>
 
             <div className="border rounded-2xl p-6 text-center">
-              Northern Areas Travel
+              Monthly Rentals
             </div>
 
             <div className="border rounded-2xl p-6 text-center">
@@ -253,10 +264,10 @@ export default function AboutPage() {
           </h2>
 
           <p className="text-lg text-slate-600 leading-9 max-w-4xl mx-auto">
-            Trust is at the center of everything we do. We review rental
-            partners, monitor customer feedback, verify listings, and maintain
-            communication throughout the booking process to create a more
-            dependable rental experience.
+            Trust is at the center of everything we do. We review vehicle
+            availability, monitor customer feedback, and maintain communication
+            throughout the booking process to create a more dependable rental
+            experience.
           </p>
 
         </div>
@@ -275,11 +286,11 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-6">
 
             <div className="border rounded-2xl p-6">
-              SECP Registered Business
+              Chauffeur-Driven Car Rental
             </div>
 
             <div className="border rounded-2xl p-6">
-              NTN Registered
+              Islamabad Headquarters
             </div>
 
             <div className="border rounded-2xl p-6">

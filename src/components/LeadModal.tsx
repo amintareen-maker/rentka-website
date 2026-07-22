@@ -78,9 +78,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
     context.modelYearLabel ?? context.modelYear ?? null;
 
   const serviceLabel =
-    context.service === "selfDrive"
-      ? "Self Drive"
-      : context.service === "withDriver"
+    context.service
       ? "With Driver"
       : null;
 
@@ -146,9 +144,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
   const leadId = `RK-${cityCode}-${newNumber}`;
 
   const serviceLabel =
-    context.service === "selfDrive"
-      ? "Self Drive"
-      : context.service === "withDriver"
+    context.service
       ? "With Driver"
       : "N/A";
 
@@ -257,7 +253,7 @@ window.open(whatsappUrl, "_blank");
     createdAt: serverTimestamp(),
   });
 
-  const reviewLink = `https://www.rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
+  const reviewLink = `https://rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
 
   await updateDoc(docRef, { reviewLink });
 
