@@ -3,6 +3,8 @@
 
 import Link from "next/link";
 import Script from "next/script";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { ORGANIZATION_ID } from "@/lib/seo";
 
 export const metadata = {
   title: "Islamabad Airport Transfer Service | Airport Pickup & Drop Islamabad | RentKA",
@@ -82,9 +84,7 @@ export default function IslamabadAirportTransferPage() {
             serviceType: "Airport Transfer Service",
             name: "Islamabad Airport Transfer Service",
             provider: {
-              "@type": "Organization",
-              name: "RentKA",
-              url: "https://rentka.co",
+              "@id": ORGANIZATION_ID,
             },
             areaServed: [
               "Islamabad",
@@ -142,6 +142,9 @@ export default function IslamabadAirportTransferPage() {
       />
 
       <main className="bg-white text-[#0F2B46] overflow-x-hidden">
+      <div className="mx-auto max-w-6xl px-4 py-4">
+        <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Islamabad Airport Transfer", href: "/airport-car-rental-islamabad" }]} />
+      </div>
 
       {/* HERO SECTION */}
       <section className="bg-[#0F2B46] text-white px-4 py-12 md:py-20">

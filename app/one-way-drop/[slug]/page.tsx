@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { intercityRoutes } from "@/data/intercityRoutes";
 import IntercityRoutePage from "@/components/intercity/IntercityRoutePage";
+import { ORGANIZATION_ID } from "@/lib/seo";
 
 type Props = {
   params: Promise<{
@@ -77,19 +78,18 @@ export default async function Page({ params }: Props) {
   "@graph": [
     {
       "@type": "Service",
+      "@id": `https://rentka.co/one-way-drop/${route.slug}#service`,
       name: `${route.from} to ${route.to} Car Rental`,
+      url: `https://rentka.co/one-way-drop/${route.slug}`,
       serviceType: "One Way Drop Service",
       provider: {
-        "@type": "Organization",
-        name: "RentKA",
-        url: "https://rentka.co",
+        "@id": ORGANIZATION_ID,
       },
       areaServed: "Pakistan",
       offers: {
         "@type": "Offer",
         price: route.vehicles.corolla.price,
         priceCurrency: "PKR",
-        availability: "https://schema.org/InStock",
       },
     },
     {

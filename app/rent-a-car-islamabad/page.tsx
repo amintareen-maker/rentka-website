@@ -4,6 +4,8 @@ import Image from "next/image";
 import FAQSection from "@/components/FAQSection";
 import GoogleReviews from "@/components/GoogleReviews";
 import Script from "next/script";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { ORGANIZATION_ID } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title:
@@ -11,6 +13,8 @@ export const metadata: Metadata = {
 
   description:
     "Browse verified car rentals in Islamabad with professional drivers and transparent pricing. Book Corolla, Civic, Prado, Hiace and more for airport transfers, city rides, Murree trips, weddings, and family travel.",
+
+  alternates: { canonical: "https://rentka.co/rent-a-car-islamabad" },
 
   keywords: [
     "rent a car islamabad",
@@ -115,9 +119,7 @@ export default function IslamabadRentalPage() {
             serviceType: "Car Rental With Driver",
             name: "Rent a Car Islamabad",
             provider: {
-              "@type": "Organization",
-              name: "RentKA",
-              url: "https://rentka.co",
+              "@id": ORGANIZATION_ID,
             },
             areaServed: [
               "Islamabad",
@@ -129,6 +131,7 @@ export default function IslamabadRentalPage() {
       />
       
       <section className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-16 space-y-24 overflow-hidden">
+      <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Rent a Car Islamabad", href: "/rent-a-car-islamabad" }]} />
 
       {/* HERO */}
       <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 xl:gap-16 items-start">

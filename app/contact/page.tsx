@@ -64,7 +64,7 @@ export default function ContactPage() {
               Office Address
             </h2>
             <p className="text-slate-700">
-              Redco Plaza, 4th Floor, Suite 4, Blue Area, Islamabad, Pakistan
+              Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area, Islamabad, Pakistan
             </p>
             <p className="text-slate-700">
               <a

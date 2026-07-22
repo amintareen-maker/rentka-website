@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { ORGANIZATION_ID } from "@/lib/seo";
 
 import Hero from "@/components/intercity/Hero";
 import RouteGrid from "@/components/intercity/RouteGrid";
@@ -88,12 +90,7 @@ export default function OneWayDropPage() {
           "One Way Intercity Car Rental",
 
         provider: {
-
-          "@type": "Organization",
-
-          name: "RentKA",
-
-          url: "https://rentka.co",
+          "@id": ORGANIZATION_ID,
 
         },
 
@@ -109,9 +106,6 @@ export default function OneWayDropPage() {
               route.vehicles.corolla.price,
 
             priceCurrency: "PKR",
-
-            availability:
-              "https://schema.org/InStock",
 
             itemOffered: {
 
@@ -177,6 +171,9 @@ export default function OneWayDropPage() {
       />
 
       <main className="bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-4">
+          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "One-Way Drop", href: "/one-way-drop" }]} />
+        </div>
 
         <Hero />
                 {/* Quick Stats */}

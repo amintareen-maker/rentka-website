@@ -4,6 +4,13 @@ import { articles } from "../data";
 import type { Metadata } from "next";
 import Breadcrumbs from "../components/Breadcrumbs";
 import { articleContents } from "../content";
+import { notFound } from "next/navigation";
+import { ORGANIZATION_ID } from "@/lib/seo";
+import { breadcrumbJsonLd } from "@/components/Breadcrumbs";
+
+export function generateStaticParams() {
+  return articles.map((article) => ({ slug: article.slug }));
+}
 
 export async function generateMetadata(
   {
@@ -30,13 +37,13 @@ export async function generateMetadata(
     description: article.description,
 
     alternates: {
-      canonical: `/blog/${article.slug}`,
+      canonical: `https://rentka.co/blog/${article.slug}`,
     },
 
     openGraph: {
       title: article.title,
       description: article.description,
-      url: `/blog/${article.slug}`,
+      url: `https://rentka.co/blog/${article.slug}`,
       type: "article",
     },
   };
@@ -54,17 +61,7 @@ export default async function ArticlePage({
   );
 
   if (!article) {
-    return (
-      <main className="mx-auto max-w-3xl px-6 py-24">
-        <h1 className="text-4xl font-bold">
-          Article not found
-        </h1>
-
-        <p className="mt-4 text-slate-600">
-          The requested article doesn't exist.
-        </p>
-      </main>
-    );
+    notFound();
   }
 
   const articleContent =
@@ -72,23 +69,13 @@ export default async function ArticlePage({
   
 
 if (!articleContent) {
-  return (
-    <main className="mx-auto max-w-3xl px-6 py-24">
-      <h1 className="text-4xl font-bold">
-        Article content not found
-      </h1>
-
-      <p className="mt-4 text-slate-600">
-        The article exists, but its content has not been registered.
-      </p>
-    </main>
-  );
+  notFound();
 }
 
   const jsonLd = {
   "@context": "https://schema.org",
 
-  "@type": "Article",
+  "@type": "BlogPosting",
 
   headline: article.title,
 
@@ -97,20 +84,11 @@ if (!articleContent) {
   image: `https://rentka.co${article.image}`,
 
   author: {
-    "@type": "Organization",
-    name: "RentKA",
+    "@id": ORGANIZATION_ID,
   },
 
   publisher: {
-    "@type": "Organization",
-
-    name: "RentKA",
-
-    logo: {
-      "@type": "ImageObject",
-
-      url: "https://rentka.co/logo.png",
-    },
+    "@id": ORGANIZATION_ID,
   },
 
   datePublished: article.date,
@@ -123,6 +101,11 @@ if (!articleContent) {
     "@id": `https://rentka.co/blog/${article.slug}`,
   },
 };
+  const breadcrumbSchema = breadcrumbJsonLd([
+    { name: "Home", href: "/" },
+    { name: "Blog", href: "/blog" },
+    { name: article.title, href: `/blog/${article.slug}` },
+  ]);
     return (
   <>
     <script
@@ -130,6 +113,10 @@ if (!articleContent) {
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(jsonLd),
       }}
+    />
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
     />
 
     <main className="bg-slate-50 min-h-screen">

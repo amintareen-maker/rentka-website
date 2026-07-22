@@ -2,6 +2,8 @@
 
 "use client";
 
+// This legacy modal-backed detail route is intentionally excluded from search.
+
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";

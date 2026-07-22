@@ -12,6 +12,7 @@ import Script from "next/script";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LOCAL_BUSINESS_ID, LOGO_ID, ORGANIZATION_ID, WEBSITE_ID } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title:
@@ -27,6 +28,9 @@ export const metadata: Metadata = {
     "murree trip car rental",
     "affordable car rental islamabad",
   ],
+  alternates: {
+    canonical: "https://rentka.co/",
+  },
   openGraph: {
     title:
       "Rent a Car in Islamabad & Rawalpindi with Driver | RentKA",
@@ -163,8 +167,70 @@ export default async function Page() {
   ]
 };
 
+  const entitySchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "ImageObject",
+        "@id": LOGO_ID,
+        url: "https://rentka.co/logo.png",
+        contentUrl: "https://rentka.co/logo.png",
+      },
+      {
+        "@type": "Organization",
+        "@id": ORGANIZATION_ID,
+        name: "RentKA",
+        legalName: "RENTKA (SMC-PRIVATE) LIMITED",
+        url: "https://rentka.co/",
+        logo: { "@id": LOGO_ID },
+        telephone: "+923020589999",
+        email: "support@rentka.co",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area",
+          addressLocality: "Islamabad",
+          addressCountry: "PK",
+        },
+        sameAs: [
+          "https://www.facebook.com/RentKACarRental",
+          "https://www.instagram.com/rentka.co",
+          "https://www.linkedin.com/company/rentka",
+          "https://x.com/RentKACarRental",
+          "https://www.youtube.com/@RentKACarRental",
+        ],
+      },
+      {
+        "@type": "CarRental",
+        "@id": LOCAL_BUSINESS_ID,
+        name: "RentKA",
+        url: "https://rentka.co/",
+        image: { "@id": LOGO_ID },
+        telephone: "+923020589999",
+        parentOrganization: { "@id": ORGANIZATION_ID },
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area",
+          addressLocality: "Islamabad",
+          addressCountry: "PK",
+        },
+      },
+      {
+        "@type": "WebSite",
+        "@id": WEBSITE_ID,
+        name: "RentKA",
+        url: "https://rentka.co/",
+        publisher: { "@id": ORGANIZATION_ID },
+      },
+    ],
+  };
+
   return (
   <>
+    <Script
+      id="rentka-entities"
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(entitySchema) }}
+    />
     <Script
   id="faq-schema"
   type="application/ld+json"

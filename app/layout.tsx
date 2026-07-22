@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/react";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
 
 export const metadata = {
+  metadataBase: new URL("https://rentka.co"),
   title: {
     default: "RentKA | Affordable Car Rental with Driver",
     template: "%s | RentKA",
@@ -60,99 +61,6 @@ export default function RootLayout({
           `}
         </Script>
 
-        {/* Organization Schema */}
-<Script
-  id="organization-schema"
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "@id": "https://rentka.co/#organization",
-      name: "RentKA",
-      legalName: "RentKA (SMC-PRIVATE) Limited",
-      url: "https://rentka.co",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://rentka.co/logo.png",
-      },
-      telephone: "+923020589999",
-      contactPoint: {
-        "@type": "ContactPoint",
-        telephone: "+923020589999",
-        contactType: "customer service",
-        areaServed: "PK",
-        availableLanguage: ["English", "Urdu"],
-      },
-      sameAs: [
-        "https://www.facebook.com/RentKACarRental",
-        "https://www.instagram.com/rentka.co",
-        "https://www.linkedin.com/company/rentka",
-        "https://x.com/RentKACarRental",
-        "https://www.youtube.com/@RentKACarRental",
-      ],
-    }),
-  }}
-/>
-
-        {/* Car Rental Business Schema */}
-<Script
-  id="localbusiness-schema"
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "CarRental",
-      "@id": "https://rentka.co/#car-rental",
-      name: "RentKA",
-      legalName: "RentKA (SMC-PRIVATE) Limited",
-      url: "https://rentka.co",
-      image: "https://rentka.co/logo.png",
-      logo: "https://rentka.co/logo.png",
-      telephone: "+923020589999",
-      priceRange: "PKR",
-      parentOrganization: {
-        "@id": "https://rentka.co/#organization",
-      },
-      areaServed: [
-        {
-          "@type": "City",
-          name: "Islamabad",
-        },
-        {
-          "@type": "City",
-          name: "Rawalpindi",
-        },
-      ],
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Islamabad",
-        addressCountry: "PK",
-      },
-      hasMap: "https://www.google.com/maps/place/Rentka/@33.715213,73.0645139,17z/data=!3m1!4b1!4m6!3m5!1s0x293c5f8a2e952d73:0x934b9c0b3c707405!8m2!3d33.715213!4d73.0670888!16s%2Fg%2F11nhgw876j",
-      knowsLanguage: ["English", "Urdu"],
-      description: "RentKA provides chauffeur-driven car rental, airport transfer, intercity travel, corporate transport and outstation travel services in Islamabad and Rawalpindi.",
-    }),
-  }}
-/>
-
-{/* Website Schema */}
-<Script
-  id="website-schema"
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "@id": "https://rentka.co/#website",
-      name: "RentKA",
-      url: "https://rentka.co",
-      publisher: {
-        "@id": "https://rentka.co/#organization",
-      },
-    }),
-  }}
-/>
       </head>
 
       <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col pt-10">
@@ -190,11 +98,33 @@ export default function RootLayout({
         <footer className="border-t bg-slate-50">
           <div className="mx-auto max-w-7xl px-4 py-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <p className="text-sm text-slate-600">
-                © {new Date().getFullYear()} RentKA. All rights reserved.
-              </p>
+              <div className="text-sm text-slate-600">
+                <p>© {new Date().getFullYear()} RENTKA (SMC-PRIVATE) LIMITED. All rights reserved.</p>
+                <p className="mt-1">
+                  Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area, Islamabad ·{" "}
+                  <a href="tel:+923020589999" className="hover:text-slate-900 hover:underline">0302 058 9999</a>
+                </p>
+              </div>
 
-              <nav className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              <nav aria-label="Footer" className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                <Link href="/rent-a-car-islamabad" className="text-slate-600 hover:text-slate-900">
+                  Islamabad Car Rental
+                </Link>
+                <Link href="/rent-a-car-rawalpindi" className="text-slate-600 hover:text-slate-900">
+                  Rawalpindi Car Rental
+                </Link>
+                <Link href="/airport-car-rental-islamabad" className="text-slate-600 hover:text-slate-900">
+                  Airport Transfer
+                </Link>
+                <Link href="/one-way-drop" className="text-slate-600 hover:text-slate-900">
+                  One-Way Drop
+                </Link>
+                <Link href="/blog" className="text-slate-600 hover:text-slate-900">
+                  Blog
+                </Link>
+                <Link href="/about" className="text-slate-600 hover:text-slate-900">
+                  About
+                </Link>
                 <Link href="/terms" className="text-slate-600 hover:text-slate-900">
                   Terms
                 </Link>

@@ -471,6 +471,24 @@ export default function BlogHome() {
         <div className="grid gap-5 md:grid-cols-2">
           {curatedSections.map((section) => <GuideLinks key={section.title} {...section} />)}
         </div>
+        <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
+          <h2 className="text-2xl font-extrabold text-[#0F2B46]">All published guides</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Browse every RentKA travel and chauffeur-driven car rental guide.
+          </p>
+          <ul className="mt-6 grid gap-x-8 gap-y-3 md:grid-cols-2 lg:grid-cols-3">
+            {articles.map((article) => (
+              <li key={article.slug}>
+                <Link
+                  href={`/blog/${article.slug}`}
+                  className="text-sm font-semibold text-slate-700 hover:text-[#347A2A] hover:underline"
+                >
+                  {article.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </section>
 
       <section className="px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">

@@ -1,16 +1,12 @@
 import type { MetadataRoute } from "next";
-import { intercityRoutes } from "../src/data/intercityRoutes";
-import { articles } from "./blog/data";
 
-const BASE_URL = "https://rentka.co";
-const LAST_MODIFIED = new Date("2026-07-12");
+import { articles } from "./blog/data";
+import { intercityRoutes } from "../src/data/intercityRoutes";
+import { SITE_URL, VEHICLE_CITIES, VEHICLE_MODELS, VEHICLE_SERVICE } from "../src/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pages: MetadataRoute.Sitemap = [];
-
-  // Static pages
   const staticPages = [
-    { path: "/", priority: 1.0 },
+    { path: "/", priority: 1 },
     { path: "/rent-a-car-islamabad", priority: 0.9 },
     { path: "/rent-a-car-rawalpindi", priority: 0.9 },
     { path: "/airport-car-rental-islamabad", priority: 0.9 },
@@ -22,68 +18,34 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/privacy", priority: 0.5 },
     { path: "/terms", priority: 0.5 },
     { path: "/cancellation-policy", priority: 0.5 },
-  ];
+  ].map(({ path, priority }) => ({
+    url: `${SITE_URL}${path}`,
+    changeFrequency: "weekly" as const,
+    priority,
+  }));
 
-  staticPages.forEach((page) => {
-    pages.push({
-      url: `${BASE_URL}${page.path}`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: page.priority,
-    });
-  });
+  const vehiclePages = VEHICLE_MODELS.flatMap((model) =>
+    VEHICLE_CITIES.map((city) => ({
+      url: `${SITE_URL}/cars/${model}/${city}/${VEHICLE_SERVICE}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
+  );
 
-  // Vehicle pages
-  const models = [
-    "toyota-corolla",
-    "honda-civic",
-    "toyota-prado",
-    "toyota-hiace",
-    "honda-br-v",
-    "toyota-hilux",
-    "honda-city",
-    "suzuki-wagon-r",
-    "toyota-yaris",
-    "suzuki-alto",
-  ];
-
-  const cities = [
-    "islamabad",
-    "rawalpindi",
-  ];
-
-  models.forEach((model) => {
-    cities.forEach((city) => {
-      pages.push({
-        url: `${BASE_URL}/cars/${model}/${city}/with-driver`,
-        lastModified: LAST_MODIFIED,
-        changeFrequency: "weekly",
-        priority: 0.8,
-      });
-    });
-  });
-
-  // One-way routes
-  intercityRoutes
+  const routePages = intercityRoutes
     .filter((route) => route.active)
-    .forEach((route) => {
-      pages.push({
-        url: `${BASE_URL}/one-way-drop/${route.slug}`,
-        lastModified: LAST_MODIFIED,
-        changeFrequency: "weekly",
-        priority: route.featured ? 0.9 : 0.8,
-      });
-    });
+    .map((route) => ({
+      url: `${SITE_URL}/one-way-drop/${route.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: route.featured ? 0.9 : 0.8,
+    }));
 
-  // Blog articles
-  articles.forEach((article) => {
-    pages.push({
-      url: `${BASE_URL}/blog/${article.slug}`,
-      lastModified: LAST_MODIFIED,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    });
-  });
+  const articlePages = articles.map((article) => ({
+    url: `${SITE_URL}/blog/${article.slug}`,
+    lastModified: new Date(article.date),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
 
-  return pages;
+  return [...staticPages, ...vehiclePages, ...routePages, ...articlePages];
 }

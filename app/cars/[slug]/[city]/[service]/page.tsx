@@ -4,22 +4,37 @@ import CarListingClient from "@/components/CarListingClient";
 import { doc, getDoc } from "firebase/firestore";
 import Script from "next/script";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import Link from "next/link";
+import Breadcrumbs, { breadcrumbJsonLd } from "@/components/Breadcrumbs";
+import {
+  ORGANIZATION_ID,
+  VEHICLE_CITIES,
+  VEHICLE_MODELS,
+  VEHICLE_SERVICE,
+  isValidVehicleRoute,
+} from "@/lib/seo";
 
 type Vendor = {
   name?: string;
   logoUrl?: string;
 };
 
-type RelatedModel = {
-  name: string;
-  slug: string;
+type VehiclePageProps = {
+  params: Promise<{ slug: string; city: string; service: string }>;
 };
 
 // ✅ ADD THIS RIGHT HERE (below imports, above Page function)
-export async function generateMetadata({ params }: any) {
+export function generateStaticParams() {
+  return VEHICLE_MODELS.flatMap((slug) =>
+    VEHICLE_CITIES.map((city) => ({ slug, city, service: VEHICLE_SERVICE })),
+  );
+}
+
+export async function generateMetadata({ params }: VehiclePageProps): Promise<Metadata> {
   const { slug, city, service } = await params;
 
-  if (service !== "with-driver") {
+  if (!isValidVehicleRoute(slug, city, service)) {
     return {
       robots: {
         index: false,
@@ -29,11 +44,14 @@ export async function generateMetadata({ params }: any) {
   }
 
   const carName = slug.replace(/-/g, " ");
+  const url = `https://rentka.co/cars/${slug}/${city}/${service}`;
 
 
   return {
     title: `${carName} with Driver Rental in ${city} | Price & Booking | RentKA`,
     description: `Book ${carName} with driver in ${city}. Compare prices from verified vendors, airport transfers, city rides, Murree trips and instant WhatsApp booking with RentKA.`,
+    alternates: { canonical: url },
+    openGraph: { title: `${carName} with Driver Rental in ${city} | RentKA`, description: `Book ${carName} with driver in ${city} through RentKA.`, url },
   };
 }
 
@@ -60,16 +78,10 @@ type Car = {
 
 export default async function Page({
   params,
-}: {
-  params: Promise<{
-    slug: string;
-    city: string;
-    service: string;
-  }>;
-}) {
+}: VehiclePageProps) {
  const { slug, city, service } = await params;
 
-  if (service !== "with-driver") {
+  if (!isValidVehicleRoute(slug, city, service)) {
     notFound();
   }
   
@@ -184,11 +196,17 @@ const cityName =
     ? "Rawalpindi & Islamabad"
     : city.charAt(0).toUpperCase() + city.slice(1);
 
-const relatedModels: RelatedModel[] = [
-  { name: "Toyota Corolla", slug: "toyota-corolla" },
-  { name: "Toyota Hiace", slug: "toyota-hiace" },
-  { name: "Honda BR-V", slug: "honda-br-v" },
-];
+const currentModelIndex = VEHICLE_MODELS.indexOf(slug as (typeof VEHICLE_MODELS)[number]);
+const relatedModels = [1, 2, 3].map((offset) => {
+  const relatedSlug = VEHICLE_MODELS[(currentModelIndex + offset) % VEHICLE_MODELS.length];
+  return {
+    slug: relatedSlug,
+    name: relatedSlug
+      .split("-")
+      .map((part) => part.toUpperCase() === "BR" ? "BR" : part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" "),
+  };
+});
 
 const carSchema = {
   "@context": "https://schema.org",
@@ -196,42 +214,22 @@ const carSchema = {
   name: `${carName} with Driver Rental in ${city}`,
    url: `https://rentka.co/cars/${slug}/${city}/${service}`,
   provider: {
-    "@type": "Organization",
-    name: "RentKA",
-    url: "https://rentka.co",
+    "@id": ORGANIZATION_ID,
   },
   areaServed: city,
-  offers: {
+  ...(minPrice ? { offers: {
     "@type": "Offer",
-    price: minPrice ?? 0,
+    price: minPrice,
     priceCurrency: "PKR",
-    availability: "https://schema.org/InStock",
-  },
+  } } : {}),
 };
-const breadcrumbSchema = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    {
-      "@type": "ListItem",
-      position: 1,
-      name: "Home",
-      item: "https://rentka.co",
-    },
-    {
-  "@type": "ListItem",
-  position: 2,
-  name: `Rent a Car ${cityName}`,
-  item: `https://rentka.co/rent-a-car-${city.toLowerCase()}`,
-},
-    {
-      "@type": "ListItem",
-      position: 3,
-      name: `${carName} With Driver`,
-      item: `https://rentka.co/cars/${slug}/${city}/${service}`,
-    },
-  ],
-};
+const breadcrumbItems = [
+  { name: "Home", href: "/" },
+  { name: "Cars", href: "/cars" },
+  { name: `Rent a Car ${city.charAt(0).toUpperCase() + city.slice(1)}`, href: `/rent-a-car-${city}` },
+  { name: `${carName} With Driver`, href: `/cars/${slug}/${city}/${service}` },
+];
+const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
 
 
   return (
@@ -252,6 +250,8 @@ const breadcrumbSchema = {
 />
     
     <main className="max-w-6xl mx-auto px-6 py-12">
+
+      <Breadcrumbs items={breadcrumbItems} />
 
       {/* 🔥 SEO HEADING */}
       <h1 className="text-3xl md:text-4xl font-bold mb-4 capitalize">
@@ -289,19 +289,19 @@ const breadcrumbSchema = {
   </h3>
 
   <div className="flex flex-wrap gap-3">
-    {relatedModels.map((model: RelatedModel) => {
+    {relatedModels.map((model) => {
       // avoid linking to same page
       if (model.slug === slug) return null;
 
 
       return (
-        <a
+        <Link
           key={model.slug}
           href={`/cars/${model.slug}/${city}/${service}`}
           className="text-sm px-4 py-2 bg-slate-100 rounded-lg hover:bg-slate-200 capitalize"
         >
           {model.name} {isDriver ? "with driver" : ""}
-        </a>
+        </Link>
       );
     })}
   </div>
@@ -337,10 +337,10 @@ const breadcrumbSchema = {
 
     <div>
       <p className="font-medium">
-        Can I book instantly on RentKA?
+        Can I book online?
       </p>
       <p>
-        Yes, you can submit your booking request online and confirm details via WhatsApp with our team.
+        Yes, bookings can be made online and confirmed via WhatsApp.
       </p>
     </div>
 

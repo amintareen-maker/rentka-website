@@ -4,6 +4,7 @@ export const metadata = {
   title: "Privacy Policy | RentKA",
   description:
     "Learn how RentKA collects, uses, and protects your personal information across our app and website.",
+  alternates: { canonical: "https://rentka.co/privacy" },
 };
 
 export default function PrivacyPage() {

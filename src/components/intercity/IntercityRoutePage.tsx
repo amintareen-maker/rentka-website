@@ -13,19 +13,20 @@ type Props = {
 export default function IntercityRoutePage({ route }: Props) {
   const price = route.vehicles.corolla?.price;
 
+  const reverseRoute = intercityRoutes.find(
+    (candidate) =>
+      candidate.active && candidate.from === route.to && candidate.to === route.from,
+  );
   const relatedRoutes = intercityRoutes
-  .filter(
-    (r) =>
-      r.slug !== route.slug &&
-      r.active &&
-      (
-        r.from === route.from ||
-        r.to === route.to ||
-        r.from === route.to ||
-        r.to === route.from
-      )
-  )
-  .slice(0, 6);
+    .filter(
+      (candidate) =>
+        candidate.active &&
+        candidate.slug !== route.slug &&
+        candidate.slug !== reverseRoute?.slug &&
+        (candidate.from === route.from || candidate.to === route.to),
+    )
+    .slice(0, reverseRoute ? 3 : 4);
+  const routeLinks = reverseRoute ? [reverseRoute, ...relatedRoutes] : relatedRoutes;
 
   return (
     <main className="bg-white">
@@ -170,7 +171,7 @@ export default function IntercityRoutePage({ route }: Props) {
 
       {/* Related Routes */}
 
-      {relatedRoutes.length > 0 && (
+      {routeLinks.length > 0 && (
         <section className="bg-slate-50 py-20">
 
           <div className="mx-auto max-w-7xl px-6">
@@ -185,7 +186,7 @@ export default function IntercityRoutePage({ route }: Props) {
 
             <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 
-              {relatedRoutes.map((related) => (
+              {routeLinks.map((related) => (
 
                 <Link
                   key={related.slug}
@@ -226,6 +227,21 @@ export default function IntercityRoutePage({ route }: Props) {
 
         </section>
       )}
+
+      <section className="bg-white py-12">
+        <div className="mx-auto max-w-5xl px-6 text-slate-700">
+          <p>
+            Compare vehicle options for your journey from our{" "}
+            <Link href="/rent-a-car-islamabad" className="font-semibold text-[#347A2A] hover:underline">
+              Islamabad chauffeur-driven car rentals
+            </Link>{" "}
+            or read the{" "}
+            <Link href="/blog/one-way-car-rental-islamabad-guide" className="font-semibold text-[#347A2A] hover:underline">
+              one-way car rental guide
+            </Link>.
+          </p>
+        </div>
+      </section>
 
     </main>
   );
