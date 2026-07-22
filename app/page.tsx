@@ -3,8 +3,8 @@ export const revalidate = 60;
 import HomeCTA from "@/components/HomeCTA";
 import HeroBanner from "@/components/HeroBanner";
 import HomePageClient from "@/components/HomePageClient";
-import { collection, getDocs, query, limit } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { collection, getDocs, query, limit } from "firebase/firestore/lite";
+import { liteDb } from "@/lib/firebaseLite";
 import GoogleReviews from "@/components/GoogleReviews";
 import RouteGrid from "@/components/intercity/RouteGrid";
 import ArticleGrid from "./blog/components/ArticleGrid";
@@ -13,6 +13,7 @@ import Script from "next/script";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LOCAL_BUSINESS_ID, LOGO_ID, ORGANIZATION_ID, WEBSITE_ID } from "@/lib/seo";
+import type { Car } from "@/lib/useCars";
 
 export const metadata: Metadata = {
   title:
@@ -44,21 +45,24 @@ export const metadata: Metadata = {
 };
 
 async function getInitialCars() {
-  const ref = collection(db, "countries", "PK", "cars");
-  const q = query(ref, limit(20));
-  const snap = await getDocs(q);
+  try {
+    const ref = collection(liteDb, "countries", "PK", "cars");
+    const q = query(ref, limit(20));
+    const snap = await getDocs(q);
+    const cars: Car[] = [];
 
-  const cars: any[] = [];
-
-  snap.forEach((doc) => {
-    cars.push({
-      ...doc.data(),
-      id: doc.id,
-      country: "PK",
+    snap.forEach((doc) => {
+      cars.push({
+        ...(doc.data() as Omit<Car, "id" | "country">),
+        id: doc.id,
+        country: "PK",
+      });
     });
-  });
 
-  return cars;
+    return cars;
+  } catch {
+    return [];
+  }
 }
 
 export default async function Page() {
@@ -187,7 +191,6 @@ export default async function Page() {
         email: "support@rentka.co",
         address: {
           "@type": "PostalAddress",
-          streetAddress: "Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area",
           addressLocality: "Islamabad",
           addressCountry: "PK",
         },
@@ -209,7 +212,6 @@ export default async function Page() {
         parentOrganization: { "@id": ORGANIZATION_ID },
         address: {
           "@type": "PostalAddress",
-          streetAddress: "Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area",
           addressLocality: "Islamabad",
           addressCountry: "PK",
         },

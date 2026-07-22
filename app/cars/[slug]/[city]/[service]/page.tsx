@@ -1,7 +1,7 @@
-import { db } from "@/lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { liteDb } from "@/lib/firebaseLite";
+import { collection, getDocs } from "firebase/firestore/lite";
 import CarListingClient from "@/components/CarListingClient";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore/lite";
 import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -92,8 +92,8 @@ export default async function Page({
   const selectedService = "withDriver";
 
   const snapshot = await getDocs(
-    collection(db, "countries", country, "cars")
-  );
+    collection(liteDb, "countries", country, "cars")
+  ).catch(() => null);
 
   const normalize = (str?: string) =>
     (str || "").toLowerCase().replace(/\s+/g, "-");
@@ -101,7 +101,7 @@ export default async function Page({
   const cars: (Car & { vendor?: Vendor })[] = [];
 
 // ✅ STEP 1: FILTER FIRST (NO API CALLS)
-const filteredCars = snapshot.docs.filter((docItem) => {
+const filteredCars = (snapshot?.docs || []).filter((docItem) => {
   const data = docItem.data() as Car;
 
   if (!data.model || normalize(data.model) !== normalize(slug)) return false;
@@ -147,7 +147,7 @@ const carsWithVendors = await Promise.all(
     if (data.vendorId) {
       try {
         const vendorRef = doc(
-          db,
+          liteDb,
           "countries",
           country,
           "vendors",

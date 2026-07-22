@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { db } from "@/lib/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { liteDb } from "@/lib/firebaseLite";
+import { collection, getDocs } from "firebase/firestore/lite";
 
 export const metadata: Metadata = {
   robots: {
@@ -52,12 +52,12 @@ export default async function Page({
 
   // 🔥 Fetch cars from Firebase
   const snapshot = await getDocs(
-    collection(db, "countries", country, "cars")
-  );
+    collection(liteDb, "countries", country, "cars")
+  ).catch(() => null);
 
   const cars: Car[] = [];
 
-  snapshot.forEach((doc) => {
+  snapshot?.forEach((doc) => {
   const data = doc.data() as Car;
   
   console.log("MODEL:", data.model);

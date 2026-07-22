@@ -101,7 +101,6 @@ export default function RootLayout({
               <div className="text-sm text-slate-600">
                 <p>© {new Date().getFullYear()} RENTKA (SMC-PRIVATE) LIMITED. All rights reserved.</p>
                 <p className="mt-1">
-                  Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area, Islamabad ·{" "}
                   <a href="tel:+923020589999" className="hover:text-slate-900 hover:underline">0302 058 9999</a>
                 </p>
               </div>

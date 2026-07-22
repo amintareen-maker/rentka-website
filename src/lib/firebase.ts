@@ -1,7 +1,7 @@
 // C:\Users\eZhire\rentka-website\src\lib\firebase.ts
 
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 /**
@@ -26,7 +26,9 @@ const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 /**
  * Firestore (READ-ONLY)
  */
-export const db = getFirestore(app);
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+});
 
 /**
  * Firebase Storage (READ-ONLY for images)

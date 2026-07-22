@@ -119,8 +119,7 @@ export default function RawalpindiVehicleSelector() {
         });
 
         setCars(availableCars);
-      } catch (error) {
-        console.error("Failed to load Rawalpindi vehicle options:", error);
+      } catch {
         setLoadFailed(true);
       } finally {
         setLoading(false);
