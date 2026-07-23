@@ -6,7 +6,9 @@ import Header from "@/components/Header";
 import { Analytics } from "@vercel/analytics/react";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
 
-export const metadata = {
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
   metadataBase: new URL("https://rentka.co"),
   title: {
     default: "RentKA | Affordable Car Rental with Driver",
