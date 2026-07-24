@@ -1,4 +1,4 @@
-export const SITE_URL = "https://rentka.co";
+export const SITE_URL = "https://www.rentka.co";
 
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const LOCAL_BUSINESS_ID = `${SITE_URL}/#localbusiness`;

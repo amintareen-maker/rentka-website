@@ -33,17 +33,17 @@ export async function generateMetadata(
   }
 
   return {
-    title: `${article.title} | RentKA`,
+    title: { absolute: `${article.title} | RentKA` },
     description: article.description,
 
     alternates: {
-      canonical: `https://rentka.co/blog/${article.slug}`,
+      canonical: `https://www.rentka.co/blog/${article.slug}`,
     },
 
     openGraph: {
       title: article.title,
       description: article.description,
-      url: `https://rentka.co/blog/${article.slug}`,
+      url: `https://www.rentka.co/blog/${article.slug}`,
       type: "article",
     },
   };
@@ -81,7 +81,7 @@ if (!articleContent) {
 
   description: article.description,
 
-  image: `https://rentka.co${article.image}`,
+  image: `https://www.rentka.co${article.image}`,
 
   author: {
     "@id": ORGANIZATION_ID,
@@ -98,7 +98,7 @@ if (!articleContent) {
   mainEntityOfPage: {
     "@type": "WebPage",
 
-    "@id": `https://rentka.co/blog/${article.slug}`,
+    "@id": `https://www.rentka.co/blog/${article.slug}`,
   },
 };
   const breadcrumbSchema = breadcrumbJsonLd([

@@ -13,7 +13,7 @@ export function breadcrumbJsonLd(items: BreadcrumbItem[]) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      ...(item.href ? { item: new URL(item.href, "https://rentka.co").toString() } : {}),
+      ...(item.href ? { item: new URL(item.href, "https://www.rentka.co").toString() } : {}),
     })),
   };
 }

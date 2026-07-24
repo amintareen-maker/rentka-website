@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About RentKA | Chauffeur-Driven Car Rental Islamabad",
+  title: { absolute: "About RentKA | Chauffeur-Driven Car Rental Islamabad" },
   description:
     "Learn about RentKA, a chauffeur-driven car rental company based in Islamabad providing reliable transport across Islamabad, Rawalpindi and intercity Pakistan.",
   alternates: {
-    canonical: "https://rentka.co/about",
+    canonical: "https://www.rentka.co/about",
   },
   openGraph: {
-    url: "https://rentka.co/about",
+    url: "https://www.rentka.co/about",
   },
 };
 

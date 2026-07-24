@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-const HOST = "https://rentka.co";
-const HOSTNAME = "rentka.co";
+const HOST = "https://www.rentka.co";
+const HOSTNAME = "www.rentka.co";
 const KEY = "d42393107d3a4b5087e9e5cf362a4698";
 
 export async function GET() {

@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://rentka.co/sitemap.xml",
+    sitemap: "https://www.rentka.co/sitemap.xml",
   };
 }

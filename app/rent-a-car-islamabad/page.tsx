@@ -24,8 +24,9 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title:
+  title: { absolute:
     "Rent a Car in Islamabad | Corolla, Civic, Prado & Hiace Rentals – RentKA",
+  },
   description:
     "Browse verified car rentals in Islamabad with professional drivers and transparent pricing. Book Corolla, Civic, Prado, Hiace and more for airport transfers, city rides, Murree trips, weddings, and family travel.",
   keywords: [
@@ -42,13 +43,13 @@ export const metadata: Metadata = {
     "wedding car rental islamabad",
   ],
   alternates: {
-    canonical: "https://rentka.co/rent-a-car-islamabad",
+    canonical: "https://www.rentka.co/rent-a-car-islamabad",
   },
   openGraph: {
     title: "Rent a Car in Islamabad With Driver | RentKA",
     description:
       "Professional chauffeur-driven cars for local travel, airport transfers, corporate transport, weddings and outstation trips.",
-    url: "https://rentka.co/rent-a-car-islamabad",
+    url: "https://www.rentka.co/rent-a-car-islamabad",
     type: "website",
     siteName: "RentKA",
   },
@@ -181,13 +182,13 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://rentka.co",
+      item: "https://www.rentka.co",
     },
     {
       "@type": "ListItem",
       position: 2,
       name: "Rent a Car Islamabad",
-      item: "https://rentka.co/rent-a-car-islamabad",
+      item: "https://www.rentka.co/rent-a-car-islamabad",
     },
   ],
 };
@@ -210,7 +211,7 @@ const serviceSchema = {
       name: "Islamabad",
     },
   ],
-  url: "https://rentka.co/rent-a-car-islamabad",
+  url: "https://www.rentka.co/rent-a-car-islamabad",
   description:
     "Chauffeur-driven car rentals in Islamabad for local travel, airport transfers, corporate transport, weddings and outstation trips.",
 };

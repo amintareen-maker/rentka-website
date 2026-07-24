@@ -39,13 +39,13 @@ export const metadata: Metadata = {
     "one way car service rawalpindi",
   ],
   alternates: {
-    canonical: "https://rentka.co/rent-a-car-rawalpindi",
+    canonical: "https://www.rentka.co/rent-a-car-rawalpindi",
   },
   openGraph: {
     title: "Rent a Car in Rawalpindi With Driver | RentKA",
     description:
       "Professional chauffeur-driven cars for local travel, airport transfers, corporate transport, weddings and outstation trips.",
-    url: "https://rentka.co/rent-a-car-rawalpindi",
+    url: "https://www.rentka.co/rent-a-car-rawalpindi",
     type: "website",
     siteName: "RentKA",
   },
@@ -178,13 +178,13 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       position: 1,
       name: "Home",
-      item: "https://rentka.co",
+      item: "https://www.rentka.co",
     },
     {
       "@type": "ListItem",
       position: 2,
       name: "Rent a Car Rawalpindi",
-      item: "https://rentka.co/rent-a-car-rawalpindi",
+      item: "https://www.rentka.co/rent-a-car-rawalpindi",
     },
   ],
 };
@@ -195,7 +195,7 @@ const serviceSchema = {
   serviceType: "Chauffeur-Driven Car Rental",
   name: "Rent a Car in Rawalpindi With Driver",
   provider: {
-    "@id": "https://rentka.co/#organization",
+    "@id": "https://www.rentka.co/#organization",
   },
   areaServed: [
     {
@@ -207,7 +207,7 @@ const serviceSchema = {
       name: "Islamabad",
     },
   ],
-  url: "https://rentka.co/rent-a-car-rawalpindi",
+  url: "https://www.rentka.co/rent-a-car-rawalpindi",
   description:
     "Chauffeur-driven car rentals in Rawalpindi for local travel, airport transfers, corporate transport, weddings and outstation trips.",
 };

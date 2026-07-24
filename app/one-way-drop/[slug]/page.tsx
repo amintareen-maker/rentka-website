@@ -39,10 +39,10 @@ export async function generateMetadata({
 
   const description = `Book a one-way car rental from ${route.from} to ${route.to} with RentKA. Professional chauffeur, fuel included and transparent pricing.`;
 
-  const url = `https://rentka.co/one-way-drop/${route.slug}`;
+  const url = `https://www.rentka.co/one-way-drop/${route.slug}`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: {
       canonical: url,
@@ -78,9 +78,9 @@ export default async function Page({ params }: Props) {
   "@graph": [
     {
       "@type": "Service",
-      "@id": `https://rentka.co/one-way-drop/${route.slug}#service`,
+      "@id": `https://www.rentka.co/one-way-drop/${route.slug}#service`,
       name: `${route.from} to ${route.to} Car Rental`,
-      url: `https://rentka.co/one-way-drop/${route.slug}`,
+      url: `https://www.rentka.co/one-way-drop/${route.slug}`,
       serviceType: "One Way Drop Service",
       provider: {
         "@id": ORGANIZATION_ID,
@@ -99,19 +99,19 @@ export default async function Page({ params }: Props) {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://rentka.co",
+          item: "https://www.rentka.co",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "One Way Drop",
-          item: "https://rentka.co/one-way-drop",
+          item: "https://www.rentka.co/one-way-drop",
         },
         {
           "@type": "ListItem",
           position: 3,
           name: `${route.from} to ${route.to}`,
-          item: `https://rentka.co/one-way-drop/${route.slug}`,
+          item: `https://www.rentka.co/one-way-drop/${route.slug}`,
         },
       ],
     },

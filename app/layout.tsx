@@ -9,7 +9,7 @@ import WhatsAppWidget from "@/components/WhatsAppWidget";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rentka.co"),
+  metadataBase: new URL("https://www.rentka.co"),
   title: {
     default: "RentKA | Affordable Car Rental with Driver",
     template: "%s | RentKA",

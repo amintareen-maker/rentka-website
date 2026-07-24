@@ -7,7 +7,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
 
 export const metadata = {
-  title: "Islamabad Airport Transfer Service | Airport Pickup & Drop Islamabad | RentKA",
+  title: { absolute: "Islamabad Airport Transfer Service | Airport Pickup & Drop Islamabad | RentKA" },
   description:
     "Book reliable Islamabad airport transfer service with driver. Airport pickup and drop with fuel included, professional drivers, transparent pricing, and 24/7 airport transportation in Islamabad.",
   keywords: [
@@ -33,13 +33,13 @@ export const metadata = {
     "RentKA Islamabad airport transfer",
   ],
   alternates: {
-    canonical: "https://rentka.co/airport-car-rental-islamabad",
+    canonical: "https://www.rentka.co/airport-car-rental-islamabad",
   },
   openGraph: {
     title: "Islamabad Airport Transfer Service | RentKA",
     description:
       "Professional airport pickup and drop service in Islamabad with driver, fuel included pricing, and 24/7 availability.",
-    url: "https://rentka.co/airport-car-rental-islamabad",
+    url: "https://www.rentka.co/airport-car-rental-islamabad",
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",
@@ -61,13 +61,13 @@ export default function IslamabadAirportTransferPage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Home",
-                item: "https://rentka.co",
+                item: "https://www.rentka.co",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Islamabad Airport Transfer",
-                item: "https://rentka.co/airport-car-rental-islamabad",
+                item: "https://www.rentka.co/airport-car-rental-islamabad",
               },
             ],
           }),
@@ -91,7 +91,7 @@ export default function IslamabadAirportTransferPage() {
               "Rawalpindi",
               "Islamabad International Airport",
             ],
-            url: "https://rentka.co/airport-car-rental-islamabad",
+            url: "https://www.rentka.co/airport-car-rental-islamabad",
           }),
         }}
       />

@@ -3,17 +3,17 @@ import { Suspense } from "react";
 import CarsPageClient from "./CarsPageClient";
 
 export const metadata: Metadata = {
-  title: "Cars Available with Driver in Islamabad | RentKA",
+  title: { absolute: "Cars Available with Driver in Islamabad | RentKA" },
   description:
     "Browse chauffeur-driven rental cars available through RentKA in Islamabad and Rawalpindi, with clear pricing and booking options.",
   alternates: {
-    canonical: "https://rentka.co/cars",
+    canonical: "https://www.rentka.co/cars",
   },
   openGraph: {
     title: "Cars Available with Driver in Islamabad | RentKA",
     description:
       "Browse chauffeur-driven rental cars available through RentKA in Islamabad and Rawalpindi, with clear pricing and booking options.",
-    url: "https://rentka.co/cars",
+    url: "https://www.rentka.co/cars",
   },
 };
 

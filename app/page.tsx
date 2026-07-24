@@ -16,8 +16,9 @@ import { LOCAL_BUSINESS_ID, LOGO_ID, ORGANIZATION_ID, WEBSITE_ID } from "@/lib/s
 import type { Car } from "@/lib/useCars";
 
 export const metadata: Metadata = {
-  title:
+  title: { absolute:
     "Rent a Car in Islamabad & Rawalpindi with Driver | Affordable Car Rental – RentKA",
+  },
   description:
     "Affordable car rental in Islamabad and Rawalpindi with driver. Book full-day city rides, airport transfers, and Murree trips. Verified drivers, transparent pricing, and reliable service.",
   keywords: [
@@ -30,14 +31,14 @@ export const metadata: Metadata = {
     "affordable car rental islamabad",
   ],
   alternates: {
-    canonical: "https://rentka.co/",
+    canonical: "https://www.rentka.co/",
   },
   openGraph: {
     title:
       "Rent a Car in Islamabad & Rawalpindi with Driver | RentKA",
     description:
       "Book affordable with-driver car rental in Islamabad and Rawalpindi. Airport pickup, full-day city rides, and Murree trips available.",
-    url: "https://rentka.co",
+    url: "https://www.rentka.co",
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",
@@ -177,15 +178,15 @@ export default async function Page() {
       {
         "@type": "ImageObject",
         "@id": LOGO_ID,
-        url: "https://rentka.co/logo.png",
-        contentUrl: "https://rentka.co/logo.png",
+        url: "https://www.rentka.co/logo.png",
+        contentUrl: "https://www.rentka.co/logo.png",
       },
       {
         "@type": "Organization",
         "@id": ORGANIZATION_ID,
         name: "RentKA",
         legalName: "RENTKA (SMC-PRIVATE) LIMITED",
-        url: "https://rentka.co/",
+        url: "https://www.rentka.co/",
         logo: { "@id": LOGO_ID },
         telephone: "+923020589999",
         email: "support@rentka.co",
@@ -206,7 +207,7 @@ export default async function Page() {
         "@type": "CarRental",
         "@id": LOCAL_BUSINESS_ID,
         name: "RentKA",
-        url: "https://rentka.co/",
+        url: "https://www.rentka.co/",
         image: { "@id": LOGO_ID },
         telephone: "+923020589999",
         parentOrganization: { "@id": ORGANIZATION_ID },
@@ -220,7 +221,7 @@ export default async function Page() {
         "@type": "WebSite",
         "@id": WEBSITE_ID,
         name: "RentKA",
-        url: "https://rentka.co/",
+        url: "https://www.rentka.co/",
         publisher: { "@id": ORGANIZATION_ID },
       },
     ],
@@ -331,7 +332,7 @@ export default async function Page() {
         <div className="hidden lg:flex justify-center">
 
           <img
-            src="/cars/corolla-white.png"
+            src="/car_light.png"
             alt="RentKA Intercity Travel"
             className="max-h-[340px] object-contain"
           />

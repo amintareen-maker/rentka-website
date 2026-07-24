@@ -44,11 +44,11 @@ export async function generateMetadata({ params }: VehiclePageProps): Promise<Me
   }
 
   const carName = slug.replace(/-/g, " ");
-  const url = `https://rentka.co/cars/${slug}/${city}/${service}`;
+  const url = `https://www.rentka.co/cars/${slug}/${city}/${service}`;
 
 
   return {
-    title: `${carName} with Driver Rental in ${city} | Price & Booking | RentKA`,
+    title: { absolute: `${carName} with Driver Rental in ${city} | Price & Booking | RentKA` },
     description: `Book ${carName} with driver in ${city}. Compare prices from verified vendors, airport transfers, city rides, Murree trips and instant WhatsApp booking with RentKA.`,
     alternates: { canonical: url },
     openGraph: { title: `${carName} with Driver Rental in ${city} | RentKA`, description: `Book ${carName} with driver in ${city} through RentKA.`, url },
@@ -212,7 +212,7 @@ const carSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
   name: `${carName} with Driver Rental in ${city}`,
-   url: `https://rentka.co/cars/${slug}/${city}/${service}`,
+   url: `https://www.rentka.co/cars/${slug}/${city}/${service}`,
   provider: {
     "@id": ORGANIZATION_ID,
   },

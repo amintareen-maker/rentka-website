@@ -3,7 +3,7 @@
 export const metadata = {
   title: "Cancellation & Refund Policy",
   description: "Cancellation and refund policy for RentKA car rental services.",
-  alternates: { canonical: "https://rentka.co/cancellation-policy" },
+  alternates: { canonical: "https://www.rentka.co/cancellation-policy" },
 };
 
 export default function CancellationPolicyPage() {

@@ -2,7 +2,7 @@
 
 export const metadata = {
   title: "Terms & Conditions",
-  alternates: { canonical: "https://rentka.co/terms" },
+  alternates: { canonical: "https://www.rentka.co/terms" },
 };
 
 export default function TermsPage() {

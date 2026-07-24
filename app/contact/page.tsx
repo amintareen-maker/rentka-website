@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact RentKA | Car Rental Islamabad",
+  title: { absolute: "Contact RentKA | Car Rental Islamabad" },
   description:
     "Contact RentKA for chauffeur-driven car rental, airport transfers and intercity travel in Islamabad and Rawalpindi.",
   alternates: {
-    canonical: "https://rentka.co/contact",
+    canonical: "https://www.rentka.co/contact",
   },
   openGraph: {
-    url: "https://rentka.co/contact",
+    url: "https://www.rentka.co/contact",
   },
 };
 
@@ -53,8 +53,8 @@ export default function ContactPage() {
               Website
             </h2>
             <p className="text-slate-700">
-              <a href="https://rentka.co" className="hover:underline">
-                https://rentka.co
+              <a href="https://www.rentka.co" className="hover:underline">
+                https://www.rentka.co
               </a>
             </p>
           </div>
