@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 import GoogleReviews from "@/components/GoogleReviews";
-import RawalpindiVehicleSelector from "./RawalpindiVehicleSelector";
+import CityVehicleSelector from "@/components/city-pages/CityVehicleSelector";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const metadata: Metadata = {
@@ -337,7 +337,7 @@ export default function RawalpindiRentalPage() {
         </section>
 
         <div className="mx-auto max-w-7xl space-y-16 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-          <RawalpindiVehicleSelector />
+          <CityVehicleSelector />
 
           <section>
             <div className="mb-8">

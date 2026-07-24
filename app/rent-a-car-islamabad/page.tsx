@@ -1,21 +1,33 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
-import FAQSection from "@/components/FAQSection";
-import GoogleReviews from "@/components/GoogleReviews";
 import Script from "next/script";
+import {
+  ArrowRight,
+  BadgeCheck,
+  BriefcaseBusiness,
+  Building2,
+  CalendarCheck,
+  CarFront,
+  CheckCircle2,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Plane,
+  Route,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+
+import GoogleReviews from "@/components/GoogleReviews";
+import CityVehicleSelector from "@/components/city-pages/CityVehicleSelector";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title:
     "Rent a Car in Islamabad | Corolla, Civic, Prado & Hiace Rentals – RentKA",
-
   description:
     "Browse verified car rentals in Islamabad with professional drivers and transparent pricing. Book Corolla, Civic, Prado, Hiace and more for airport transfers, city rides, Murree trips, weddings, and family travel.",
-
-  alternates: { canonical: "https://rentka.co/rent-a-car-islamabad" },
-
   keywords: [
     "rent a car islamabad",
     "car rental islamabad",
@@ -29,57 +41,192 @@ export const metadata: Metadata = {
     "monthly car rental islamabad",
     "wedding car rental islamabad",
   ],
+  alternates: {
+    canonical: "https://rentka.co/rent-a-car-islamabad",
+  },
+  openGraph: {
+    title: "Rent a Car in Islamabad With Driver | RentKA",
+    description:
+      "Professional chauffeur-driven cars for local travel, airport transfers, corporate transport, weddings and outstation trips.",
+    url: "https://rentka.co/rent-a-car-islamabad",
+    type: "website",
+    siteName: "RentKA",
+  },
 };
 
-const popularCars = [
+const whatsappUrl =
+  "https://wa.me/923020589999?text=Hello%20RentKA%2C%20I%20want%20to%20book%20a%20chauffeur-driven%20car%20in%20Islamabad.%20Please%20share%20available%20cars%20and%20prices.";
+
+const serviceAreas = [
+  "Blue Area",
+  "F-6",
+  "F-7",
+  "F-8",
+  "F-10",
+  "F-11",
+  "G-6",
+  "G-8",
+  "G-9",
+  "G-10",
+  "G-11",
+  "I-8",
+  "I-9",
+  "I-10",
+  "I-11",
+  "E-11",
+  "Bani Gala",
+  "Gulberg Greens",
+  "Bahria Enclave",
+  "DHA Islamabad",
+  "PWD Housing Scheme",
+  "Pakistan Town",
+  "Islamabad International Airport",
+  "Rawat",
+];
+
+const faqs = [
   {
-    name: "Toyota Corolla",
-    type: "Comfort Sedan",
-    model: "Toyota Corolla",
-
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/carconnectapp-be6a1.firebasestorage.app/o/cars%2Fcorolla.png?alt=media&token=b6c9325b-de4c-4800-bda8-01a06f8e5445",
-
-    whatsappText:
-      "Hi RentKA, I want to rent a Toyota Corolla in Islamabad.",
+    question: "Do you provide rent-a-car service in Islamabad with a driver?",
+    answer:
+      "Yes. RentKA currently provides chauffeur-driven rentals in Islamabad for local travel, airport transfers, business requirements, events and outstation journeys.",
   },
-
   {
-    name: "Honda Civic",
-    type: "Executive Sedan",
-    model: "Honda Civic",
-
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/carconnectapp-be6a1.firebasestorage.app/o/cars%2Fcivic.png?alt=media&token=7eba6c94-6c2f-4f97-b0d5-555d09c70d46",
-
-    whatsappText:
-      "Hi RentKA, I want to rent a Honda Civic in Islamabad.",
+    question: "Can I book a car for Murree or northern trips from Islamabad?",
+    answer:
+      "Yes. Customers frequently book Prado, Hiace, Corolla and SUVs for Murree, Nathia Gali, Naran and northern travel.",
   },
-
   {
-    name: "Toyota Prado",
-    type: "Luxury SUV",
-    model: "Toyota Prado",
-
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/carconnectapp-be6a1.firebasestorage.app/o/cars%2FToyota%20Prado%2FpRado.webp?alt=media&token=727beae6-14fc-44f0-a487-3144d24c3e9b",
-
-    whatsappText:
-      "Hi RentKA, I want to rent a Toyota Prado in Islamabad.",
+    question: "Which areas of Islamabad do you serve?",
+    answer:
+      "We serve Islamabad, Rawalpindi, DHA, Bahria Town, Blue Area and surrounding sectors.",
   },
-
   {
-    name: "Toyota Hiace",
-    type: "Family & Group Travel",
-    model: "Toyota Hiace",
-
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/carconnectapp-be6a1.firebasestorage.app/o/cars%2FToyota%20Hiace%2Fgrand.jpg?alt=media&token=d4275851-e8ce-46d9-bd01-522fd32e44ba",
-
-    whatsappText:
-      "Hi RentKA, I want to rent a Toyota Hiace in Islamabad.",
+    question: "Can I arrange an airport transfer from Islamabad?",
+    answer:
+      "Yes. Chauffeur-driven airport pickup and drop-off can be arranged between Islamabad and Islamabad International Airport. Vehicle selection can be matched to your passenger and luggage requirements.",
+  },
+  {
+    question: "Can I book a one-way or outstation trip from Islamabad?",
+    answer:
+      "Yes. One-way and outstation transport is available for popular routes across Pakistan. RentKA confirms the vehicle, route requirements and quotation before booking.",
+  },
+  {
+    question: "Is advance payment required?",
+    answer:
+      "Yes. A 20% advance payment is required after availability and pricing are confirmed to secure the booking. The RentKA team then shares the booking confirmation.",
+  },
+  {
+    question: "Which cars are available in Islamabad?",
+    answer:
+      "Availability commonly includes economy cars, sedans, family vehicles, premium SUVs and vans such as Suzuki Alto, Toyota Corolla, Honda Civic, Honda BR-V, Toyota Prado and Toyota Hiace. Live availability varies by date.",
+  },
+  {
+    question: "Do you provide self-drive cars?",
+    answer:
+      "RentKA currently provides chauffeur-driven car rental services. Self-drive service is not currently available.",
   },
 ];
+
+const serviceShortcuts = [
+  {
+    title: "Within Islamabad",
+    description: "Local rides and full-day city travel",
+    href: "#cars",
+    icon: MapPin,
+  },
+  {
+    title: "Airport Transfer",
+    description: "Scheduled airport pickup and drop-off",
+    href: "/airport-car-rental-islamabad",
+    icon: Plane,
+  },
+  {
+    title: "Outstation Travel",
+    description: "Travel outside the twin cities",
+    href: "#cars",
+    icon: Route,
+  },
+  {
+    title: "One-Way Drop",
+    description: "Popular intercity one-way routes",
+    href: "/one-way-drop",
+    icon: ArrowRight,
+  },
+  {
+    title: "Corporate Travel",
+    description: "Transport for meetings and teams",
+    href: "#cars",
+    icon: BriefcaseBusiness,
+  },
+  {
+    title: "Monthly Rental",
+    description: "Longer-term chauffeur-driven plans",
+    href: "#cars",
+    icon: CalendarCheck,
+  },
+  {
+    title: "Wedding Cars",
+    description: "Sedans and SUVs for special events",
+    href: whatsappUrl,
+    icon: Sparkles,
+    external: true,
+  },
+];
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://rentka.co",
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Rent a Car Islamabad",
+      item: "https://rentka.co/rent-a-car-islamabad",
+    },
+  ],
+};
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  serviceType: "Chauffeur-Driven Car Rental",
+  name: "Rent a Car in Islamabad With Driver",
+  provider: {
+    "@id": ORGANIZATION_ID,
+  },
+  areaServed: [
+    {
+      "@type": "City",
+      name: "Rawalpindi",
+    },
+    {
+      "@type": "City",
+      name: "Islamabad",
+    },
+  ],
+  url: "https://rentka.co/rent-a-car-islamabad",
+  description:
+    "Chauffeur-driven car rentals in Islamabad for local travel, airport transfers, corporate transport, weddings and outstation trips.",
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faqs.map((faq) => ({
+    "@type": "Question",
+    name: faq.question,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: faq.answer,
+    },
+  })),
+};
 
 export default function IslamabadRentalPage() {
   return (
@@ -87,442 +234,319 @@ export default function IslamabadRentalPage() {
       <Script
         id="breadcrumb-schema-islamabad"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Home",
-                item: "https://rentka.co",
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name: "Rent a Car Islamabad",
-                item: "https://rentka.co/rent-a-car-islamabad",
-              },
-            ],
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-
       <Script
         id="service-schema-islamabad"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Service",
-            serviceType: "Car Rental With Driver",
-            name: "Rent a Car Islamabad",
-            provider: {
-              "@id": ORGANIZATION_ID,
-            },
-            areaServed: [
-              "Islamabad",
-              "Rawalpindi"
-            ],
-            url: "https://rentka.co/rent-a-car-islamabad",
-          }),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
       />
-      
-      <section className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-16 space-y-24 overflow-hidden">
-      <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Rent a Car Islamabad", href: "/rent-a-car-islamabad" }]} />
+      <Script
+        id="faq-schema-islamabad"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
 
-      {/* HERO */}
-      <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 xl:gap-16 items-start">
-
-        {/* LEFT SIDE */}
-        <div className="space-y-8 pt-2">
-
-          <div className="space-y-6">
-
-            <h1 className="max-w-4xl text-5xl md:text-6xl xl:text-7xl font-extrabold leading-[1.05] tracking-[-0.03em] text-[var(--rentka-blue)]">
-              Rent a Car in Islamabad, Browse Verified Cars & Transparent Pricing
-            </h1>
-
-            <p className="max-w-2xl text-lg md:text-xl leading-relaxed text-slate-700">
-              Compare Corolla, Civic, Prado, Hiace and more from verified rental
-              partners in Islamabad & Rawalpindi. Book airport transfers, city
-              rides, Murree trips, weddings and family travel with professional
-              drivers without unexpected last-minute price changes.
-            </p>
-
-          </div>
-
-          {/* TRUST STRIP */}
-          <div className="flex flex-wrap gap-3">
-
-            {[
-              "SECP Registered",
-              "NTN Registered",
-              "Verified Rental Partners",
-              "Transparent Pricing",
-            ].map((item) => (
-
-              <div
-                key={item}
-                className="rounded-full border border-[var(--rentka-green)]/10 bg-[var(--rentka-green)]/10 px-4 py-2 text-sm font-semibold text-[var(--rentka-green)]"
-              >
-                ✅ {item}
-              </div>
-
-            ))}
-
-          </div>
-
-          {/* CTA */}
-          <div className="flex flex-wrap gap-4 pt-2">
-
-            <Link
-              href="/cars?city=islamabad&service=with-driver&country=PK"
-              className="inline-flex items-center justify-center rounded-2xl bg-[var(--rentka-blue)] px-8 py-4 text-base font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:opacity-90"
-            >
-              Browse Cars
-            </Link>
-
-            <a
-              href="https://wa.me/923020589999"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-2xl bg-[var(--rentka-green)] px-8 py-4 text-base font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:opacity-90"
-            >
-              WhatsApp Now
-            </a>
-
-          </div>
-
+      <main className="overflow-x-clip bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+          <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Rent a Car Islamabad", href: "/rent-a-car-islamabad" }]} />
         </div>
-
-        {/* RIGHT SIDE */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-
-          {popularCars.map((car) => (
-
-            <div
-              key={car.name}
-              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-
-              {/* IMAGE */}
-              <div className="relative h-[240px] bg-white">
-
-                <Image
-                  src={car.image}
-                  alt={car.name}
-                  fill
-                  unoptimized
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-contain p-4 transition duration-300 group-hover:scale-[1.03]"
-                />
-
+        <section className="border-b border-slate-200 bg-[#F7FAFC]">
+          <div className="mx-auto grid max-w-7xl gap-9 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-14 lg:px-8">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-[var(--rentka-green)]/20 bg-white px-4 py-2 text-sm font-bold text-[var(--rentka-green)] shadow-sm">
+                <CarFront className="h-4 w-4" aria-hidden="true" />
+                Chauffeur-Driven Only
               </div>
 
-              {/* CONTENT */}
-              <div className="space-y-4 p-5">
+              <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.035em] text-[var(--rentka-blue)] sm:text-5xl lg:text-6xl">
+                Rent a Car in Islamabad With Driver
+              </h1>
 
-                <div>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
+                Professional chauffeur-driven cars for local travel, airport
+                transfers, corporate transport, weddings and outstation trips
+                across Islamabad and the surrounding twin-city area.
+              </p>
 
-                  <h3 className="text-2xl font-bold text-slate-900">
-                    {car.name}
-                  </h3>
+              <p className="mt-3 text-sm font-bold text-[var(--rentka-green)]">
+                Car rentals. Made simple.
+              </p>
 
-                  <p className="mt-1 text-sm text-slate-600">
-                    {car.type}
-                  </p>
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                {[
+                  "Professional drivers",
+                  "Transparent pricing",
+                  "Verified fleet partners",
+                  "Fast WhatsApp booking",
+                ].map((point) => (
+                  <div key={point} className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <CheckCircle2 className="h-5 w-5 shrink-0 text-[var(--rentka-green)]" aria-hidden="true" />
+                    {point}
+                  </div>
+                ))}
+              </div>
 
-                </div>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href="#cars"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--rentka-green)] px-6 py-3.5 font-bold text-white transition hover:bg-[var(--rentka-green-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-green)] focus-visible:ring-offset-2"
+                >
+                  View Cars &amp; Prices
+                  <ArrowRight className="h-5 w-5" aria-hidden="true" />
+                </a>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-[var(--rentka-blue)] bg-white px-6 py-3.5 font-bold text-[var(--rentka-blue)] transition hover:bg-[var(--rentka-blue)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-blue)] focus-visible:ring-offset-2"
+                >
+                  <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                  Book on WhatsApp
+                </a>
+              </div>
+            </div>
 
-                {/* BUTTONS */}
-                <div className="space-y-3">
+            <aside className="rounded-[2rem] bg-[var(--rentka-blue)] p-7 text-white shadow-xl sm:p-9">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#9AD08F]">
+                Quick booking
+              </p>
+              <h2 className="mt-3 text-2xl font-extrabold sm:text-3xl">
+                Find the right car in a few simple steps
+              </h2>
+              <div className="mt-7 space-y-5">
+                {[
+                  ["1", "Choose a vehicle", "Compare current cars and starting prices."],
+                  ["2", "Review the package", "Select city or outstation pricing in the vehicle details."],
+                  ["3", "Request availability", "Share your pickup date, time and contact details."],
+                ].map(([number, title, description]) => (
+                  <div key={number} className="flex gap-4">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--rentka-green)] font-extrabold">
+                      {number}
+                    </span>
+                    <div>
+                      <h3 className="font-bold">{title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-slate-300">{description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-7 rounded-2xl border border-white/15 bg-white/10 p-4 text-sm leading-6 text-slate-200">
+                Availability and the final quotation are confirmed by the RentKA
+                team before the 20% booking advance is requested.
+              </div>
+            </aside>
+          </div>
+        </section>
 
-                  <Link
-                    href={`/cars?city=islamabad&service=with-driver&country=PK&model=${encodeURIComponent(
-                      car.model
-                    )}`}
-                    className="flex w-full items-center justify-center rounded-2xl bg-[var(--rentka-blue)] px-4 py-3 text-center text-sm font-bold text-white transition hover:opacity-90"
-                  >
-                    Browse Available Cars
-                  </Link>
+        <div className="mx-auto max-w-7xl space-y-16 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <CityVehicleSelector city="islamabad" />
 
+          <section>
+            <div className="mb-8">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--rentka-green)]">
+                Travel your way
+              </p>
+              <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
+                Chauffeur-Driven Services in Islamabad
+              </h2>
+              <p className="mt-3 max-w-2xl leading-7 text-slate-600">
+                Choose the trip type that best matches your plans. Dedicated
+                service pages are linked where available.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {serviceShortcuts.map((service) => {
+                const Icon = service.icon;
+                const className =
+                  "group rounded-2xl border border-slate-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-[var(--rentka-green)] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-green)]";
+                const content = (
+                  <>
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--rentka-green)]/10 text-[var(--rentka-green)]">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-4 font-extrabold text-[var(--rentka-blue)]">{service.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">{service.description}</p>
+                  </>
+                );
+
+                return service.external ? (
                   <a
-                    href={`https://wa.me/923020589999?text=${encodeURIComponent(
-                      car.whatsappText
-                    )}`}
+                    key={service.title}
+                    href={service.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex w-full items-center justify-center rounded-2xl border border-[var(--rentka-green)] bg-white px-4 py-3 text-center text-sm font-bold text-[var(--rentka-green)] transition hover:bg-[var(--rentka-green)] hover:text-white"
+                    className={className}
                   >
-                    WhatsApp Inquiry
+                    {content}
                   </a>
+                ) : (
+                  <Link key={service.title} href={service.href} className={className}>
+                    {content}
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
 
-                </div>
-
+          <section className="rounded-[2rem] bg-slate-50 p-7 sm:p-10">
+            <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--rentka-green)]">
+                  Why RentKA
+                </p>
+                <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
+                  Clear, Supported Travel From Islamabad
+                </h2>
+                <p className="mt-4 leading-7 text-slate-600">
+                  RentKA coordinates bookings through verified fleet partners
+                  while keeping the customer journey simple and transparent.
+                </p>
               </div>
 
+              <div className="grid gap-4 sm:grid-cols-2">
+                {[
+                  [ShieldCheck, "Chauffeur-driven service", "A professional driver is included with every available rental."],
+                  [BadgeCheck, "Transparent pricing", "Review package rates and applicable conditions before confirming."],
+                  [MessageCircle, "Professional support", "Get booking assistance through RentKA and WhatsApp."],
+                  [CarFront, "Maintained vehicles", "Choose from active listings provided by vetted fleet partners."],
+                  [Plane, "Airport and intercity travel", "Arrange city, airport and outstation transport."],
+                  [Building2, "SECP-registered company", "Book through RentKA's official customer channels."],
+                ].map(([Icon, title, description]) => {
+                  const FeatureIcon = Icon as typeof ShieldCheck;
+                  return (
+                    <div key={title as string} className="rounded-2xl border border-slate-200 bg-white p-5">
+                      <FeatureIcon className="h-6 w-6 text-[var(--rentka-green)]" aria-hidden="true" />
+                      <h3 className="mt-3 font-extrabold text-[var(--rentka-blue)]">{title as string}</h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600">{description as string}</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+          </section>
 
-          ))}
-
-        </div>
-
-      </div>
-
-            {/* SERVICES WE PROVIDE */}
-      <div>
-
-        <h2 className="mb-8 text-3xl font-bold text-[var(--rentka-blue)]">
-          Services We Provide
-        </h2>
-
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-
-          {[
-            {
-              title: "Airport Transfers",
-              description:
-                "Pickup & drop-off service for Islamabad International Airport with professional drivers.",
-            },
-
-            {
-              title: "Murree & Northern Trips",
-              description:
-                "Comfortable travel for Murree, Nathia Gali, Naran and northern areas.",
-            },
-
-            {
-              title: "Wedding Cars",
-              description:
-                "Luxury and executive vehicles available for weddings and special occasions.",
-            },
-
-            {
-              title: "Corporate Travel",
-              description:
-                "Professional transport solutions for meetings, office staff and business travel.",
-            },
-
-            {
-              title: "Monthly Rentals",
-              description:
-                "Flexible long-term rental options for personal and corporate needs.",
-            },
-
-            {
-              title: "Family Travel",
-              description:
-                "Spacious SUVs and Hiace options for families and group travel.",
-            },
-          ].map((service) => (
-
-            <div
-              key={service.title}
-              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
-            >
-
-              <h3 className="text-xl font-bold text-slate-900">
-                {service.title}
-              </h3>
-
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                {service.description}
+          <section>
+            <div className="mb-7">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--rentka-green)]">
+                Local pickup coverage
               </p>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </div>
-      
-      {/* WHY RENTKA */}
-      <div className="rounded-[32px] bg-slate-50 p-8 md:p-12">
-
-        <h2 className="mb-10 text-3xl font-bold text-[var(--rentka-blue)]">
-          Why Customers Choose RentKA
-        </h2>
-
-        <div className="grid gap-6 md:grid-cols-2">
-
-          {[
-            "Browse multiple verified cars before booking",
-            "Transparent pricing with no hidden surprises",
-            "No last-minute pricing surprises after booking confirmation",
-            "Quick WhatsApp booking confirmation",
-            "Professional drivers and maintained vehicles",
-            "Multiple vehicle categories available",
-            "Ideal for airport transfers, family travel & city rides",
-          ].map((item) => (
-
-            <div
-              key={item}
-              className="flex items-start gap-3"
-            >
-
-              <span className="mt-0.5 text-lg font-bold text-[var(--rentka-green)]">
-                ✓
-              </span>
-
-              <p className="text-slate-700">
-                {item}
+              <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
+                Areas We Serve in Islamabad
+              </h2>
+              <p className="mt-4 max-w-4xl leading-7 text-slate-600">
+                Pickup can be arranged from major residential, commercial and
+                business areas across Islamabad, subject to vehicle and
+                chauffeur availability for your selected date.
               </p>
-
             </div>
 
-          ))}
+            <ul className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {serviceAreas.map((area) => (
+                <li
+                  key={area}
+                  className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-700"
+                >
+                  <MapPin className="h-4 w-4 shrink-0 text-[var(--rentka-green)]" aria-hidden="true" />
+                  {area}
+                </li>
+              ))}
+            </ul>
+          </section>
 
+          <section className="rounded-[2rem] border border-slate-200 bg-white p-7 sm:p-10">
+            <div className="mb-8">
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--rentka-green)]">
+                Simple confirmation
+              </p>
+              <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
+                How Booking Works
+              </h2>
+            </div>
+
+            <ol className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                ["1", "Select your car", "Compare live vehicle options and choose a suitable model."],
+                ["2", "Share trip details", "Provide the pickup date, time, route and contact information."],
+                ["3", "Confirm availability and price", "The RentKA team verifies the vehicle and final quotation."],
+                ["4", "Secure the booking", "Pay the required 20% advance and receive booking confirmation."],
+              ].map(([number, title, description]) => (
+                <li key={number} className="rounded-2xl bg-slate-50 p-5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--rentka-green)] font-extrabold text-white">
+                    {number}
+                  </span>
+                  <h3 className="mt-4 font-extrabold text-[var(--rentka-blue)]">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
         </div>
 
-      </div>
+        <GoogleReviews />
 
-      {/* SEO CONTENT */}
-      <div className="space-y-12">
-
-        <div>
-
-          <h2 className="mb-4 text-3xl font-bold text-[var(--rentka-blue)]">
-            Car Rental in Islamabad Made Simple
+        <section className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--rentka-green)]">
+            Helpful answers
+          </p>
+          <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
+            Frequently Asked Questions
           </h2>
 
-          <p className="leading-8 text-slate-700">
-            Finding a reliable rental car in Islamabad can be frustrating —
-            especially when prices suddenly change or vehicles become unavailable
-            at the last minute. RentKA simplifies the process by helping customers
-            browse verified rental options in one place with transparent pricing
-            and quick booking coordination.
-          </p>
-
-        </div>
-
-        <div>
-
-          <h2 className="mb-4 text-3xl font-bold text-[var(--rentka-blue)]">
-            Airport Transfers & Northern Trips
-          </h2>
-
-          <p className="leading-8 text-slate-700">
-            We provide airport pickup and drop-off services from Islamabad
-            International Airport along with travel to Murree, Nathia Gali,
-            Naran and northern destinations. Whether you need a sedan, SUV,
-            or family vehicle, our verified partners offer reliable travel
-            solutions with professional drivers.
-          </p>
-
-        </div>
-
-      </div>
-
-            {/* RELATED CAR RENTAL LINKS */}
-      <section className="py-16 md:py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-
-          <div className="text-center mb-12">
-
-            <span className="text-[#5BAE4A] font-bold uppercase tracking-[2px] text-xs md:text-sm">
-              Explore More Options
-            </span>
-
-            <h2 className="text-3xl md:text-5xl font-black mt-4 text-[#0F2B46] leading-tight tracking-[-1px]">
-  Popular Car Rentals In Islamabad & Rawalpindi
-</h2>
-
-<p className="text-gray-600 mt-5 max-w-3xl mx-auto leading-[1.8] text-base md:text-lg">
-  RentKA serves both Islamabad and Rawalpindi through a shared network
-  of verified rental partners. Most vehicles are available for customers
-  across both cities, including airport transfers, city travel, family
-  trips and corporate transportation.
-</p>
-
+          <div className="mt-8 divide-y divide-slate-200 rounded-3xl border border-slate-200 bg-white px-6 sm:px-8">
+            {faqs.map((faq) => (
+              <article key={faq.question} className="py-6">
+                <h3 className="text-lg font-extrabold text-[var(--rentka-blue)]">{faq.question}</h3>
+                <p className="mt-3 leading-7 text-slate-600">{faq.answer}</p>
+              </article>
+            ))}
           </div>
+        </section>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <section className="px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-8 rounded-[2rem] bg-[var(--rentka-blue)] p-8 text-white shadow-xl md:grid-cols-[1.15fr_0.85fr] md:items-center md:p-12">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#9AD08F]">
+                Islamabad bookings
+              </p>
+              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+                Ready to Book a Car in Islamabad?
+              </h2>
+              <p className="mt-4 max-w-2xl leading-7 text-slate-200">
+                Compare current cars and prices, or speak with RentKA for help
+                planning your chauffeur-driven journey.
+              </p>
+            </div>
 
-            <Link
-              href="/cars/toyota-corolla/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Toyota Corolla Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/honda-civic/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Honda Civic Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/toyota-prado/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Toyota Prado Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/toyota-hiace/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Toyota Hiace Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/honda-br-v/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Honda BR-V Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/toyota-hilux/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Toyota Hilux Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/honda-city/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Honda City Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/toyota-yaris/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Toyota Yaris Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/suzuki-alto/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Suzuki Alto Rental Islamabad →
-            </Link>
-
-            <Link
-              href="/cars/suzuki-wagon-r/islamabad/with-driver"
-              className="rounded-2xl border border-slate-200 p-4 font-semibold hover:border-[#5BAE4A] hover:bg-[#F8FAFC] transition"
-            >
-              Suzuki Wagon R Rental Islamabad →
-            </Link>
-
+            <div className="flex flex-col gap-3">
+              <a
+                href="#cars"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-[var(--rentka-green)] px-6 py-3.5 font-bold text-white transition hover:bg-[var(--rentka-green-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                View Cars &amp; Prices
+                <ArrowRight className="h-5 w-5" aria-hidden="true" />
+              </a>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/30 px-6 py-3.5 font-bold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                Book on WhatsApp
+              </a>
+              <a
+                href="tel:+923020589999"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-6 py-3.5 font-bold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                <Phone className="h-5 w-5" aria-hidden="true" />
+                Call 0302 058 9999
+              </a>
+            </div>
           </div>
-
-        </div>
-      </section>
-
-      {/* FAQ */}
-<FAQSection city="Islamabad" />
-
-<GoogleReviews />
-
-    </section>
+        </section>
+      </main>
     </>
   );
 }

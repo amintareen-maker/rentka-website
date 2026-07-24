@@ -17,7 +17,7 @@ type ModelOption = {
   category?: string;
   seatingCapacity?: string;
   minPrice?: number;
-  inventoryCity: string;
+  inventoryCity: "rawalpindi" | "islamabad";
   useCase: string;
 };
 
@@ -58,12 +58,12 @@ function normalizeModel(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-function trackModelSelection(option: ModelOption) {
+function trackModelSelection(option: ModelOption, city: "rawalpindi" | "islamabad") {
   if (typeof window === "undefined") return;
 
   const eventData = {
     model: option.model,
-    city: "rawalpindi",
+    city,
     service: "withDriver",
     price: option.minPrice || 0,
   };
@@ -90,12 +90,18 @@ function trackModelSelection(option: ModelOption) {
   });
 }
 
-export default function RawalpindiVehicleSelector() {
+type VehicleSelectorProps = {
+  city?: "rawalpindi" | "islamabad";
+};
+
+export default function CityVehicleSelector({
+  city = "rawalpindi",
+}: VehicleSelectorProps) {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  const [selectedInventoryCity, setSelectedInventoryCity] = useState("rawalpindi");
+  const [selectedInventoryCity, setSelectedInventoryCity] = useState(city);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
 
   useEffect(() => {
@@ -176,15 +182,22 @@ export default function RawalpindiVehicleSelector() {
           category: representative.category,
           seatingCapacity: representative.seatingCapacity,
           minPrice: pricedCars[0]?.price,
-          inventoryCity: exactRawalpindiCity || exactIslamabadCity || "rawalpindi",
+          inventoryCity:
+            city === "islamabad"
+              ? exactIslamabadCity
+                ? "islamabad"
+                : "rawalpindi"
+              : exactRawalpindiCity
+                ? "rawalpindi"
+                : "islamabad",
           useCase: priority.useCase,
         } satisfies ModelOption,
       ];
     });
-  }, [cars]);
+  }, [cars, city]);
 
   function selectModel(option: ModelOption) {
-    trackModelSelection(option);
+    trackModelSelection(option, city);
     setSelectedModel(option.model);
     setSelectedInventoryCity(option.inventoryCity);
   }
@@ -206,7 +219,7 @@ export default function RawalpindiVehicleSelector() {
             </p>
           </div>
           <Link
-            href="/cars?city=rawalpindi&service=with-driver&country=PK"
+            href={`/cars?city=${city}&service=with-driver&country=PK`}
             className="inline-flex w-fit items-center gap-2 rounded-lg font-bold text-[var(--rentka-green)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-green)]"
           >
             Browse all available cars
@@ -234,7 +247,7 @@ export default function RawalpindiVehicleSelector() {
                   {option.imageURL ? (
                     <Image
                       src={option.imageURL}
-                      alt={option.model + " chauffeur-driven rental in Rawalpindi"}
+                      alt={`${option.model} chauffeur-driven rental in ${city === "islamabad" ? "Islamabad" : "Rawalpindi"}`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-contain p-5 transition duration-300 group-hover:scale-[1.03]"
@@ -299,14 +312,14 @@ export default function RawalpindiVehicleSelector() {
         {!loading && (loadFailed || modelOptions.length === 0) && (
           <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center">
             <h3 className="text-xl font-extrabold text-[var(--rentka-blue)]">
-              View current Rawalpindi availability
+              View current {city === "islamabad" ? "Islamabad" : "Rawalpindi"} availability
             </h3>
             <p className="mx-auto mt-2 max-w-xl leading-7 text-slate-600">
               Live vehicle listings could not be displayed here. Continue to
               the car selection page to see current options and pricing.
             </p>
             <Link
-              href="/cars?city=rawalpindi&service=with-driver&country=PK"
+              href={`/cars?city=${city}&service=with-driver&country=PK`}
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--rentka-green)] px-6 py-3 font-bold text-white hover:bg-[var(--rentka-green-hover)]"
             >
               View Cars &amp; Prices
