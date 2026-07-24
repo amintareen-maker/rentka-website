@@ -3,11 +3,7 @@
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { ReactNode } from "react";
-const trackEvent = (eventName: string, data: any = {}) => {
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", eventName, data);
-  }
-};
+import { trackDataLayer as trackEvent } from "@/lib/tracking";
 import { useState, useEffect, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useCars, Car } from "@/lib/useCars";

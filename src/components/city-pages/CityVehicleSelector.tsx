@@ -9,6 +9,7 @@ import { ArrowRight, CarFront, LoaderCircle, Users } from "lucide-react";
 import CarDetailsModal from "@/components/CarDetailsModal";
 import ModelListingsBottomSheet from "@/components/ModelListingsBottomSheet";
 import { db } from "@/lib/firebase";
+import { trackDataLayer, trackMetaPixel } from "@/lib/tracking";
 import type { Car } from "@/lib/useCars";
 
 type ModelOption = {
@@ -68,19 +69,8 @@ function trackModelSelection(option: ModelOption, city: "rawalpindi" | "islamaba
     price: option.minPrice || 0,
   };
 
-  const trackedWindow = window as Window & {
-    dataLayer?: Array<Record<string, unknown>>;
-    gtag?: (command: string, eventName: string, data: Record<string, unknown>) => void;
-    fbq?: (command: string, eventName: string, data: Record<string, unknown>) => void;
-  };
-
-  trackedWindow.dataLayer = trackedWindow.dataLayer || [];
-  trackedWindow.dataLayer.push({
-    event: "select_model",
-    ...eventData,
-  });
-  trackedWindow.gtag?.("event", "select_model", eventData);
-  trackedWindow.fbq?.("track", "ViewContent", {
+  trackDataLayer("select_model", eventData);
+  trackMetaPixel("ViewContent", {
     content_name: option.model,
     content_category: "Vehicle",
     content_type: "CarModel",

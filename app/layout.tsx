@@ -5,6 +5,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import { Analytics } from "@vercel/analytics/react";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
+import WhatsAppTracking from "@/components/WhatsAppTracking";
 
 import type { Metadata } from "next";
 
@@ -94,6 +95,7 @@ export default function RootLayout({
         <Header />
 
         <WhatsAppWidget />
+        <WhatsAppTracking />
 
         <main className="flex-1">{children}</main>
 

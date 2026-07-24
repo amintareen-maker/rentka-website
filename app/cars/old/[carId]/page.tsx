@@ -94,6 +94,7 @@ export default function CarDetailPage() {
         open={showModal}
         onClose={() => setShowModal(false)}
         context={{
+          carId,
           carName: car.name,
           country,
         }}

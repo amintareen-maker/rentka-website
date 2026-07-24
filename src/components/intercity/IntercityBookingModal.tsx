@@ -1,6 +1,13 @@
 "use client";
 
 import { useMemo, useState, useRef } from "react";
+import {
+  addDoc,
+  collection,
+  doc,
+  runTransaction,
+  serverTimestamp,
+} from "firebase/firestore";
 import DatePicker from "react-datepicker";
 import {
   Autocomplete,
@@ -13,10 +20,19 @@ import {
   Phone,
   User,
   Users,
-  Car,
   MessageSquare,
   X,
 } from "lucide-react";
+import { db } from "@/lib/firebase";
+import {
+  trackDataLayer,
+  trackGoogleAdsLead,
+  trackMetaPixel,
+  trackWhatsAppClick,
+} from "@/lib/tracking";
+
+const SHEETS_WEBHOOK =
+  "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
 
 type Props = {
   open: boolean;
@@ -95,6 +111,7 @@ const [dropPlaceId, setDropPlaceId] =
 
   const [loading, setLoading] =
     useState(false);
+  const submissionInProgress = useRef(false);
 
   const [error, setError] =
     useState<string | null>(null);
@@ -142,9 +159,12 @@ const [dropPlaceId, setDropPlaceId] =
   }
 
   async function handleContinue() {
+    if (submissionInProgress.current) return;
     if (!validateForm()) return;
 
+    submissionInProgress.current = true;
     setLoading(true);
+    const whatsappWindow = window.open("", "_blank");
         try {
       const message = `
 Hi RentKA,
@@ -229,24 +249,104 @@ Thank you.
         message
       )}`;
 
-      /*
-      =========================================
+      const counterRef = doc(db, "meta", "counters");
+      const leadNumber = await runTransaction(db, async (transaction) => {
+        const counterDocument = await transaction.get(counterRef);
+        if (!counterDocument.exists()) {
+          throw new Error("Counter document does not exist!");
+        }
 
-      FUTURE INTEGRATIONS
+        const next = (counterDocument.data().leadCounter || 0) + 1;
+        transaction.update(counterRef, { leadCounter: next });
+        return next;
+      });
 
-      1. Firebase Lead
-      2. Google Sheets
-      3. GTM Events
-      4. GA4
-      5. Meta Pixel
-      6. Email Notification
+      const leadId = `RK-OWD-${leadNumber}`;
+      const travelDateValue = travelDate!.toISOString();
+      const value = typeof price === "number" && price > 0 ? price : 1;
 
-      We'll add these after the UI is finalized.
+      await addDoc(collection(db, "leads"), {
+        leadId,
+        name: name.trim(),
+        phone: phone.trim(),
+        pickupCity: route.from,
+        destinationCity: route.to,
+        routeSlug: route.slug || null,
+        pickupAddress: pickupAddress.trim(),
+        pickupLat,
+        pickupLng,
+        pickupPlaceId: pickupPlaceId || null,
+        dropAddress: dropAddress.trim(),
+        dropLat,
+        dropLng,
+        dropPlaceId: dropPlaceId || null,
+        travelDate: travelDateValue,
+        travelTime: pickupTime,
+        passengers,
+        vehicle,
+        quotedPrice: price,
+        tripType,
+        notes: notes.trim() || null,
+        source: "one_way_drop",
+        status: "new",
+        createdAt: serverTimestamp(),
+      });
 
-      =========================================
-      */
+      const trackingPayload = {
+        lead_id: leadId,
+        car: vehicle,
+        car_name: vehicle,
+        car_id: null,
+        city: route.from,
+        pickup_city: route.from,
+        destination_city: route.to,
+        route_slug: route.slug || null,
+        service: tripType,
+        vendor: null,
+        pricing_type: "intercity",
+        duration: tripType,
+        price: value,
+        value,
+        currency: "PKR",
+        source: "one_way_drop",
+      };
 
-      window.open(whatsappUrl, "_blank");
+      trackDataLayer("lead_submit", trackingPayload);
+      trackDataLayer("generate_lead", trackingPayload);
+      trackGoogleAdsLead(trackingPayload);
+      trackMetaPixel("Lead", trackingPayload);
+      trackWhatsAppClick("one_way_drop");
+
+      if (whatsappWindow) {
+        whatsappWindow.location.href = whatsappUrl;
+      } else {
+        window.location.href = whatsappUrl;
+      }
+
+      const formData = new URLSearchParams({
+        leadId,
+        name: name.trim(),
+        phone: phone.trim(),
+        city: route.from,
+        destinationCity: route.to,
+        routeSlug: route.slug || "",
+        pickupAddress: pickupAddress.trim(),
+        dropAddress: dropAddress.trim(),
+        pickupDate: travelDateValue,
+        preferredTime: pickupTime,
+        passengers,
+        carName: vehicle,
+        packagePrice: price === null ? "" : String(price),
+        notes: notes.trim(),
+        source: "one_way_drop",
+        status: "new",
+      });
+
+      void fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
+        method: "POST",
+      }).catch((sheetError) => {
+        console.error("Google Sheets lead sync failed:", sheetError);
+      });
 
       onClose();
 
@@ -262,10 +362,15 @@ Thank you.
     } catch (err) {
       console.error(err);
 
+      if (whatsappWindow && !whatsappWindow.closed) {
+        whatsappWindow.close();
+      }
+
       setError(
         "Unable to continue. Please try again."
       );
     } finally {
+      submissionInProgress.current = false;
       setLoading(false);
     }
   }

@@ -1,29 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { addDoc, collection, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { doc, runTransaction } from "firebase/firestore";
-
-const trackEvent = (
-  eventName: string,
-  data: any = {}
-) => {
-  if (typeof window !== "undefined") {
-    (window as any).dataLayer =
-      (window as any).dataLayer || [];
-
-    (window as any).dataLayer.push({
-      event: eventName,
-      ...data,
-    });
-
-    console.log("GTM Event Fired:", {
-      event: eventName,
-      ...data,
-    });
-  }
-};
+import {
+  trackDataLayer,
+  trackGoogleAdsLead,
+  trackMetaPixel,
+  trackWhatsAppClick,
+} from "@/lib/tracking";
 
 /* ===============================
    🔗 GOOGLE SHEETS WEBHOOK
@@ -37,6 +23,7 @@ const WHATSAPP_NUMBER = "923020589999";
    Types
    =============================== */
 type LeadContext = {
+  carId?: string;
   carName?: string;
   country?: string;
   city?: string;
@@ -68,6 +55,7 @@ export default function LeadModal({ open, onClose, context }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [desktopWhatsappUrl, setDesktopWhatsappUrl] = useState<string | null>(null);
+  const submissionInProgress = useRef(false);
 
   if (!open) return null;
 
@@ -85,26 +73,12 @@ export default function LeadModal({ open, onClose, context }: Props) {
   /* ===============================
      🔥 GOOGLE ADS FUNCTION (FIXED)
      =============================== */
-  function gtag_report_conversion() {
-  if (typeof window !== "undefined") {
-    (window as any).dataLayer =
-      (window as any).dataLayer || [];
-
-    (window as any).dataLayer.push({
-      event: "google_ads_conversion",
-      send_to: "AW-18044696705/e9EwCIuvgaMcEIHxsJxD",
-      value: 1.0,
-      currency: "PKR",
-    });
-
-    console.log("Google Ads Conversion Fired");
-  }
-}
-
   /* ===============================
      Submit handler
      =============================== */
   const handleSubmit = async () => {
+    if (submissionInProgress.current) return;
+
     setError(null);
 
     if (!name.trim() || !phone.trim()) {
@@ -117,8 +91,11 @@ export default function LeadModal({ open, onClose, context }: Props) {
       return;
     }
 
+    submissionInProgress.current = true;
+    setLoading(true);
+    const whatsappWindow = window.open("", "_blank");
+
     try {
-  setLoading(true);
 
   const cityCode = (context.city ?? "GEN")
     .substring(0, 3)
@@ -184,39 +161,6 @@ Please confirm availability.
    FIRE TRACKING FIRST
    ====================================== */
 
-trackEvent("lead_submit", {
-  lead_id: leadId,
-  car_name: context.carName ?? null,
-  city: context.city ?? null,
-  service: context.service ?? null,
-  vendor_name: context.vendorName ?? null,
-  pricing_type: context.pricingType ?? null,
-  duration: context.duration ?? null,
-  price: context.price ?? null,
-  source: "website",
-});
-
-trackEvent("generate_lead", {
-  currency: "PKR",
-  value: context.price ? Number(context.price) : 1,
-});
-
-if (typeof window !== "undefined" && (window as any).fbq) {
-  (window as any).fbq("track", "Lead", {
-    currency: "PKR",
-    value: context.price ? Number(context.price) : 1,
-  });
-}
-
-gtag_report_conversion();
-
-/* ======================================
-   OPEN WHATSAPP IMMEDIATELY
-   ====================================== */
-
-window.open(whatsappUrl, "_blank");
-
-
   /* ======================================
      BACKGROUND TASKS
      ====================================== */
@@ -255,7 +199,40 @@ window.open(whatsappUrl, "_blank");
 
   const reviewLink = `https://www.rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
 
-  await updateDoc(docRef, { reviewLink });
+  const parsedValue = Number(String(context.price ?? "").replace(/,/g, ""));
+  const value = Number.isFinite(parsedValue) && parsedValue > 0 ? parsedValue : 1;
+  const trackingPayload = {
+    lead_id: leadId,
+    car: context.carName ?? null,
+    car_name: context.carName ?? null,
+    car_id: context.carId ?? null,
+    city: context.city ?? null,
+    service: context.service ?? null,
+    vendor: context.vendorName ?? null,
+    vendor_name: context.vendorName ?? null,
+    pricing_type: context.pricingType ?? null,
+    duration: context.duration ?? null,
+    price: value,
+    value,
+    currency: "PKR",
+    source: "website",
+  };
+
+  trackDataLayer("lead_submit", trackingPayload);
+  trackDataLayer("generate_lead", trackingPayload);
+  trackGoogleAdsLead(trackingPayload);
+  trackMetaPixel("Lead", trackingPayload);
+  trackWhatsAppClick("main_lead_form");
+
+  if (whatsappWindow) {
+    whatsappWindow.location.href = whatsappUrl;
+  } else {
+    window.location.href = whatsappUrl;
+  }
+
+  void updateDoc(docRef, { reviewLink }).catch((reviewLinkError) => {
+    console.error("Firestore review link update failed:", reviewLinkError);
+  });
 
   const formData = new URLSearchParams({
     name: name.trim(),
@@ -285,8 +262,10 @@ window.open(whatsappUrl, "_blank");
     status: "new",
   });
 
-  fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
+  void fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
     method: "POST",
+  }).catch((sheetError) => {
+    console.error("Google Sheets lead sync failed:", sheetError);
   });
 
   /* ======================================
@@ -297,10 +276,15 @@ window.open(whatsappUrl, "_blank");
 } catch (err) {
   console.error("Failed:", err);
 
+  if (whatsappWindow && !whatsappWindow.closed) {
+    whatsappWindow.close();
+  }
+
   setError(
     "Something went wrong. Please try again."
   );
 } finally {
+  submissionInProgress.current = false;
   setLoading(false);
 }
   };

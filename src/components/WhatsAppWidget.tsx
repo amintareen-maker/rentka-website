@@ -1,23 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-
-const trackEvent = (eventName: string, data: any = {}) => {
-  if (typeof window !== "undefined") {
-    window.dataLayer = window.dataLayer || [];
-
-    window.dataLayer.push({
-      event: eventName,
-      ...data,
-    });
-
-    if ((window as any).gtag) {
-      (window as any).gtag("event", eventName, data);
-    }
-
-    console.log("Tracked Event:", eventName, data);
-  }
-};
+import { trackMetaPixel } from "@/lib/tracking";
 
 export default function WhatsAppWidget() {
   const [chatOpen, setChatOpen] = useState(false);
@@ -45,16 +29,11 @@ export default function WhatsAppWidget() {
 
           <a
             href="https://wa.me/923020589999?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
+            data-whatsapp-source="floating_widget"
             onClick={() => {
-              trackEvent("whatsapp_click", {
-                source: "global_widget",
+              trackMetaPixel("Contact", {
+                content_name: "WhatsApp Widget",
               });
-
-              if (typeof window !== "undefined" && (window as any).fbq) {
-                (window as any).fbq("track", "Contact", {
-                  content_name: "WhatsApp Widget",
-                });
-              }
             }}
             target="_blank"
             rel="noopener noreferrer"

@@ -1,12 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
-const trackEvent = (eventName: string, data: any = {}) => {
-  if (typeof window !== "undefined" && (window as any).gtag) {
-    (window as any).gtag("event", eventName, data);
-  }
-};
+import { trackDataLayer as trackEvent } from "@/lib/tracking";
 
 export default function HomeCTA() {
   return (

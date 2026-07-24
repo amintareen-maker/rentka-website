@@ -671,6 +671,7 @@ export default function CarDetailsModal({
         open={leadOpen}
         onClose={() => setLeadOpen(false)}
         context={{
+            carId: car.id,
             carName: car.name,
             modelYear: car.modelYear,
             modelYearLabel: car.modelYearLabel,
