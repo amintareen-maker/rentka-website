@@ -102,7 +102,7 @@ export default async function Page() {
       "name": "Do you provide airport pickup and drop?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other chauffeur-driven vehicles."
+        "text": "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other with driver chauffeur-driven vehicles."
       }
     },
     {
@@ -303,7 +303,7 @@ export default async function Page() {
 
           <p className="mt-5 max-w-xl text-lg leading-8 text-slate-300">
             Travel comfortably between cities with a professional driver.
-            Whether you need a One Way Drop or a Round Trip, we've got you covered.
+            Whether you need a One Way Drop or a Round Trip, our chauffeur-driven service has you covered.
           </p>
 
           <div className="mt-8 grid grid-cols-2 gap-3 text-white">
@@ -373,6 +373,9 @@ export default async function Page() {
               full-day city ride, airport transfer, or outstation trip, we connect
               you with verified local vendors to ensure reliable service without
               unnecessary complications.
+            </p>
+            <p className="mt-3 text-slate-700 leading-relaxed">
+              Looking to rent a car with driver in Islamabad or Rawalpindi? Request availability and pricing today.
             </p>
           </div>
 
