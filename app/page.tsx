@@ -102,7 +102,7 @@ export default async function Page() {
       "name": "Do you provide airport pickup and drop?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other with driver chauffeur-driven vehicles."
+        "text": "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other cars with a driver."
       }
     },
     {
@@ -302,10 +302,8 @@ export default async function Page() {
           </h2>
 
           <p className="mt-5 max-w-xl text-lg leading-8 text-slate-300">
-            Travel comfortably between cities with a professional driver.
-            Whether you need a One Way Drop or a Round Trip, our chauffeur-driven service has you covered.
+            Travel comfortably between cities with a professional driver. Whether you need a One Way Drop or a Round Trip, RentKA provides reliable car rental with driver service for your journey.
           </p>
-
           <div className="mt-8 grid grid-cols-2 gap-3 text-white">
 
             <div>✅ One Way Drop</div>
@@ -444,7 +442,7 @@ export default async function Page() {
       },
       {
         q: "Do you provide airport pickup and drop?",
-        a: "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other chauffeur-driven vehicles."
+        a: "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other cars with a driver."
       },
       {
         q: "Can tourists and overseas Pakistanis book a car?",

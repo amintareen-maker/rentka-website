@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: { absolute: "Contact RentKA | Car Rental Islamabad" },
   description:
-    "Contact RentKA for chauffeur-driven car rental, airport transfers and intercity travel in Islamabad and Rawalpindi.",
+    "Contact RentKA for car rental with driver, airport transfers and intercity travel in Islamabad and Rawalpindi.",
   alternates: {
     canonical: "https://www.rentka.co/contact",
   },

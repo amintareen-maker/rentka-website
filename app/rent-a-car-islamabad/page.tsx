@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Rent a Car in Islamabad With Driver | RentKA",
     description:
-      "Professional chauffeur-driven cars for local travel, airport transfers, corporate transport, weddings and outstation trips.",
+      "Professional cars with drivers for local travel, airport transfers, corporate transport, weddings and outstation trips.",
     url: "https://www.rentka.co/rent-a-car-islamabad",
     type: "website",
     siteName: "RentKA",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
 };
 
 const whatsappUrl =
-  "https://wa.me/923020589999?text=Hello%20RentKA%2C%20I%20want%20to%20book%20a%20chauffeur-driven%20car%20in%20Islamabad.%20Please%20share%20available%20cars%20and%20prices.";
+  "https://wa.me/923020589999?text=Hello%20RentKA%2C%20I%20want%20to%20book%20a%20car%20with%20driver%20in%20Islamabad.%20Please%20share%20available%20cars%20and%20prices.";
 
 const serviceAreas = [
   "Blue Area",
@@ -89,7 +89,7 @@ const faqs = [
   {
     question: "Do you provide rent-a-car service in Islamabad with a driver?",
     answer:
-      "Yes. RentKA currently provides chauffeur-driven rentals in Islamabad for local travel, airport transfers, business requirements, events and outstation journeys.",
+      "Yes. RentKA currently provides cars with professional drivers in Islamabad for local travel, airport transfers, business requirements, events and outstation journeys.",
   },
   {
     question: "Can I book a car for Murree or northern trips from Islamabad?",
@@ -104,7 +104,7 @@ const faqs = [
   {
     question: "Can I arrange an airport transfer from Islamabad?",
     answer:
-      "Yes. Chauffeur-driven airport pickup and drop-off can be arranged between Islamabad and Islamabad International Airport. Vehicle selection can be matched to your passenger and luggage requirements.",
+      "Yes. Airport pickup and drop-off can be arranged between Islamabad and Islamabad International Airport with a professional driver. Vehicle selection can be matched to your passenger and luggage requirements.",
   },
   {
     question: "Can I book a one-way or outstation trip from Islamabad?",
@@ -124,7 +124,7 @@ const faqs = [
   {
     question: "Do you provide self-drive cars?",
     answer:
-      "RentKA currently provides chauffeur-driven car rental services. Self-drive service is not currently available.",
+      "RentKA currently provides cars with professional drivers. Self-drive service is not currently available.",
   },
 ];
 
@@ -137,7 +137,7 @@ const serviceShortcuts = [
   },
   {
     title: "Airport Transfer",
-    description: "Scheduled airport pickup and drop-off",
+    description: "Scheduled airport pickup and drop-off with a professional driver",
     href: "/airport-car-rental-islamabad",
     icon: Plane,
   },
@@ -161,7 +161,7 @@ const serviceShortcuts = [
   },
   {
     title: "Monthly Rental",
-    description: "Longer-term chauffeur-driven plans",
+    description: "Long-term car rental with driver",
     href: "#cars",
     icon: CalendarCheck,
   },
@@ -196,7 +196,7 @@ const breadcrumbSchema = {
 const serviceSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
-  serviceType: "Chauffeur-Driven Car Rental",
+  serviceType: "Car Rental With Driver",
   name: "Rent a Car in Islamabad With Driver",
   provider: {
     "@id": ORGANIZATION_ID,
@@ -213,7 +213,7 @@ const serviceSchema = {
   ],
   url: "https://www.rentka.co/rent-a-car-islamabad",
   description:
-    "Chauffeur-driven car rentals in Islamabad for local travel, airport transfers, corporate transport, weddings and outstation trips.",
+    "Car rentals in Islamabad with driver for local travel, airport transfers, corporate transport, weddings and outstation trips.",
 };
 
 const faqSchema = {
@@ -257,7 +257,7 @@ export default function IslamabadRentalPage() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--rentka-green)]/20 bg-white px-4 py-2 text-sm font-bold text-[var(--rentka-green)] shadow-sm">
                 <CarFront className="h-4 w-4" aria-hidden="true" />
-                Chauffeur-Driven Only
+                With Driver Only
               </div>
 
               <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.035em] text-[var(--rentka-blue)] sm:text-5xl lg:text-6xl">
@@ -265,9 +265,7 @@ export default function IslamabadRentalPage() {
               </h1>
 
               <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-                Professional chauffeur-driven cars for local travel, airport
-                transfers, corporate transport, weddings and outstation trips
-                across Islamabad and the surrounding twin-city area.
+                Professional cars with driver for premium, corporate, wedding, airport, city, and outstation travel. Rent a car with driver in Islamabad and Rawalpindi for reliable local and intercity journeys.
               </p>
 
               <p className="mt-3 text-sm font-bold text-[var(--rentka-green)]">
@@ -349,8 +347,11 @@ export default function IslamabadRentalPage() {
                 Travel your way
               </p>
               <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
-                Chauffeur-Driven Services in Islamabad
+                Driver-Included Services in Islamabad
               </h2>
+              <p className="mt-3 max-w-2xl leading-7 text-slate-600">
+                Book a car with an experienced driver for airport transfers, city travel, corporate transport, weddings, and outstation journeys.
+              </p>
               <p className="mt-3 max-w-2xl leading-7 text-slate-600">
                 Choose the trip type that best matches your plans. Dedicated
                 service pages are linked where available.
@@ -408,7 +409,7 @@ export default function IslamabadRentalPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
-                  [ShieldCheck, "Chauffeur-driven service", "A professional driver is included with every available rental."],
+                  [ShieldCheck, "Driver-included service", "A professional driver is included with every available rental."],
                   [BadgeCheck, "Transparent pricing", "Review package rates and applicable conditions before confirming."],
                   [MessageCircle, "Professional support", "Get booking assistance through RentKA and WhatsApp."],
                   [CarFront, "Maintained vehicles", "Choose from active listings provided by vetted fleet partners."],
@@ -439,7 +440,7 @@ export default function IslamabadRentalPage() {
               <p className="mt-4 max-w-4xl leading-7 text-slate-600">
                 Pickup can be arranged from major residential, commercial and
                 business areas across Islamabad, subject to vehicle and
-                chauffeur availability for your selected date.
+                driver availability for your selected date.
               </p>
             </div>
 
@@ -516,7 +517,7 @@ export default function IslamabadRentalPage() {
               </h2>
               <p className="mt-4 max-w-2xl leading-7 text-slate-200">
                 Compare current cars and prices, or speak with RentKA for help
-                planning your chauffeur-driven journey.
+                planning your car rental with driver.
               </p>
             </div>
 

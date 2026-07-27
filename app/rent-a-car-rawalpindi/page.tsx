@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     absolute: "Rent a Car in Rawalpindi With Driver | RentKA",
   },
   description:
-    "Book chauffeur-driven cars in Rawalpindi for local travel, airport transfers, corporate transport, weddings and outstation trips with clear pricing from RentKA.",
+    "Book cars with drivers in Rawalpindi for local travel, airport transfers, corporate transport, weddings and outstation trips with clear pricing from RentKA.",
   keywords: [
     "rent a car rawalpindi",
     "car rental rawalpindi",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Rent a Car in Rawalpindi With Driver | RentKA",
     description:
-      "Professional chauffeur-driven cars for local travel, airport transfers, corporate transport, weddings and outstation trips.",
+      "Professional cars with drivers for local travel, airport transfers, corporate transport, weddings and outstation trips across Rawalpindi and Islamabad.",
     url: "https://www.rentka.co/rent-a-car-rawalpindi",
     type: "website",
     siteName: "RentKA",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
 };
 
 const whatsappUrl =
-  "https://wa.me/923020589999?text=Hello%20RentKA%2C%20I%20want%20to%20book%20a%20chauffeur-driven%20car%20in%20Rawalpindi.%20Please%20share%20available%20cars%20and%20prices.";
+  "https://wa.me/923020589999?text=Hello%20RentKA%2C%20I%20want%20to%20book%20a%20car%20with%20driver%20in%20Rawalpindi.%20Please%20share%20available%20cars%20and%20prices.";
 
 const serviceAreas = [
   "Saddar Rawalpindi",
@@ -85,12 +85,12 @@ const faqs = [
   {
     question: "Do you provide rent-a-car service in Rawalpindi with a driver?",
     answer:
-      "Yes. RentKA currently provides chauffeur-driven rentals in Rawalpindi for local travel, airport transfers, business requirements, events and outstation journeys.",
+      "Yes. RentKA currently provides cars with professional drivers in Rawalpindi for local travel, airport transfers, business requirements, events and outstation journeys.",
   },
   {
     question: "Can I book a car from Saddar Rawalpindi?",
     answer:
-      "Yes. Pickup can be arranged from Saddar for city travel, airport transfers and intercity trips, subject to vehicle and chauffeur availability.",
+      "Yes. Pickup can be arranged from Saddar for city travel, airport transfers and intercity trips, subject to vehicle and driver availability.",
   },
   {
     question: "Do you serve Bahria Town and DHA Rawalpindi?",
@@ -100,7 +100,7 @@ const faqs = [
   {
     question: "Can I arrange an airport transfer from Rawalpindi?",
     answer:
-      "Yes. Chauffeur-driven airport pickup and drop-off can be arranged between Rawalpindi and Islamabad International Airport. Vehicle selection can be matched to your passenger and luggage requirements.",
+      "Yes. Airport pickup and drop-off can be arranged between Rawalpindi and Islamabad International Airport with a professional driver. Vehicle selection can be matched to your passenger and luggage requirements.",
   },
   {
     question: "Can I book a one-way or outstation trip from Rawalpindi?",
@@ -120,7 +120,7 @@ const faqs = [
   {
     question: "Do you provide self-drive cars?",
     answer:
-      "RentKA currently provides chauffeur-driven car rental services. Self-drive service is not currently available.",
+      "RentKA currently provides cars with professional drivers. Self-drive service is not currently available.",
   },
 ];
 
@@ -157,7 +157,7 @@ const serviceShortcuts = [
   },
   {
     title: "Monthly Rental",
-    description: "Longer-term chauffeur-driven plans",
+    description: "Long-term car rental with driver",
     href: "#cars",
     icon: CalendarCheck,
   },
@@ -192,7 +192,7 @@ const breadcrumbSchema = {
 const serviceSchema = {
   "@context": "https://schema.org",
   "@type": "Service",
-  serviceType: "Chauffeur-Driven Car Rental",
+  serviceType: "Car Rental With Driver",
   name: "Rent a Car in Rawalpindi With Driver",
   provider: {
     "@id": "https://www.rentka.co/#organization",
@@ -209,7 +209,7 @@ const serviceSchema = {
   ],
   url: "https://www.rentka.co/rent-a-car-rawalpindi",
   description:
-    "Chauffeur-driven car rentals in Rawalpindi for local travel, airport transfers, corporate transport, weddings and outstation trips.",
+    "Car rentals in Rawalpindi with driver for local travel, airport transfers, corporate transport, weddings and outstation trips.",
 };
 
 const faqSchema = {
@@ -253,7 +253,7 @@ export default function RawalpindiRentalPage() {
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-[var(--rentka-green)]/20 bg-white px-4 py-2 text-sm font-bold text-[var(--rentka-green)] shadow-sm">
                 <CarFront className="h-4 w-4" aria-hidden="true" />
-                Chauffeur-Driven Only
+                With Driver Only
               </div>
 
               <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.035em] text-[var(--rentka-blue)] sm:text-5xl lg:text-6xl">
@@ -261,7 +261,7 @@ export default function RawalpindiRentalPage() {
               </h1>
 
               <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-                Professional chauffeur-driven cars for local travel, airport
+                Professional cars with driver for local travel, airport
                 transfers, corporate transport, weddings and outstation trips
                 across Rawalpindi and Islamabad.
               </p>
@@ -404,7 +404,7 @@ export default function RawalpindiRentalPage() {
 
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
-                  [ShieldCheck, "Chauffeur-driven service", "A professional driver is included with every available rental."],
+                  [ShieldCheck, "Driver-included service", "A professional driver is included with every available rental."],
                   [BadgeCheck, "Transparent pricing", "Review package rates and applicable conditions before confirming."],
                   [MessageCircle, "Professional support", "Get booking assistance through RentKA and WhatsApp."],
                   [CarFront, "Maintained vehicles", "Choose from active listings provided by vetted fleet partners."],
@@ -435,7 +435,7 @@ export default function RawalpindiRentalPage() {
               <p className="mt-4 max-w-4xl leading-7 text-slate-600">
                 Pickup can be arranged from major residential, commercial and
                 business areas across Rawalpindi, subject to vehicle and
-                chauffeur availability for your selected date.
+                driver availability for your selected date.
               </p>
             </div>
 
@@ -512,7 +512,7 @@ export default function RawalpindiRentalPage() {
               </h2>
               <p className="mt-4 max-w-2xl leading-7 text-slate-200">
                 Compare current cars and prices, or speak with RentKA for help
-                planning your chauffeur-driven journey.
+                planning your car rental with driver.
               </p>
             </div>
 

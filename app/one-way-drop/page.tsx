@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "lahore to islamabad",
     "murree transport",
     "rentka",
-    "chauffeur service pakistan",
+    "driver service pakistan",
   ],
 
   alternates: {
@@ -708,8 +708,8 @@ export default function OneWayDropPage() {
               </h2>
 
               <p className="mt-6 text-lg leading-8 text-slate-600">
-                Looking for airport transfers, city rentals or chauffeur
-                services? Explore our most popular transportation solutions.
+                Looking for airport transfers, city rentals or cars with professional drivers?
+                Explore our most popular transportation solutions.
               </p>
 
             </div>
@@ -725,7 +725,7 @@ export default function OneWayDropPage() {
                 </h3>
 
                 <p className="mt-4 text-slate-600">
-                  Daily, weekly and monthly chauffeur-driven rentals.
+                  Daily, weekly and monthly car rentals with professional drivers.
                 </p>
 
               </a>

@@ -18,7 +18,7 @@ export const metadata = {
     "Islamabad airport taxi",
     "airport pickup Islamabad",
     "Islamabad airport car rental with driver",
-    "Islamabad airport chauffeur service",
+    "Islamabad airport transfer service",
     "Islamabad airport transportation",
     "Islamabad airport transfer service",
     "Islamabad airport ride",
