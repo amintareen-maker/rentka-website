@@ -10,7 +10,7 @@ export const islamabadToNeelumValleyCarRentalGuide = {
 
       <p>
         Since the journey exceeds 8-10 hours depending on road conditions,
-        most travellers prefer chauffeur-driven transportation instead of
+        most travellers prefer transportation with a professional driver instead of
         driving themselves. A professional driver allows passengers to enjoy
         the scenery while travelling safely through winding mountain roads.
       </p>
@@ -85,7 +85,7 @@ export const islamabadToNeelumValleyCarRentalGuide = {
 
     <p>
       The right vehicle depends on your group size, luggage and travel season.
-      RentKA offers comfortable chauffeur-driven vehicles suitable for both
+      RentKA offers comfortable vehicles with professional drivers suitable for both
       families and corporate travellers.
     </p>,
 
@@ -160,7 +160,7 @@ export const islamabadToNeelumValleyCarRentalGuide = {
     </p>,
 
     <p>
-      RentKA provides transparent quotations with no hidden charges. Customers
+      RentKA provides transparent quotations with applicable charges explained before confirmation. Customers
       receive pricing before confirming their booking, allowing them to choose
       the most suitable option for their travel requirements.
     </p>,
@@ -192,19 +192,19 @@ export const islamabadToNeelumValleyCarRentalGuide = {
 },
 
 {
-  id: "why-chauffeur",
-  heading: "Why Choose Chauffeur-Driven Transportation?",
+  id: "why-driver",
+  heading: "Why Choose transportation with a professional driver?",
 
   content: [
 
     <p>
       Long-distance mountain driving requires experience and constant attention.
-      Professional chauffeurs understand mountain roads and allow passengers to
+      professional drivers understand mountain roads and allow passengers to
       relax while enjoying the journey.
     </p>,
 
     <p>
-      Chauffeur-driven travel is especially beneficial for families with children,
+      travel with a professional driver is especially beneficial for families with children,
       elderly passengers, overseas visitors and corporate travellers who prefer
       a comfortable and stress-free experience.
     </p>,
@@ -219,7 +219,7 @@ export const islamabadToNeelumValleyCarRentalGuide = {
   content: [
 
     <ul className="list-disc pl-6 space-y-2">
-      <li>Professional licensed chauffeurs</li>
+      <li>Professional licensed professional drivers</li>
       <li>Transparent pricing</li>
       <li>Comfortable, well-maintained vehicles</li>
       <li>Airport pickup available</li>
@@ -229,7 +229,7 @@ export const islamabadToNeelumValleyCarRentalGuide = {
 
     <p>
       Whether you're planning a family vacation, honeymoon or corporate trip,
-      RentKA provides dependable chauffeur-driven transportation from Islamabad
+      RentKA provides dependable transportation with a professional driver from Islamabad
       to destinations across Azad Kashmir and Northern Pakistan.
     </p>,
 
@@ -273,7 +273,7 @@ faq: [
   {
     question: "Is the road to Neelum Valley safe?",
     answer:
-      "Yes. Most of the route is paved, although mountain roads require careful driving. Booking a chauffeur-driven vehicle provides a safer and more comfortable journey.",
+      "Yes. Most of the route is paved, although mountain roads require careful driving. Booking a vehicle with a professional driver provides a safer and more comfortable journey.",
   },
 
   {
@@ -285,7 +285,7 @@ faq: [
   {
     question: "Can I book a return trip with RentKA?",
     answer:
-      "Yes. RentKA provides both one-way and return chauffeur-driven transportation based on your travel plans.",
+      "Yes. RentKA provides both one-way and return transportation with a professional driver based on your travel plans.",
   },
 
   {
@@ -295,7 +295,7 @@ faq: [
   },
 
   {
-    question: "Can tourists book chauffeur-driven vehicles?",
+    question: "Can tourists book vehicles with professional drivers?",
     answer:
       "Yes. Local and international visitors frequently book RentKA for tourism, family vacations, airport transfers and long-distance travel across Pakistan.",
   },
@@ -303,7 +303,7 @@ faq: [
   {
     question: "Why should I choose RentKA?",
     answer:
-      "RentKA offers professional chauffeurs, transparent pricing, well-maintained vehicles, responsive customer support and reliable transportation for destinations throughout Pakistan.",
+      "RentKA offers professional drivers, transparent pricing, well-maintained vehicles, responsive customer support and reliable transportation for destinations throughout Pakistan.",
   },
 ],
 };

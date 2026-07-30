@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: { absolute: "Contact RentKA | Car Rental Islamabad" },
+  title: { absolute: "Contact RentKA | Car Rental with Driver Islamabad" },
   description:
     "Contact RentKA for car rental with driver, airport transfers and intercity travel in Islamabad and Rawalpindi.",
   alternates: {
     canonical: "https://www.rentka.co/contact",
   },
   openGraph: {
+    title: "Contact RentKA | Car Rental with Driver Islamabad",
+    description: "Contact RentKA for car rental with driver, airport transfers and intercity travel in Islamabad and Rawalpindi.",
     url: "https://www.rentka.co/contact",
+    images: [{ url: "/logo.png", alt: "Contact RentKA" }],
   },
 };
 
@@ -43,7 +46,7 @@ export default function ContactPage() {
             </h2>
             <p className="text-slate-700">
               <a href="tel:+923020589999" className="hover:underline">
-                +92 302 0589999
+                +92 302 058 9999
               </a>
             </p>
           </div>
@@ -64,7 +67,7 @@ export default function ContactPage() {
               Office Address
             </h2>
             <p className="text-slate-700">
-              Suit 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area, Islamabad, Pakistan
+              Suite 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area, Islamabad, Pakistan
             </p>
             <p className="text-slate-700">
               <a

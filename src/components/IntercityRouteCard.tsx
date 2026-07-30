@@ -54,7 +54,7 @@ export default function IntercityRouteCard({ route }: Props) {
 
       <div className="mt-6">
         <Link
-          href={`/intercity/${route.slug}`}
+          href={`/one-way-drop/${route.slug}`}
           className="block w-full text-center rounded-xl bg-[#5BAE4A] hover:bg-[#4b9a3d] text-white font-semibold py-3 transition-colors"
         >
           View Details

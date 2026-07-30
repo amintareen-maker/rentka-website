@@ -53,11 +53,13 @@ export async function generateMetadata({
       url,
       siteName: "RentKA",
       type: "website",
+      images: [{ url: "/blog/motorway-road-trip.png", alt: `${route.from} to ${route.to} car rental with driver` }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: ["/blog/motorway-road-trip.png"],
     },
   };
 }
@@ -86,11 +88,11 @@ export default async function Page({ params }: Props) {
         "@id": ORGANIZATION_ID,
       },
       areaServed: "Pakistan",
-      offers: {
+      ...(typeof route.vehicles.corolla.price === "number" ? { offers: {
         "@type": "Offer",
         price: route.vehicles.corolla.price,
         priceCurrency: "PKR",
-      },
+      } } : {}),
     },
     {
       "@type": "BreadcrumbList",

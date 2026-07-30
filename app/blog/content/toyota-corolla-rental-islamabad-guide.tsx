@@ -4,12 +4,12 @@ export const toyotaCorollaRentalIslamabadGuide = {
     <>
       <p>
         Toyota Corolla Rental Islamabad Guide provides a practical way to arrange dependable,
-        chauffeur-driven transportation for planned journeys in the capital
+        transportation with a professional driver for planned journeys in the capital
         and across Pakistan.
       </p>
 
       <p>
-        RentKA coordinates the vehicle, professional chauffeur and schedule
+        RentKA coordinates the vehicle, professional driver and schedule
         around passenger numbers, luggage, pickup points and the purpose of
         travel.
       </p>
@@ -30,7 +30,7 @@ export const toyotaCorollaRentalIslamabadGuide = {
           This service provides an efficient, comfortable sedan for airport transfers, meetings, everyday city travel, weddings and intercity journeys on established roads.
         </p>,
         <p>
-          A confirmed chauffeur and vehicle create a consistent experience from
+          A confirmed driver and vehicle create a consistent experience from
           pickup to drop-off, with fewer transport arrangements to manage.
         </p>,
       ],
@@ -78,7 +78,7 @@ export const toyotaCorollaRentalIslamabadGuide = {
           additional allowances.
         </p>,
         <p>
-          A chauffeur-driven booking keeps route management with a professional
+          A booking with a professional driver keeps route management with a professional
           while the passenger focuses on the visit, event or journey.
         </p>,
       ],
@@ -131,18 +131,14 @@ export const toyotaCorollaRentalIslamabadGuide = {
     },
 
     {
-      id: "why-chauffeur",
-      heading: "Why Chauffeur-Driven Transportation?",
+      id: "why-driver",
+      heading: "Why transportation with a professional driver?",
       content: [
         <p>
-          Chauffeur-driven service gives passengers a single professional point
+          service with a professional driver gives passengers a single professional point
           of transport throughout the booking. It removes the pressure of
           navigation, parking and unfamiliar routes while improving continuity
           across multiple stops.
-        </p>,
-        <p>
-          RentKA recommendations are always based on chauffeur-driven travel;
-          this guide does not cover self-drive vehicles.
         </p>,
       ],
     },
@@ -152,7 +148,7 @@ export const toyotaCorollaRentalIslamabadGuide = {
       heading: "Why Choose RentKA?",
       content: [
         <ul className="list-disc pl-6 space-y-2">
-          <li>Professional, courteous chauffeurs.</li>
+          <li>Professional, courteous drivers.</li>
           <li>Clean and well-maintained vehicles.</li>
           <li>Clear quotations before confirmation.</li>
           <li>Airport, city and intercity coordination.</li>
@@ -171,7 +167,7 @@ export const toyotaCorollaRentalIslamabadGuide = {
       heading: "Final Thoughts",
       content: [
         <p>
-          The right chauffeur-driven arrangement combines a suitable vehicle,
+          The right car-and-driver arrangement combines a suitable vehicle,
           an accurate schedule and a clearly explained quotation. Providing
           complete details at booking helps every stage run more smoothly.
         </p>,
@@ -185,9 +181,9 @@ export const toyotaCorollaRentalIslamabadGuide = {
 
   faq: [
     {
-      question: "Is Toyota Corolla rental in Islamabad chauffeur-driven?",
+      question: "Does Toyota Corolla rental in Islamabad include a professional driver?",
       answer:
-        "Yes. RentKA provides chauffeur-driven transportation with a professional driver assigned according to the confirmed itinerary.",
+        "Yes. RentKA provides transportation with a professional driver assigned according to the confirmed itinerary.",
     },
     {
       question: "Which vehicles are available for this service?",
@@ -222,7 +218,7 @@ export const toyotaCorollaRentalIslamabadGuide = {
     {
       question: "Why choose RentKA for Toyota Corolla rental?",
       answer:
-        "RentKA combines professional chauffeurs, suitable vehicles, transparent quotations and responsive support for planned transportation.",
+        "RentKA combines professional drivers, suitable vehicles, transparent quotations and responsive support for planned transportation.",
     },
   ],
 };

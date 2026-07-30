@@ -25,7 +25,7 @@ import { ORGANIZATION_ID } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: { absolute:
-    "Rent a Car in Islamabad | Corolla, Civic, Prado & Hiace Rentals – RentKA",
+    "Car Rental with Driver Islamabad | RentKA",
   },
   description:
     "Browse verified car rentals in Islamabad with professional drivers and transparent pricing. Book Corolla, Civic, Prado, Hiace and more for airport transfers, city rides, Murree trips, weddings, and family travel.",
@@ -52,6 +52,7 @@ export const metadata: Metadata = {
     url: "https://www.rentka.co/rent-a-car-islamabad",
     type: "website",
     siteName: "RentKA",
+    images: [{ url: "/hero-1.webp", alt: "Car rental with driver in Islamabad" }],
   },
 };
 
@@ -144,7 +145,7 @@ const serviceShortcuts = [
   {
     title: "Outstation Travel",
     description: "Travel outside the twin cities",
-    href: "#cars",
+    href: "/one-way-drop",
     icon: Route,
   },
   {
@@ -156,13 +157,13 @@ const serviceShortcuts = [
   {
     title: "Corporate Travel",
     description: "Transport for meetings and teams",
-    href: "#cars",
+    href: "/blog/corporate-car-rental-islamabad",
     icon: BriefcaseBusiness,
   },
   {
     title: "Monthly Rental",
     description: "Long-term car rental with driver",
-    href: "#cars",
+    href: "/blog/monthly-car-rental-islamabad",
     icon: CalendarCheck,
   },
   {

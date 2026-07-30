@@ -6,21 +6,21 @@ import { SITE_URL, VEHICLE_CITIES, VEHICLE_MODELS, VEHICLE_SERVICE } from "../sr
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
-    { path: "/", priority: 1 },
-    { path: "/rent-a-car-islamabad", priority: 0.9 },
-    { path: "/rent-a-car-rawalpindi", priority: 0.9 },
-    { path: "/airport-car-rental-islamabad", priority: 0.9 },
-    { path: "/one-way-drop", priority: 0.9 },
-    { path: "/cars", priority: 0.8 },
-    { path: "/blog", priority: 0.8 },
-    { path: "/about", priority: 0.7 },
-    { path: "/contact", priority: 0.7 },
-    { path: "/privacy", priority: 0.5 },
-    { path: "/terms", priority: 0.5 },
-    { path: "/cancellation-policy", priority: 0.5 },
-  ].map(({ path, priority }) => ({
+    { path: "/", priority: 1, changeFrequency: "weekly" as const },
+    { path: "/rent-a-car-islamabad", priority: 0.9, changeFrequency: "weekly" as const },
+    { path: "/rent-a-car-rawalpindi", priority: 0.9, changeFrequency: "weekly" as const },
+    { path: "/airport-car-rental-islamabad", priority: 0.9, changeFrequency: "weekly" as const },
+    { path: "/one-way-drop", priority: 0.9, changeFrequency: "weekly" as const },
+    { path: "/cars", priority: 0.8, changeFrequency: "weekly" as const },
+    { path: "/blog", priority: 0.8, changeFrequency: "weekly" as const },
+    { path: "/about", priority: 0.7, changeFrequency: "monthly" as const },
+    { path: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
+    { path: "/privacy", priority: 0.5, changeFrequency: "yearly" as const },
+    { path: "/terms", priority: 0.5, changeFrequency: "yearly" as const },
+    { path: "/cancellation-policy", priority: 0.5, changeFrequency: "yearly" as const },
+  ].map(({ path, priority, changeFrequency }) => ({
     url: `${SITE_URL}${path}`,
-    changeFrequency: "weekly" as const,
+    changeFrequency,
     priority,
   }));
 

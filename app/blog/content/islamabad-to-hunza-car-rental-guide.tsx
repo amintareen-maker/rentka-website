@@ -19,7 +19,7 @@ export const islamabadToHunzaCarRentalGuide = {
 
       <p>
         Since the journey covers a long distance through mountainous terrain,
-        many travellers prefer chauffeur-driven transportation instead of
+        many travellers prefer transportation with a professional driver instead of
         driving themselves. Professional drivers are familiar with the
         Karakoram Highway, changing weather conditions and mountain roads,
         allowing passengers to relax and enjoy the scenery.
@@ -56,11 +56,11 @@ export const islamabadToHunzaCarRentalGuide = {
 
     {
       id: "why-rental",
-      heading: "Why Choose Chauffeur-Driven Transportation?",
+      heading: "Why Choose transportation with a professional driver?",
       content: [
         <>
           The route to Hunza follows the Karakoram Highway through mountainous
-          terrain and changing weather conditions. Experienced chauffeurs are
+          terrain and changing weather conditions. experienced drivers are
           familiar with these roads, allowing passengers to travel more safely
           and comfortably.
         </>,
@@ -146,7 +146,7 @@ export const islamabadToHunzaCarRentalGuide = {
         </>,
 
         <>
-          Travelling with an experienced chauffeur provides additional
+          Travelling with an experienced driver provides additional
           confidence because professional drivers are familiar with mountain
           driving, road closures and changing weather conditions.
         </>,
@@ -258,7 +258,7 @@ export const islamabadToHunzaCarRentalGuide = {
       heading: "Why Choose RentKA?",
       content: [
         <>
-          RentKA provides reliable chauffeur-driven transportation across
+          RentKA provides reliable transportation with a professional driver across
           Pakistan with transparent pricing, professional drivers and responsive
           customer support.
         </>,
@@ -302,9 +302,9 @@ export const islamabadToHunzaCarRentalGuide = {
         "Toyota Prado, Honda BR-V and Toyota Hiace are popular choices, while Toyota Corolla is suitable for smaller groups during favourable road conditions.",
     },
     {
-      question: "Do you provide chauffeur-driven transportation?",
+      question: "Do you provide transportation with a professional driver?",
       answer:
-        "Yes. RentKA specialises in professional chauffeur-driven transportation across Pakistan.",
+        "Yes. RentKA specialises in professional transportation with a professional driver across Pakistan.",
     },
     {
       question: "Can I continue to Khunjerab Pass?",
@@ -339,7 +339,7 @@ export const islamabadToHunzaCarRentalGuide = {
     {
       question: "Why choose RentKA?",
       answer:
-        "RentKA provides transparent pricing, experienced drivers and dependable chauffeur-driven transportation throughout Pakistan.",
+        "RentKA provides transparent pricing, experienced drivers and dependable transportation with a professional driver throughout Pakistan.",
     },
   ],
 };

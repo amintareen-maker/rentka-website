@@ -20,7 +20,7 @@ export const airportCarRentalIslamabadGuide = {
 
       <p>
         Unlike ride-hailing services, pre-booked airport transfers provide a
-        dedicated chauffeur, confirmed pickup schedule, and a vehicle that
+        dedicated driver, confirmed pickup schedule, and a vehicle that
         matches your luggage and passenger requirements.
       </p>
 
@@ -58,7 +58,7 @@ export const airportCarRentalIslamabadGuide = {
     </>,
 
     <>
-      Many travellers also prefer chauffeur-driven airport transfers because
+      Many travellers also prefer airport transfers with professional drivers because
       they offer fixed quotations, experienced local drivers, comfortable
       vehicles, and professional service throughout the journey.
     </>
@@ -96,7 +96,7 @@ export const airportCarRentalIslamabadGuide = {
   heading: "Airport Transfer Services Available",
   content: [
     <>
-      RentKA provides chauffeur-driven airport transfers between{" "}
+      RentKA provides airport transfers with professional drivers between{" "}
       <Link
         href="/airport-car-rental-islamabad"
         className="text-[#5BAE4A] hover:underline"
@@ -370,7 +370,7 @@ export const airportCarRentalIslamabadGuide = {
   heading: "Why Choose RentKA for Airport Transfers?",
   content: [
     <>
-      RentKA specialises in professional chauffeur-driven transportation across
+      RentKA specialises in professional transportation with a professional driver across
       Islamabad, Rawalpindi and destinations throughout Pakistan.
     </>,
 
@@ -418,7 +418,7 @@ export const airportCarRentalIslamabadGuide = {
     </>,
 
     <>
-      RentKA provides chauffeur-driven airport transfers, city transportation
+      RentKA provides airport transfers with professional drivers, city transportation
       and one-way journeys with transparent quotations and professional
       customer support, helping travellers move comfortably throughout Pakistan.
     </>
@@ -436,7 +436,7 @@ export const airportCarRentalIslamabadGuide = {
   {
     question: "Do you provide airport pickup and drop-off?",
     answer:
-      "Yes. Chauffeur-driven airport pickup and drop-off services are available throughout Islamabad, Rawalpindi and surrounding areas."
+      "Yes. Airport pickup and drop-off services with professional drivers are available throughout Islamabad, Rawalpindi and surrounding areas."
   },
 
   {

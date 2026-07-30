@@ -294,27 +294,6 @@ export default function CarDetailsModal({
 
               {/* Service Switch */}
               <div className="flex gap-2 mb-4">
-                {supportsSelfDrive && (
-                  <button
-                    className={`flex-1 py-2 rounded-lg border text-sm font-medium ${
-                      selectedService === "selfDrive"
-                        ? "bg-[var(--rentka-blue)] text-white border-[var(--rentka-green)]"
-                        : "border-slate-300 text-slate-800 hover:border-[var(--rentka-green)]"
-                    }`}
-                    onClick={() => {
-  trackEvent("change_service", {
-    from: selectedService,
-    to: "selfDrive",
-    car_name: car.name,
-  });
-
-  setSelectedService("selfDrive");
-}}
-                  >
-                    Self Drive
-                  </button>
-                )}
-
                 {supportsWithDriver && (
                   <button
                     className={`flex-1 py-2 rounded-lg border text-sm font-medium ${

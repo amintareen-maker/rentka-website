@@ -7,6 +7,8 @@ import { articleContents } from "../content";
 import { notFound } from "next/navigation";
 import { ORGANIZATION_ID } from "@/lib/seo";
 import { breadcrumbJsonLd } from "@/components/Breadcrumbs";
+import Link from "next/link";
+import { intercityRoutes } from "@/data/intercityRoutes";
 
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
@@ -33,18 +35,29 @@ export async function generateMetadata(
   }
 
   return {
-    title: { absolute: `${article.title} | RentKA` },
-    description: article.description,
+    title: { absolute: article.seoTitle },
+    description: article.metaDescription,
 
     alternates: {
       canonical: `https://www.rentka.co/blog/${article.slug}`,
     },
 
     openGraph: {
-      title: article.title,
-      description: article.description,
+      title: article.seoTitle,
+      description: article.metaDescription,
       url: `https://www.rentka.co/blog/${article.slug}`,
       type: "article",
+      siteName: "RentKA",
+      locale: "en_PK",
+      publishedTime: article.date,
+      modifiedTime: article.date,
+      images: [{ url: article.image, alt: article.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.seoTitle,
+      description: article.metaDescription,
+      images: [article.image],
     },
   };
 }
@@ -79,7 +92,8 @@ if (!articleContent) {
 
   headline: article.title,
 
-  description: article.description,
+  url: `https://www.rentka.co/blog/${article.slug}`,
+  description: article.metaDescription,
 
   image: `https://www.rentka.co${article.image}`,
 
@@ -95,12 +109,46 @@ if (!articleContent) {
 
   dateModified: article.date,
 
+  articleSection: article.category,
+
+  keywords: article.keywords.join(", "),
+
   mainEntityOfPage: {
     "@type": "WebPage",
 
     "@id": `https://www.rentka.co/blog/${article.slug}`,
   },
 };
+  const faqEntities = articleContent.faq.flatMap((item) =>
+    typeof item.question === "string" && typeof item.answer === "string"
+      ? [{
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: { "@type": "Answer", text: item.answer },
+        }]
+      : [],
+  );
+  const faqSchema = faqEntities.length
+    ? { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqEntities }
+    : null;
+  const relatedArticles = articles
+    .filter((candidate) => candidate.slug !== article.slug)
+    .sort((a, b) => Number(b.category === article.category) - Number(a.category === article.category))
+    .slice(0, 3);
+  const routeSlug = article.slug.replace(/-car-rental-guide$/, "");
+  const matchingRoute = intercityRoutes.find((route) => route.slug === routeSlug && route.active);
+  const vehicleMatch = article.slug.match(/^(.+)-rental-islamabad-guide$/);
+  const commercialLink = matchingRoute
+    ? { href: `/one-way-drop/${matchingRoute.slug}`, label: `View ${matchingRoute.from} to ${matchingRoute.to} booking options` }
+    : article.slug.includes("airport")
+      ? { href: "/airport-car-rental-islamabad", label: "View Islamabad airport transfer options" }
+      : article.slug.includes("one-way") || article.slug.startsWith("islamabad-to-")
+        ? { href: "/one-way-drop", label: "Explore one-way intercity car rentals" }
+        : vehicleMatch
+          ? { href: `/cars/${vehicleMatch[1]}/islamabad/with-driver`, label: `View ${article.title.replace(" Guide", "")} booking options` }
+          : article.slug.includes("rawalpindi")
+            ? { href: "/rent-a-car-rawalpindi", label: "View car rental with driver in Rawalpindi" }
+            : { href: "/rent-a-car-islamabad", label: "View car rental with driver in Islamabad" };
   const breadcrumbSchema = breadcrumbJsonLd([
     { name: "Home", href: "/" },
     { name: "Blog", href: "/blog" },
@@ -118,6 +166,12 @@ if (!articleContent) {
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
     />
+    {faqSchema && (
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+    )}
 
     <main className="bg-slate-50 min-h-screen">
       <Breadcrumbs
@@ -187,11 +241,27 @@ if (!articleContent) {
           {/* Article */}
 
           <article className="rounded-3xl bg-white p-10 shadow">
-  <ArticleContent
+<ArticleContent
   introduction={articleContent.introduction}
   sections={articleContent.sections}
   faq={articleContent.faq}
 />
+            <div className="mt-10 rounded-2xl bg-[#E9F4E6] p-6">
+              <p className="font-semibold text-[#0F2B46]">Ready to compare suitable vehicles and pricing?</p>
+              <Link href={commercialLink.href} className="mt-3 inline-flex font-bold text-[#347A2A] hover:underline">
+                {commercialLink.label} →
+              </Link>
+            </div>
+            <section className="mt-14 border-t border-slate-200 pt-10" aria-labelledby="related-articles">
+              <h2 id="related-articles" className="text-2xl font-bold text-[#0F2B46]">Related car rental guides</h2>
+              <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                {relatedArticles.map((related) => (
+                  <Link key={related.slug} href={`/blog/${related.slug}`} className="rounded-2xl border border-slate-200 p-5 font-semibold text-[#0F2B46] transition hover:border-[#5BAE4A] hover:text-[#347A2A]">
+                    {related.title}
+                  </Link>
+                ))}
+              </div>
+            </section>
 </article>
 
         </div>

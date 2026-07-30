@@ -105,7 +105,7 @@
     useEffect(() => {
       const fetchAllCars = async () => {
         try {
-          let cars: Car[] = [];
+          const cars: Car[] = [];
 
           for (const c of COUNTRIES) {
             const ref = collection(
@@ -291,9 +291,9 @@
         {/* HEADER */}
         <div className="mb-10">
 
-          <h1 className="text-3xl md:text-4xl font-bold text-[var(--rentka-blue)]">
+          <h2 className="text-3xl md:text-4xl font-bold text-[var(--rentka-blue)]">
             Browse Rental Cars
-          </h1>
+          </h2>
 
           <p className="text-slate-600 mt-3 max-w-2xl leading-relaxed">
             Browse verified rental cars in

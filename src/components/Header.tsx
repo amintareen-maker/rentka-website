@@ -43,6 +43,20 @@ export default function Header() {
             <nav className="flex items-center gap-8 text-sm font-medium text-slate-700">
 
   <Link
+    href="/rent-a-car-islamabad"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    Islamabad
+  </Link>
+
+  <Link
+    href="/airport-car-rental-islamabad"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    Airport Transfer
+  </Link>
+
+  <Link
     href="/one-way-drop"
     className="hover:text-[var(--rentka-blue)] transition"
   >
@@ -54,13 +68,6 @@ export default function Header() {
     className="hover:text-[var(--rentka-blue)] transition"
   >
     Travel Guides
-  </Link>
-
-  <Link
-    href="/contact"
-    className="hover:text-[var(--rentka-blue)] transition"
-  >
-    Info
   </Link>
 
   <Link
@@ -86,6 +93,13 @@ export default function Header() {
 
         {/* ROW 2 — MOBILE ONLY */}
         <nav className="flex md:hidden items-center gap-6 pb-3 text-sm font-medium text-slate-700">
+
+  <Link
+    href="/rent-a-car-islamabad"
+    className="hover:text-[var(--rentka-blue)] transition"
+  >
+    Islamabad
+  </Link>
 
   <Link
     href="/one-way-drop"

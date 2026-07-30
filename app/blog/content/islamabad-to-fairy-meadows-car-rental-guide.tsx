@@ -12,7 +12,7 @@ export const islamabadToFairyMeadowsCarRentalGuide = {
       <p>
         Since reaching Fairy Meadows involves a long highway journey followed by
         a jeep ride and a short hike, many travellers prefer booking a
-        chauffeur-driven rental car for a safe, comfortable and hassle-free trip.
+        rental car with driver for a safe, comfortable and hassle-free trip.
       </p>
 
       <p>
@@ -82,7 +82,7 @@ export const islamabadToFairyMeadowsCarRentalGuide = {
 
         <p>
           The ideal vehicle depends on passenger count, luggage and travel
-          preferences. RentKA offers chauffeur-driven vehicles suitable for
+          preferences. RentKA offers vehicles with professional drivers suitable for
           every type of traveller.
         </p>,
 
@@ -175,19 +175,19 @@ export const islamabadToFairyMeadowsCarRentalGuide = {
     },
 
     {
-      id: "chauffeur",
-      heading: "Why Choose Chauffeur-Driven Transportation?",
+      id: "professional-driver",
+      heading: "Why Choose transportation with a professional driver?",
 
       content: [
 
         <p>
           Long-distance mountain travel requires concentration and experience.
-          Professional chauffeurs allow passengers to relax while enjoying the
+          professional drivers allow passengers to relax while enjoying the
           journey safely.
         </p>,
 
         <p>
-          Chauffeur-driven travel is particularly beneficial for families,
+          travel with a professional driver is particularly beneficial for families,
           overseas visitors and travellers unfamiliar with northern Pakistan.
         </p>,
 
@@ -201,7 +201,7 @@ export const islamabadToFairyMeadowsCarRentalGuide = {
       content: [
 
         <ul className="list-disc pl-6 space-y-2">
-          <li>Experienced professional chauffeurs</li>
+          <li>Experienced professional drivers</li>
           <li>Transparent pricing</li>
           <li>Comfortable, well-maintained vehicles</li>
           <li>Airport pickup available</li>
@@ -210,7 +210,7 @@ export const islamabadToFairyMeadowsCarRentalGuide = {
         </ul>,
 
         <p>
-          RentKA provides dependable chauffeur-driven transportation from
+          RentKA provides dependable transportation with a professional driver from
           Islamabad to Fairy Meadows and destinations throughout Northern
           Pakistan.
         </p>,
@@ -270,13 +270,13 @@ export const islamabadToFairyMeadowsCarRentalGuide = {
     {
       question: "Do you provide return trips?",
       answer:
-        "Yes. RentKA offers one-way, return and multi-day chauffeur-driven travel packages.",
+        "Yes. RentKA offers one-way, return and multi-day travel with a professional driver packages.",
     },
 
     {
-      question: "Can tourists hire chauffeur-driven vehicles?",
+      question: "Can tourists hire vehicles with professional drivers?",
       answer:
-        "Yes. Local and international visitors regularly book chauffeur-driven transportation for Fairy Meadows tours.",
+        "Yes. Local and international visitors regularly book transportation with a professional driver for Fairy Meadows tours.",
     },
 
     {

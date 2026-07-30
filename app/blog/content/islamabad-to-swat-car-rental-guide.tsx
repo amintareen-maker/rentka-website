@@ -18,7 +18,7 @@ export const islamabadToSwatCarRentalGuide = {
 
       <p>
         The journey combines motorway driving with beautiful mountain roads.
-        Many travellers prefer chauffeur-driven transportation, allowing them
+        Many travellers prefer transportation with a professional driver, allowing them
         to enjoy the scenery while experienced drivers handle changing road and
         weather conditions.
       </p>
@@ -52,7 +52,7 @@ export const islamabadToSwatCarRentalGuide = {
 
     {
       id: "why-rental",
-      heading: "Why Choose Chauffeur-Driven Transportation?",
+      heading: "Why Choose transportation with a professional driver?",
       content: [
         <>
           Mountain roads require experience, particularly during heavy rain or
@@ -140,7 +140,7 @@ export const islamabadToSwatCarRentalGuide = {
         </>,
 
         <>
-          Travelling with an experienced chauffeur provides additional peace of
+          Travelling with an experienced driver provides additional peace of
           mind because professional drivers are familiar with mountain routes
           and changing road conditions.
         </>,
@@ -255,7 +255,7 @@ export const islamabadToSwatCarRentalGuide = {
       heading: "Why Choose RentKA?",
       content: [
         <>
-          RentKA provides reliable chauffeur-driven transportation across
+          RentKA provides reliable transportation with a professional driver across
           Pakistan with transparent pricing, professional drivers and responsive
           customer support.
         </>,
@@ -298,9 +298,9 @@ export const islamabadToSwatCarRentalGuide = {
         "Toyota Prado, Honda BR-V and Toyota Hiace are popular choices, while Toyota Corolla is suitable for smaller groups travelling mainly on highways.",
     },
     {
-      question: "Do you provide chauffeur-driven transportation?",
+      question: "Do you provide transportation with a professional driver?",
       answer:
-        "Yes. RentKA specialises in professional chauffeur-driven transportation across Pakistan.",
+        "Yes. RentKA specialises in professional transportation with a professional driver across Pakistan.",
     },
     {
       question: "Can I continue to Kalam or Malam Jabba?",
@@ -335,7 +335,7 @@ export const islamabadToSwatCarRentalGuide = {
     {
       question: "Why choose RentKA?",
       answer:
-        "RentKA provides transparent pricing, experienced drivers and dependable chauffeur-driven transportation throughout Pakistan.",
+        "RentKA provides transparent pricing, experienced drivers and dependable transportation with a professional driver throughout Pakistan.",
     },
   ],
 };

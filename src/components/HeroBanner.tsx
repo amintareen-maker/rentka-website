@@ -74,7 +74,7 @@ export default function HeroBanner() {
           {/* LEFT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
-              Find the Right Car (With Driver) — Without Calling Multiple Vendors. 
+              Car Rental with Driver in Islamabad &amp; Rawalpindi
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-xl">
@@ -82,7 +82,7 @@ export default function HeroBanner() {
             </p>
 
             <p className="mt-4 text-gray-700 font-medium">
-              One platform - Multiple options, Multiple owners, Multiple Rates, No hidden charges.
+              One platform - multiple options, vehicle providers and rates, with applicable charges explained before confirmation.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
@@ -108,7 +108,7 @@ export default function HeroBanner() {
   <span>✔ Verified Vendors</span>
   <span>✔ SECP Registered</span>
   <span>✔ NTN Registered</span>
-  <span>✔ No Hidden Charges</span>
+  <span>✔ Charges Explained Upfront</span>
 </div>
           </div>
 
@@ -132,7 +132,7 @@ export default function HeroBanner() {
               >
                 <Image
                   src={img}
-                  alt={`Hero image ${index + 1}`}
+                  alt={index === 0 ? "RentKA car rental with driver" : ""}
                   fill
                   className="object-contain"
                   priority={index === 0}

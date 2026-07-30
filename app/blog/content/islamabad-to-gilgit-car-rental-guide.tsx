@@ -16,7 +16,7 @@ export const islamabadToGilgitCarRentalGuide = {
 
       <p>
         This guide explains everything you need to know before booking a
-        chauffeur-driven rental car from Islamabad to Gilgit, including travel
+        rental car with driver from Islamabad to Gilgit, including travel
         time, vehicle recommendations, pricing, road conditions and booking
         advice.
       </p>
@@ -73,7 +73,7 @@ export const islamabadToGilgitCarRentalGuide = {
 
     <p>
       The ideal vehicle depends on your group size, luggage and travel
-      preferences. RentKA offers chauffeur-driven vehicles suitable for both
+      preferences. RentKA offers vehicles with professional drivers suitable for both
       family vacations and corporate travel.
     </p>,
 
@@ -177,19 +177,19 @@ export const islamabadToGilgitCarRentalGuide = {
 },
 
 {
-  id: "why-chauffeur",
-  heading: "Why Choose Chauffeur-Driven Transportation?",
+  id: "why-driver",
+  heading: "Why Choose transportation with a professional driver?",
 
   content: [
 
     <p>
       Long-distance mountain travel requires concentration and experience.
-      Professional chauffeurs understand the route and allow passengers to
+      professional drivers understand the route and allow passengers to
       enjoy the journey safely and comfortably.
     </p>,
 
     <p>
-      Chauffeur-driven travel is ideal for overseas visitors, families,
+      travel with a professional driver is ideal for overseas visitors, families,
       corporate travellers and tourists exploring Northern Pakistan.
     </p>,
 
@@ -203,7 +203,7 @@ export const islamabadToGilgitCarRentalGuide = {
   content: [
 
     <ul className="list-disc pl-6 space-y-2">
-      <li>Professional licensed chauffeurs</li>
+      <li>Professional licensed professional drivers</li>
       <li>Transparent pricing</li>
       <li>Comfortable, well-maintained vehicles</li>
       <li>Airport pickup available</li>
@@ -212,7 +212,7 @@ export const islamabadToGilgitCarRentalGuide = {
     </ul>,
 
     <p>
-      RentKA provides dependable chauffeur-driven transportation from
+      RentKA provides dependable transportation with a professional driver from
       Islamabad to Gilgit and destinations throughout Northern Pakistan.
     </p>,
 
@@ -227,7 +227,7 @@ export const islamabadToGilgitCarRentalGuide = {
 
     <p>
       Gilgit is the gateway to many of Pakistan's most spectacular destinations.
-      Choosing a comfortable vehicle and experienced chauffeur makes the
+      Choosing a comfortable vehicle and experienced driver makes the
       long journey safer and far more enjoyable.
     </p>,
 
@@ -258,12 +258,12 @@ faq: [
   {
     question: "Do you provide one-way trips to Gilgit?",
     answer:
-      "Yes. RentKA offers both one-way and return chauffeur-driven transportation between Islamabad and Gilgit.",
+      "Yes. RentKA offers both one-way and return transportation with a professional driver between Islamabad and Gilgit.",
   },
   {
     question: "Why choose RentKA?",
     answer:
-      "RentKA provides transparent pricing, experienced chauffeurs, well-maintained vehicles and reliable customer support for long-distance travel.",
+      "RentKA provides transparent pricing, experienced drivers, well-maintained vehicles and reliable customer support for long-distance travel.",
   },
 ],
 };

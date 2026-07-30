@@ -4,6 +4,11 @@ export const metadata = {
   title: "Cancellation & Refund Policy",
   description: "Cancellation and refund policy for RentKA car rental services.",
   alternates: { canonical: "https://www.rentka.co/cancellation-policy" },
+  openGraph: {
+    title: "Cancellation & Refund Policy | RentKA",
+    description: "Cancellation and refund policy for RentKA car rental services.",
+    url: "https://www.rentka.co/cancellation-policy",
+  },
 };
 
 export default function CancellationPolicyPage() {

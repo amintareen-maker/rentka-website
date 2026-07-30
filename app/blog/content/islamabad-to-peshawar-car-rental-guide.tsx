@@ -4,7 +4,7 @@ export const islamabadToPeshawarCarRentalGuide = {
     <>
       <p>
         Travelling from Islamabad to Peshawar is easier and more comfortable
-        with planned, chauffeur-driven transportation. The route serves tourists,
+        with planned, transportation with a professional driver. The route serves tourists,
         families, business visitors and overseas guests who value dependable
         door-to-door travel.
       </p>
@@ -40,7 +40,7 @@ export const islamabadToPeshawarCarRentalGuide = {
       heading: "Distance and Travel Time from Islamabad to Peshawar",
       content: [
         <p>
-          The road distance is approximately 185 kilometres. A typical chauffeur-driven trip
+          The road distance is approximately 185 kilometres. A typical trip with a professional driver
           takes 2.5 to 3 hours, although meal breaks, traffic and sightseeing stops
           can increase the total duration.
         </p>,
@@ -77,7 +77,7 @@ export const islamabadToPeshawarCarRentalGuide = {
           The M-1 is a modern, controlled-access motorway and is generally in good condition. Rush-hour traffic inside Peshawar and motorway stops can influence total time.
         </p>,
         <p>
-          RentKA chauffeurs follow a measured schedule and adjust the journey
+          RentKA drivers follow a measured schedule and adjust the journey
           around current route and weather information.
         </p>,
       ],
@@ -128,17 +128,17 @@ export const islamabadToPeshawarCarRentalGuide = {
     },
 
     {
-      id: "why-chauffeur",
-      heading: "Why Choose Chauffeur-Driven Transportation?",
+      id: "why-driver",
+      heading: "Why Choose transportation with a professional driver?",
       content: [
         <p>
-          A professional chauffeur manages navigation, traffic, parking and
+          A professional driver manages navigation, traffic, parking and
           changing road conditions while passengers rest, work or enjoy the
           scenery. This is especially valuable for families, senior travellers
           and guests unfamiliar with the route.
         </p>,
         <p>
-          Every recommendation in this guide assumes a chauffeur-driven RentKA
+          Every recommendation in this guide assumes a RentKA car-with-driver
           service, with the travel plan agreed before departure.
         </p>,
       ],
@@ -149,14 +149,14 @@ export const islamabadToPeshawarCarRentalGuide = {
       heading: "Why Choose RentKA?",
       content: [
         <ul className="list-disc pl-6 space-y-2">
-          <li>Professional chauffeurs for intercity travel.</li>
+          <li>professional drivers for intercity travel.</li>
           <li>Clean, well-maintained vehicle options.</li>
           <li>Transparent quotations before booking.</li>
           <li>One-way, return and multi-day arrangements.</li>
           <li>Airport pickup and responsive customer support.</li>
         </ul>,
         <p>
-          RentKA coordinates chauffeur-driven transportation from Islamabad
+          RentKA coordinates transportation with a professional driver from Islamabad
           around the traveller's schedule, group size and destination.
         </p>,
       ],
@@ -168,7 +168,7 @@ export const islamabadToPeshawarCarRentalGuide = {
       content: [
         <p>
           A successful trip to Peshawar begins with a realistic schedule,
-          the right vehicle and a chauffeur who can manage the route calmly.
+          the right vehicle and a driver who can manage the route calmly.
           Advance booking also improves vehicle choice during busy periods.
         </p>,
         <p>
@@ -196,9 +196,9 @@ export const islamabadToPeshawarCarRentalGuide = {
         "Toyota Corolla suits small groups, Honda BR-V works well for families, Toyota Prado offers premium comfort, and Toyota Hiace is suitable for larger groups.",
     },
     {
-      question: "Does RentKA provide a chauffeur for the journey?",
+      question: "Does RentKA provide a professional driver for the journey?",
       answer:
-        "Yes. RentKA transportation is chauffeur-driven, allowing passengers to travel without managing navigation, traffic or parking.",
+        "Yes. RentKA bookings include a professional driver, allowing passengers to travel without managing navigation, traffic or parking.",
     },
     {
       question: "Can I book a one-way or return trip?",

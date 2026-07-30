@@ -43,15 +43,19 @@ export async function generateMetadata({ params }: VehiclePageProps): Promise<Me
     };
   }
 
-  const carName = slug.replace(/-/g, " ");
+  const carName = slug
+    .split("-")
+    .map((part) => part.toUpperCase() === "BR" ? "BR" : part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   const url = `https://www.rentka.co/cars/${slug}/${city}/${service}`;
 
 
   return {
-    title: { absolute: `${carName} with Driver Rental in ${city} | Price & Booking | RentKA` },
-    description: `Book ${carName} with driver in ${city}. Compare prices from verified vendors, airport transfers, city rides, Murree trips and instant WhatsApp booking with RentKA.`,
+    title: { absolute: `${carName} with Driver in ${cityName} | RentKA` },
+    description: `Book ${carName} with driver in ${cityName}. Compare current options for airport transfers, city travel, family journeys and outstation bookings with RentKA.`,
     alternates: { canonical: url },
-    openGraph: { title: `${carName} with Driver Rental in ${city} | RentKA`, description: `Book ${carName} with driver in ${city} through RentKA.`, url },
+    openGraph: { title: `${carName} with Driver in ${cityName} | RentKA`, description: `Book ${carName} with driver in ${cityName} through RentKA.`, url, images: [{ url: "/hero-car.png", alt: `${carName} with driver in ${cityName}` }] },
   };
 }
 
@@ -190,11 +194,7 @@ cars.forEach((car) => {
 const isDriver = service?.toLowerCase() === "with-driver";
 const carName = slug ? slug.replace(/-/g, " ") : "Cars";
 const cityName =
-  city.toLowerCase() === "islamabad"
-    ? "Islamabad & Rawalpindi"
-    : city.toLowerCase() === "rawalpindi"
-    ? "Rawalpindi & Islamabad"
-    : city.charAt(0).toUpperCase() + city.slice(1);
+  city.charAt(0).toUpperCase() + city.slice(1);
 
 const currentModelIndex = VEHICLE_MODELS.indexOf(slug as (typeof VEHICLE_MODELS)[number]);
 const relatedModels = [1, 2, 3].map((offset) => {
@@ -217,12 +217,27 @@ const carSchema = {
     "@id": ORGANIZATION_ID,
   },
   areaServed: city,
-  ...(minPrice ? { offers: {
+  ...(typeof minPrice === "number" ? { offers: {
     "@type": "Offer",
     price: minPrice,
     priceCurrency: "PKR",
   } } : {}),
 };
+
+const modelGuidance: Record<string, { passengers: string; luggage: string; bestFor: string; bookingTip: string }> = {
+  "toyota-corolla": { passengers: "up to four passengers", luggage: "two medium suitcases", bestFor: "airport transfers, business travel and intercity journeys", bookingTip: "Share your luggage count if four passengers are travelling." },
+  "honda-civic": { passengers: "up to four passengers", luggage: "two medium suitcases", bestFor: "executive travel, meetings and motorway journeys", bookingTip: "Reserve early for corporate and wedding dates." },
+  "toyota-prado": { passengers: "up to five passengers", luggage: "three to four medium bags", bestFor: "executive travel, weddings and northern-area journeys", bookingTip: "Confirm the exact variant and luggage requirements before payment." },
+  "toyota-hiace": { passengers: "larger families and groups", luggage: "group luggage when capacity is planned carefully", bestFor: "airport groups, tours, weddings and corporate teams", bookingTip: "Provide the passenger and bag count so the seating layout can be confirmed." },
+  "honda-br-v": { passengers: "families and small groups", luggage: "light luggage with all seats occupied", bestFor: "family travel, airport pickup and outstation trips", bookingTip: "For airport travel, confirm whether rear seating or luggage space matters more." },
+  "toyota-hilux": { passengers: "small groups", luggage: "bulky luggage or equipment where suitable", bestFor: "site visits, rugged routes and practical outstation travel", bookingTip: "Describe the route and any equipment before requesting availability." },
+  "honda-city": { passengers: "up to four passengers", luggage: "two medium suitcases", bestFor: "city appointments, airport transfers and economical intercity travel", bookingTip: "Share all stops when requesting a full-day quotation." },
+  "suzuki-wagon-r": { passengers: "up to four passengers", luggage: "light city luggage", bestFor: "economical local travel and short scheduled journeys", bookingTip: "Choose a larger vehicle when travelling with several airport bags." },
+  "toyota-yaris": { passengers: "up to four passengers", luggage: "two medium suitcases", bestFor: "city travel, airport transfers and business appointments", bookingTip: "Confirm the itinerary to compare daily and route-based pricing." },
+  "suzuki-alto": { passengers: "up to three adults comfortably", luggage: "light hand luggage", bestFor: "budget-conscious city travel and short local bookings", bookingTip: "For long routes or substantial luggage, compare a sedan before booking." },
+};
+const guidance = modelGuidance[slug];
+
 const breadcrumbItems = [
   { name: "Home", href: "/" },
   { name: "Cars", href: "/cars" },
@@ -255,7 +270,7 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
 
       {/* 🔥 SEO HEADING */}
       <h1 className="text-3xl md:text-4xl font-bold mb-4 capitalize">
-        {carName} with Driver Rental in {cityName} – Price & Booking | RentKA
+        {carName} with Driver in {cityName}
       </h1>
 
       {/* 🔥 SEO PARAGRAPH */}
@@ -266,6 +281,22 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
         choose what fits your requirement, and book easily with clear and transparent pricing. 
         Ideal for airport transfers, family trips, and daily city travel.
       </p>
+
+      <section className="mb-12 grid gap-6 rounded-2xl bg-slate-50 p-6 md:grid-cols-2">
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900">Who this vehicle suits</h2>
+          <p className="mt-3 text-slate-600">
+            This model generally suits {guidance.passengers} and works well for {guidance.bestFor}.
+            Actual seating depends on the specific vehicle confirmed for your booking.
+          </p>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900">Luggage and booking guidance</h2>
+          <p className="mt-3 text-slate-600">
+            Allow for approximately {guidance.luggage}. {guidance.bookingTip}
+          </p>
+        </div>
+      </section>
 
       {/* 🔥 EMPTY STATE */}
       {cars.length === 0 && (
@@ -284,9 +315,9 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
       />
 
       <div className="mt-12">
-  <h3 className="text-lg font-semibold mb-4">
+  <h2 className="text-lg font-semibold mb-4">
     Explore more options in {city}
-  </h3>
+  </h2>
 
   <div className="flex flex-wrap gap-3">
     {relatedModels.map((model) => {
@@ -310,9 +341,9 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
 
       {/* 🔥 TRUST SECTION */}
       <div className="mt-16 border-t pt-10">
-        <h3 className="text-xl font-semibold mb-3">
+        <h2 className="text-xl font-semibold mb-3">
           Why rent with RentKA?
-        </h3>
+        </h2>
         <ul className="text-slate-600 space-y-2 text-sm">
           <li>✔ Verified rental partners</li>
           <li>✔ Transparent pricing</li>
@@ -321,9 +352,9 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
         </ul>
       </div>
 <div className="mt-16">
-  <h3 className="text-xl font-semibold mb-4">
+  <h2 className="text-xl font-semibold mb-4">
     Frequently Asked Questions
-  </h3>
+  </h2>
 
   <div className="space-y-4 text-sm text-slate-700">
     <div>
@@ -331,7 +362,9 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
         What is the price of {carName} with driver in {city}?
       </p>
       <p>
-        Prices typically start from Rs {minPrice ?? "varies"}/day depending on vendor, duration, and availability.
+        {typeof minPrice === "number"
+          ? `Prices currently start from Rs ${minPrice}/day, subject to vendor, duration and availability.`
+          : "Pricing depends on the confirmed vehicle, itinerary, duration and availability. Request a quotation for your travel date."}
       </p>
     </div>
 
@@ -368,7 +401,9 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
           name: `What is the price of ${carName} with driver in ${city}?`,
           acceptedAnswer: {
             "@type": "Answer",
-            text: `Prices start from Rs ${minPrice ?? "varies"} per day depending on vendor and availability.`,
+            text: typeof minPrice === "number"
+              ? `Prices currently start from Rs ${minPrice} per day, subject to vendor and availability.`
+              : "Pricing depends on the confirmed vehicle, itinerary, duration and availability. Request a quotation for your travel date.",
           },
         },
         {
@@ -384,7 +419,7 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
           name: "Are there any hidden charges?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "No. RentKA works with verified vendors and provides transparent pricing before booking confirmation.",
+            text: "RentKA explains the applicable rental, fuel, toll, parking and overtime terms before booking confirmation.",
           },
         },
       ],

@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: { absolute: "About RentKA | Chauffeur-Driven Car Rental Islamabad" },
+  title: { absolute: "About RentKA | Car Rental with Driver Islamabad" },
   description:
-    "Learn about RentKA, a chauffeur-driven car rental company based in Islamabad providing reliable transport across Islamabad, Rawalpindi and intercity Pakistan.",
+    "Learn about RentKA, a professional car rental company with driver based in Islamabad and serving Rawalpindi and intercity travellers across Pakistan.",
   alternates: {
     canonical: "https://www.rentka.co/about",
   },
   openGraph: {
+    title: "About RentKA | Car Rental with Driver Islamabad",
+    description: "RentKA provides cars with professional drivers for airport transfers, local travel, corporate transport and intercity journeys.",
     url: "https://www.rentka.co/about",
+    images: [{ url: "/logo.png", alt: "RentKA car rental company" }],
   },
 };
 
@@ -23,20 +27,16 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-6 py-24 text-center">
 
           <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 mb-6">
-            Chauffeur-Driven Car Rental Company in Islamabad
+            Car Rental Company with Professional Drivers in Islamabad
           </span>
 
           <h1 className="text-5xl md:text-6xl font-bold text-slate-900 tracking-tight mb-6">
-            Renting a car should be simple,
-            <span className="text-[var(--rentka-green)]">
-              {" "}transparent
-            </span>
-            {" "}and stress-free.
+            About RentKA: Car Rental with Professional Drivers
           </h1>
 
           <p className="max-w-3xl mx-auto text-lg text-slate-600 leading-8">
-            RentKA is a professionally managed chauffeur-driven car rental
-            company headquartered in Islamabad, providing reliable transport
+            RentKA is a professionally managed car rental company with driver
+            headquartered in Islamabad, providing reliable transport
             across Islamabad, Rawalpindi and intercity Pakistan.
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
 
             <div className="text-center border rounded-2xl p-6">
-              <div className="text-3xl font-bold text-slate-900">100%</div>
+              <div className="text-3xl font-bold text-slate-900">Carefully</div>
               <div className="text-slate-600 mt-2">
                 Verified Vehicles
               </div>
@@ -203,8 +203,8 @@ export default function AboutPage() {
           </h2>
 
           <p className="text-lg text-slate-600 leading-9 max-w-4xl mx-auto">
-            RentKA (SMC-PRIVATE) Limited is a professionally managed
-            chauffeur-driven car rental company headquartered in Islamabad.
+            RentKA (SMC-PRIVATE) LIMITED is a professional car rental company
+            with driver headquartered in Islamabad.
             We provide airport transfers, corporate transport, monthly rentals
             and one-way intercity travel across Islamabad, Rawalpindi and
             destinations throughout Pakistan.
@@ -286,7 +286,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-6">
 
             <div className="border rounded-2xl p-6">
-              Chauffeur-Driven Car Rental
+              Car Rental with Professional Driver
             </div>
 
             <div className="border rounded-2xl p-6">
@@ -352,12 +352,12 @@ export default function AboutPage() {
             simplify your rental experience.
           </p>
 
-          <a
+          <Link
             href="/"
             className="inline-flex items-center justify-center bg-[var(--rentka-green)] hover:bg-[var(--rentka-green-hover)] px-8 py-4 rounded-xl font-semibold transition"
           >
             Browse Available Cars
-          </a>
+          </Link>
 
         </div>
       </section>

@@ -19,7 +19,7 @@ export const islamabadToNaranCarRentalGuide = {
 
       <p>
         Because the journey is long and includes mountainous roads, many
-        travellers choose chauffeur-driven transportation instead of driving
+        travellers choose transportation with a professional driver instead of driving
         themselves. A professional driver allows passengers to enjoy the scenery
         while travelling safely and comfortably.
       </p>
@@ -55,7 +55,7 @@ export const islamabadToNaranCarRentalGuide = {
 
     {
       id: "why-rental",
-      heading: "Why Choose Chauffeur-Driven Transportation?",
+      heading: "Why Choose transportation with a professional driver?",
       content: [
         <>
           The journey from Islamabad to Naran includes long motorway sections
@@ -142,7 +142,7 @@ export const islamabadToNaranCarRentalGuide = {
 
     <>
       Road conditions can also change due to rainfall or landslides. Travelling
-      with an experienced chauffeur provides additional peace of mind because
+      with an experienced driver provides additional peace of mind because
       drivers are familiar with the route and local driving conditions.
     </>,
   ],
@@ -246,7 +246,7 @@ export const islamabadToNaranCarRentalGuide = {
   heading: "Why Choose RentKA?",
   content: [
     <>
-      RentKA provides chauffeur-driven transportation across Pakistan with
+      RentKA provides transportation with a professional driver across Pakistan with
       transparent quotations, professional drivers and vehicles suitable for
       both families and corporate travellers.
     </>,
@@ -300,9 +300,9 @@ faq: [
       "Toyota Prado, Honda BR-V and Toyota Hiace are popular choices, while Toyota Corolla is suitable for smaller groups during the summer season."
   },
   {
-    question: "Do you provide chauffeur-driven transportation?",
+    question: "Do you provide transportation with a professional driver?",
     answer:
-      "Yes. RentKA specialises in chauffeur-driven transportation."
+      "Yes. RentKA specialises in transportation with a professional driver."
   },
   {
     question: "Can I continue to Hunza after Naran?",
@@ -337,7 +337,7 @@ faq: [
   {
     question: "Why choose RentKA?",
     answer:
-      "RentKA offers transparent pricing, experienced drivers and reliable chauffeur-driven transportation across Pakistan."
+      "RentKA offers transparent pricing, experienced drivers and reliable transportation with a professional driver across Pakistan."
   }
 ]
 };

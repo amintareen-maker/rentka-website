@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     "rent a car rawalpindi",
     "car rental rawalpindi",
     "car with driver rawalpindi",
-    "chauffeur driven car rawalpindi",
+    "car rental with driver rawalpindi",
     "rawalpindi airport transfer",
     "outstation car rental rawalpindi",
     "monthly car rental rawalpindi",
@@ -48,6 +48,7 @@ export const metadata: Metadata = {
     url: "https://www.rentka.co/rent-a-car-rawalpindi",
     type: "website",
     siteName: "RentKA",
+    images: [{ url: "/hero-1.webp", alt: "Car rental with driver in Rawalpindi" }],
   },
 };
 
@@ -140,7 +141,7 @@ const serviceShortcuts = [
   {
     title: "Outstation Travel",
     description: "Travel outside the twin cities",
-    href: "#cars",
+    href: "/one-way-drop",
     icon: Route,
   },
   {
@@ -152,13 +153,13 @@ const serviceShortcuts = [
   {
     title: "Corporate Travel",
     description: "Transport for meetings and teams",
-    href: "#cars",
+    href: "/blog/corporate-car-rental-islamabad",
     icon: BriefcaseBusiness,
   },
   {
     title: "Monthly Rental",
     description: "Long-term car rental with driver",
-    href: "#cars",
+    href: "/blog/monthly-car-rental-islamabad",
     icon: CalendarCheck,
   },
   {
@@ -345,7 +346,7 @@ export default function RawalpindiRentalPage() {
                 Travel your way
               </p>
               <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
-                Chauffeur-Driven Services in Rawalpindi
+                Car Rental Services with Driver in Rawalpindi
               </h2>
               <p className="mt-3 max-w-2xl leading-7 text-slate-600">
                 Choose the trip type that best matches your plans. Dedicated

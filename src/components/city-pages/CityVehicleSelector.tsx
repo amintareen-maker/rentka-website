@@ -237,7 +237,7 @@ export default function CityVehicleSelector({
                   {option.imageURL ? (
                     <Image
                       src={option.imageURL}
-                      alt={`${option.model} chauffeur-driven rental in ${city === "islamabad" ? "Islamabad" : "Rawalpindi"}`}
+                      alt={`${option.model} with driver in ${city === "islamabad" ? "Islamabad" : "Rawalpindi"}`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-contain p-5 transition duration-300 group-hover:scale-[1.03]"

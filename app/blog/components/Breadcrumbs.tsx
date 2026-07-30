@@ -29,7 +29,7 @@ export default function Breadcrumbs({
           href="/blog"
           className="text-slate-500 hover:text-[#5BAE4A]"
         >
-          Journal
+          Blog
         </Link>
 
         <span className="text-slate-400">

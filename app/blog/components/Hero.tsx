@@ -17,6 +17,12 @@
     updated,
     readingTime,
   }: HeroProps) {
+    const formattedDate = new Intl.DateTimeFormat("en-PK", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(new Date(`${updated}T00:00:00Z`));
     return (
       <section className="bg-white border-b">
 
@@ -41,7 +47,7 @@
             </span>
 
             <span>
-              📅 {updated}
+              📅 {formattedDate}
             </span>
 
             <span>

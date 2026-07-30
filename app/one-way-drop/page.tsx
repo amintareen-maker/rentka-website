@@ -16,7 +16,7 @@ import { intercityRoutes } from "@/data/intercityRoutes";
 
 export const metadata: Metadata = {
   title: { absolute:
-    "One Way Drop & Intercity Car Rental Pakistan | RentKA",
+    "One-Way Car Rental with Driver Pakistan | RentKA",
 
   },
   description:
@@ -51,6 +51,7 @@ export const metadata: Metadata = {
     siteName: "RentKA",
 
     type: "website",
+    images: [{ url: "/blog/motorway-road-trip.png", alt: "One-way intercity car rental with driver" }],
   },
 
   twitter: {
@@ -61,6 +62,7 @@ export const metadata: Metadata = {
 
     description:
       "Book one-way intercity transportation across Pakistan.",
+    images: ["/blog/motorway-road-trip.png"],
   },
 };
 
@@ -99,7 +101,7 @@ export default function OneWayDropPage() {
 
         offers:
 
-          intercityRoutes.map((route) => ({
+          intercityRoutes.filter((route) => typeof route.vehicles.corolla.price === "number").map((route) => ({
 
             "@type": "Offer",
 
@@ -425,7 +427,7 @@ export default function OneWayDropPage() {
               <p className="mt-6 text-lg leading-8 text-slate-600">
 
                 Besides one-way transfers, RentKA provides airport transport,
-                city rentals and chauffeur-driven vehicles across Pakistan.
+                city rentals and cars with professional drivers across Pakistan.
 
               </p>
 
@@ -446,7 +448,7 @@ export default function OneWayDropPage() {
 
                 <p className="mt-4 leading-7 text-slate-600">
 
-                  Chauffeur-driven cars for city travel,
+                  Cars with professional drivers for city travel,
                   corporate meetings and daily transportation.
 
                 </p>

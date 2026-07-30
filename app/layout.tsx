@@ -16,7 +16,17 @@ export const metadata: Metadata = {
     template: "%s | RentKA",
   },
   description:
-    "Find reliable rental cars with clear pricing and flexible options, Affordable car rental with professional driver in Islamabad and Rawalpindi.",
+    "RentKA provides car rental with professional drivers in Islamabad and Rawalpindi, including airport transfers, intercity travel and monthly rentals.",
+  openGraph: {
+    siteName: "RentKA",
+    locale: "en_PK",
+    type: "website",
+    images: [{ url: "/hero-1.webp", alt: "RentKA car rental with driver in Islamabad" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/hero-1.webp"],
+  },
 };
 
 export default function RootLayout({
@@ -103,7 +113,7 @@ export default function RootLayout({
           <div className="mx-auto max-w-7xl px-4 py-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="text-sm text-slate-600">
-                <p>© {new Date().getFullYear()} RENTKA (SMC-PRIVATE) LIMITED. All rights reserved.</p>
+                <p>© {new Date().getFullYear()} RentKA (SMC-PRIVATE) LIMITED. All rights reserved.</p>
                 <p className="mt-1">
                   <a href="tel:+923020589999" className="hover:text-slate-900 hover:underline">0302 058 9999</a>
                 </p>

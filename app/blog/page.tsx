@@ -2,20 +2,21 @@ import type { Metadata } from "next";
 
 import BlogHome from "./components/BlogHome";
 import { articles } from "./data";
+import Breadcrumbs, { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 
 export const metadata: Metadata = {
   title: {
     absolute: "Car Rental & Pakistan Travel Guides | RentKA Journal",
   },
   description:
-    "Explore chauffeur-driven car rental guides, intercity routes, airport transfers, vehicle advice and Pakistan travel information from RentKA.",
+    "Explore car rental with driver guides, airport transfer advice, intercity routes, vehicle comparisons and practical travel information for Pakistan.",
   alternates: {
     canonical: "https://www.rentka.co/blog",
   },
   openGraph: {
     title: "Car Rental & Pakistan Travel Guides | RentKA Journal",
     description:
-      "Explore chauffeur-driven car rental guides, intercity routes, airport transfers, vehicle advice and Pakistan travel information from RentKA.",
+      "Explore car rental with driver guides, airport transfer advice, intercity routes, vehicle comparisons and practical travel information for Pakistan.",
     url: "https://www.rentka.co/blog",
     type: "website",
     siteName: "RentKA",
@@ -29,7 +30,7 @@ const blogSchema = {
   url: "https://www.rentka.co/blog",
   name: "Car Rental & Pakistan Travel Guides | RentKA Journal",
   description:
-    "Explore chauffeur-driven car rental guides, intercity routes, airport transfers, vehicle advice and Pakistan travel information from RentKA.",
+    "Explore car rental with driver guides, airport transfer advice, intercity routes, vehicle comparisons and practical travel information for Pakistan.",
   isPartOf: {
     "@id": "https://www.rentka.co/#website",
   },
@@ -47,6 +48,10 @@ const blogSchema = {
     })),
   },
 };
+const breadcrumbSchema = breadcrumbJsonLd([
+  { name: "Home", href: "/" },
+  { name: "Blog", href: "/blog" },
+]);
 
 export default function BlogPage() {
   return (
@@ -55,6 +60,13 @@ export default function BlogPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+        <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: "Blog", href: "/blog" }]} />
+      </div>
       <BlogHome />
     </>
   );

@@ -19,7 +19,7 @@ export const islamabadToLahoreCarRentalGuide = {
 
       <p>
         While buses and domestic flights remain available, many travellers now
-        prefer chauffeur-driven car rental because it offers greater privacy,
+        prefer car rental with driver because it offers greater privacy,
         flexibility, comfort and door-to-door convenience without the stress of
         driving long distances.
       </p>
@@ -39,7 +39,7 @@ export const islamabadToLahoreCarRentalGuide = {
       content: [
         <>
           The Islamabad–Lahore motorway is one of Pakistan's best highways,
-          making chauffeur-driven travel both comfortable and efficient.
+          making travel with a professional driver both comfortable and efficient.
           Instead of following bus schedules or airport timings, passengers can
           depart whenever they prefer while enjoying complete privacy
           throughout the journey.
@@ -138,7 +138,7 @@ export const islamabadToLahoreCarRentalGuide = {
         </>,
 
         <>
-          Travelling with a professional chauffeur allows passengers to relax,
+          Travelling with a professional driver allows passengers to relax,
           work, enjoy the scenery or simply rest throughout the trip without
           worrying about navigation or motorway driving.
         </>,
@@ -211,7 +211,7 @@ export const islamabadToLahoreCarRentalGuide = {
       heading: "Why Choose RentKA?",
       content: [
         <>
-          RentKA provides chauffeur-driven transportation with transparent
+          RentKA provides transportation with a professional driver with transparent
           pricing, experienced drivers and responsive customer support.
         </>,
 
@@ -240,7 +240,7 @@ export const islamabadToLahoreCarRentalGuide = {
       content: [
         <>
           Travelling between Islamabad and Lahore has never been easier.
-          Chauffeur-driven transportation offers flexibility, privacy and
+          transportation with a professional driver offers flexibility, privacy and
           comfort while eliminating the stress of driving long distances.
         </>,
 
@@ -307,7 +307,7 @@ export const islamabadToLahoreCarRentalGuide = {
     {
       question: "Why choose RentKA?",
       answer:
-        "RentKA focuses on professional chauffeur-driven transportation, transparent pricing and reliable customer support.",
+        "RentKA focuses on professional transportation with a professional driver, transparent pricing and reliable customer support.",
     },
   ],
 };

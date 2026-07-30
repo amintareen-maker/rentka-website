@@ -19,7 +19,7 @@ export const islamabadToSkarduCarRentalGuide = {
 
       <p>
         Because the journey covers a long distance through mountainous terrain,
-        many travellers prefer chauffeur-driven transportation instead of
+        many travellers prefer transportation with a professional driver instead of
         driving themselves. Experienced drivers understand the route, weather
         conditions and road safety, allowing passengers to enjoy the scenery in
         comfort.
@@ -56,7 +56,7 @@ export const islamabadToSkarduCarRentalGuide = {
 
     {
       id: "why-rental",
-      heading: "Why Choose Chauffeur-Driven Transportation?",
+      heading: "Why Choose transportation with a professional driver?",
       content: [
         <>
           The journey from Islamabad to Skardu is long and includes mountain
@@ -250,7 +250,7 @@ export const islamabadToSkarduCarRentalGuide = {
       heading: "Why Choose RentKA?",
       content: [
         <>
-          RentKA provides professional chauffeur-driven transportation across
+          RentKA provides professional transportation with a professional driver across
           Pakistan with transparent pricing, experienced drivers and reliable
           customer support.
         </>,
@@ -294,9 +294,9 @@ export const islamabadToSkarduCarRentalGuide = {
         "Toyota Prado, Honda BR-V and Toyota Hiace are popular choices, while Toyota Corolla is suitable for smaller groups on standard road conditions.",
     },
     {
-      question: "Do you provide chauffeur-driven transportation?",
+      question: "Do you provide transportation with a professional driver?",
       answer:
-        "Yes. RentKA specialises in professional chauffeur-driven transportation across Pakistan.",
+        "Yes. RentKA specialises in professional transportation with a professional driver across Pakistan.",
     },
     {
       question: "Can I continue to Shigar or Khaplu?",
@@ -331,7 +331,7 @@ export const islamabadToSkarduCarRentalGuide = {
     {
       question: "Why choose RentKA?",
       answer:
-        "RentKA provides transparent pricing, experienced drivers and dependable chauffeur-driven transportation throughout Pakistan.",
+        "RentKA provides transparent pricing, experienced drivers and dependable transportation with a professional driver throughout Pakistan.",
     },
   ],
 };

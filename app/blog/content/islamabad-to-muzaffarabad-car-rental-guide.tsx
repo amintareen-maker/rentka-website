@@ -9,7 +9,7 @@ export const islamabadToMuzaffarabadCarRentalGuide = {
       </p>
 
       <p>
-        Many travellers choose chauffeur-driven transportation for this journey
+        Many travellers choose transportation with a professional driver for this journey
         to avoid the stress of driving through winding mountain roads. A
         professional driver allows passengers to enjoy the scenery while
         travelling comfortably and safely.
@@ -75,7 +75,7 @@ export const islamabadToMuzaffarabadCarRentalGuide = {
 
     <p>
       Choosing the right vehicle depends on passenger count, luggage and travel
-      preferences. RentKA offers professionally maintained chauffeur-driven
+      preferences. RentKA offers professionally maintained vehicles with professional drivers for
       vehicles for every type of traveller.
     </p>,
 
@@ -148,13 +148,13 @@ export const islamabadToMuzaffarabadCarRentalGuide = {
 },
 
 {
-  id: "why-chauffeur",
-  heading: "Why Choose Chauffeur-Driven Transportation?",
+  id: "why-driver",
+  heading: "Why Choose transportation with a professional driver?",
 
   content: [
 
     <p>
-      Chauffeur-driven transportation allows passengers to relax while enjoying
+      Transportation with a professional driver allows passengers to relax while enjoying
       mountain scenery instead of concentrating on unfamiliar roads and traffic.
     </p>,
 
@@ -174,7 +174,7 @@ export const islamabadToMuzaffarabadCarRentalGuide = {
   content: [
 
     <ul className="list-disc pl-6 space-y-2">
-      <li>Professional chauffeurs.</li>
+      <li>professional drivers.</li>
       <li>Transparent pricing.</li>
       <li>Comfortable, well-maintained vehicles.</li>
       <li>Airport pickup available.</li>
@@ -183,7 +183,7 @@ export const islamabadToMuzaffarabadCarRentalGuide = {
     </ul>,
 
     <p>
-      RentKA provides reliable chauffeur-driven transportation from Islamabad
+      RentKA provides reliable transportation with a professional driver from Islamabad
       to Muzaffarabad and destinations throughout Azad Kashmir.
     </p>,
 
@@ -203,7 +203,7 @@ export const islamabadToMuzaffarabadCarRentalGuide = {
     </p>,
 
     <p>
-      Booking a comfortable chauffeur-driven vehicle allows you to enjoy the
+      Booking a comfortable vehicle with a professional driver allows you to enjoy the
       journey while travelling safely and conveniently with family, friends or
       colleagues.
     </p>,
@@ -236,7 +236,7 @@ faq: [
   {
     question: "Do you provide one-way trips?",
     answer:
-      "Yes. RentKA offers both one-way and return chauffeur-driven transportation.",
+      "Yes. RentKA offers both one-way and return transportation with a professional driver.",
   },
   {
     question: "Can airport pickup be included?",
@@ -246,7 +246,7 @@ faq: [
   {
     question: "Why choose RentKA?",
     answer:
-      "RentKA offers transparent pricing, experienced chauffeurs, well-maintained vehicles and dependable customer support.",
+      "RentKA offers transparent pricing, experienced drivers, well-maintained vehicles and dependable customer support.",
   },
   {
     question: "Should I book in advance?",

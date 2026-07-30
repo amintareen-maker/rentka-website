@@ -7,7 +7,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
 
 export const metadata = {
-  title: { absolute: "Islamabad Airport Transfer Service | Airport Pickup & Drop Islamabad | RentKA" },
+  title: { absolute: "Islamabad Airport Transfer with Driver | RentKA" },
   description:
     "Book reliable Islamabad airport transfer service with driver. Airport pickup and drop with fuel included, professional drivers, transparent pricing, and 24/7 airport transportation in Islamabad.",
   keywords: [
@@ -43,6 +43,7 @@ export const metadata = {
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",
+    images: [{ url: "/blog/airport-transfer.png", alt: "Islamabad airport transfer with driver" }],
   },
 };
 
@@ -203,7 +204,7 @@ export default function IslamabadAirportTransferPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
 
               <div className="bg-[#5BAE4A] text-white p-3.5 md:p-4 rounded-2xl font-medium shadow-lg text-[13px] sm:text-sm md:text-base leading-relaxed">
-                ✔ No Hidden Charges
+                ✔ Charges Explained Upfront
               </div>
 
               <div className="bg-[#5BAE4A] text-white p-3.5 md:p-4 rounded-2xl font-medium shadow-lg text-[13px] sm:text-sm md:text-base leading-relaxed">

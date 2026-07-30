@@ -2,7 +2,13 @@
 
 export const metadata = {
   title: "Terms & Conditions",
+  description: "Read the booking, payment, cancellation, customer responsibility and service terms for RentKA car rentals with professional drivers.",
   alternates: { canonical: "https://www.rentka.co/terms" },
+  openGraph: {
+    title: "Terms & Conditions | RentKA",
+    description: "Read the booking, payment, cancellation, customer responsibility and service terms for RentKA car rentals with professional drivers.",
+    url: "https://www.rentka.co/terms",
+  },
 };
 
 export default function TermsPage() {

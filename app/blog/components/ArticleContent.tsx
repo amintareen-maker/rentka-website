@@ -1,62 +1,4 @@
-import Link from "next/link";
 import { ReactNode } from "react";
-
-const internalLinks: Record<string, string> = {
-  "rent a car in Islamabad": "/rent-a-car-islamabad",
-  "rent a car in Rawalpindi": "/rent-a-car-rawalpindi",
-
-  "airport transfers": "/airport-car-rental-islamabad",
-  "Islamabad International Airport": "/airport-car-rental-islamabad",
-
-  "one-way car rental": "/one-way-drop",
-
-  "Toyota Corolla": "/cars/toyota-corolla/islamabad/with-driver",
-  "Honda BR-V": "/cars/honda-br-v/islamabad/with-driver",
-  "Toyota Prado": "/cars/toyota-prado/islamabad/with-driver",
-  "Toyota Hiace": "/cars/toyota-hiace/islamabad/with-driver",
-
-  "Islamabad to Lahore": "/one-way-drop/islamabad-to-lahore",
-  "Islamabad to Murree": "/one-way-drop/islamabad-to-murree",
-  "Islamabad to Peshawar": "/one-way-drop/islamabad-to-peshawar",
-  "Islamabad to Abbottabad": "/one-way-drop/islamabad-to-abbottabad",
-  "Islamabad to Naran": "/one-way-drop/islamabad-to-naran",
-};
-
-function renderParagraph(text: string) {
-  let parts: ReactNode[] = [text];
-
-  Object.entries(internalLinks).forEach(([keyword, href]) => {
-    parts = parts.flatMap((part) => {
-      if (typeof part !== "string") return [part];
-
-      const split = part.split(keyword);
-
-      if (split.length === 1) return [part];
-
-      const result: ReactNode[] = [];
-
-      split.forEach((segment, index) => {
-        result.push(segment);
-
-        if (index < split.length - 1) {
-          result.push(
-            <Link
-              key={`${keyword}-${index}`}
-              href={href}
-              className="font-medium text-[#5BAE4A] hover:underline"
-            >
-              {keyword}
-            </Link>
-          );
-        }
-      });
-
-      return result;
-    });
-  });
-
-  return parts;
-}
 type Section = {
   id: string;
   heading: string;
@@ -145,9 +87,9 @@ export default function ArticleContent({
         </h2>
 
         <p className="mt-4 text-lg text-slate-200 leading-8">
-          Whether you're travelling for business, tourism, airport transfers,
+          Whether you&apos;re travelling for business, tourism, airport transfers,
           family vacations or one-way travel, RentKA provides professional
-          chauffeur-driven vehicles across Pakistan with transparent pricing
+          cars with professional drivers across Pakistan with transparent pricing
           and responsive customer support.
         </p>
 

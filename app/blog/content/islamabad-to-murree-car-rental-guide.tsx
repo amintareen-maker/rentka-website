@@ -15,7 +15,7 @@ export const islamabadToMurreeCarRentalGuide = {
       </p>
 
       <p>
-        Many travellers prefer chauffeur-driven vehicles over driving
+        Many travellers prefer vehicles with professional drivers over driving
         themselves, especially during weekends, snowfall, holiday seasons, and
         periods of heavy tourist traffic. Professional drivers are familiar with
         the mountain roads, allowing passengers to enjoy the scenery without the
@@ -57,7 +57,7 @@ export const islamabadToMurreeCarRentalGuide = {
         <>
           Many visitors choose{" "}
           <Link href="/airport-car-rental-islamabad" className="text-[#5BAE4A] hover:underline">
-            chauffeur-driven transportation
+            transportation with a professional driver
           </Link>{" "}
           because mountain roads can become challenging during weekends,
           snowfall and busy tourist seasons. Professional drivers understand
@@ -152,7 +152,7 @@ export const islamabadToMurreeCarRentalGuide = {
 
     <>
       Winter snowfall can also affect road conditions. Professional
-      chauffeur-driven vehicles provide additional peace of mind because
+      vehicles with professional drivers provide additional peace of mind because
       experienced drivers are familiar with mountain roads and changing weather
       conditions.
     </>,
@@ -210,7 +210,7 @@ export const islamabadToMurreeCarRentalGuide = {
   heading: "Why Choose RentKA?",
   content: [
     <>
-      RentKA provides professional chauffeur-driven transportation between
+      RentKA provides professional transportation with a professional driver between
       Islamabad and Murree with transparent quotations, experienced drivers and
       responsive customer support.
     </>,
@@ -245,7 +245,7 @@ export const islamabadToMurreeCarRentalGuide = {
     </>,
 
     <>
-      Professional chauffeur-driven transportation allows you to enjoy the
+      Professional transportation with a professional driver allows you to enjoy the
       beautiful mountain scenery without worrying about driving, parking or
       changing weather conditions.
     </>,
@@ -271,9 +271,9 @@ export const islamabadToMurreeCarRentalGuide = {
         "Toyota Corolla is suitable for couples and small families, while BR-V, Prado and Hiace are ideal for larger groups or travellers needing additional comfort."
     },
     {
-      question: "Do you provide chauffeur-driven vehicles?",
+      question: "Do you provide vehicles with professional drivers?",
       answer:
-        "Yes. RentKA currently specialises in chauffeur-driven transportation."
+        "Yes. RentKA currently specialises in transportation with a professional driver."
     },
     {
       question: "Can I book a one-way trip to Murree?",
@@ -333,7 +333,7 @@ export const islamabadToMurreeCarRentalGuide = {
     {
       question: "Why choose RentKA?",
       answer:
-        "RentKA provides transparent quotations, experienced drivers and reliable chauffeur-driven transportation across Pakistan."
+        "RentKA provides transparent quotations, experienced drivers and reliable transportation with a professional driver across Pakistan."
     }
   ]
 };

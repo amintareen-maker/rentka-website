@@ -158,7 +158,7 @@ export const carRentalPricesIslamabadRawalpindi = {
   content: [
     <>
       While every quotation depends on your specific travel requirements, the
-      table below provides a general comparison of the most common chauffeur-driven
+      table below provides a general comparison of the most common car-with-driver
       vehicle categories available in Islamabad and Rawalpindi. Actual prices may
       vary depending on travel distance, duration, destination, season, and the
       services included in your booking.
@@ -290,7 +290,7 @@ export const carRentalPricesIslamabadRawalpindi = {
 
     <>
       Start by confirming whether fuel is included in the quotation. Some
-      chauffeur-driven packages include fuel, while others calculate charges
+      packages with drivers include fuel, while others calculate charges
       separately depending on the distance travelled or the destination.
     </>,
 
@@ -436,7 +436,7 @@ export const carRentalPricesIslamabadRawalpindi = {
   content: [
     <>
       Getting the best value doesn't always mean choosing the lowest quotation.
-      The right vehicle, a transparent quotation, and a reliable chauffeur-driven
+      The right vehicle, a transparent quotation, and a reliable car-and-driver
       service often provide a much better experience than selecting the cheapest
       available option. Focusing on overall value can help you avoid unnecessary
       costs and travel more comfortably.
@@ -509,7 +509,7 @@ export const carRentalPricesIslamabadRawalpindi = {
 },
 {
   id: "why-rentka",
-  heading: "Why Choose RentKA for Chauffeur-Driven Car Rental?",
+  heading: "Why Choose RentKA for car rental with driver?",
   content: [
     <>
       Choosing a car rental company isn't only about finding the lowest price.
@@ -525,7 +525,7 @@ export const carRentalPricesIslamabadRawalpindi = {
         href="/rent-a-car-islamabad"
         className="text-[#5BAE4A] hover:underline"
       >
-        chauffeur-driven car rental in Islamabad
+        car rental with driver in Islamabad
       </Link>{" "}
       and{" "}
       <Link
@@ -597,7 +597,7 @@ export const carRentalPricesIslamabadRawalpindi = {
 
       <ul className="mt-3 list-disc space-y-2 pl-6">
         <li>Transparent quotations with no hidden surprises.</li>
-        <li>Professional chauffeur-driven service.</li>
+        <li>Professional service with a professional driver.</li>
         <li>Wide selection of economy, executive, SUV, and group vehicles.</li>
         <li>Airport transfers, one-way trips, weddings, and corporate travel.</li>
         <li>Responsive customer support before and during your journey.</li>
@@ -623,7 +623,7 @@ export const carRentalPricesIslamabadRawalpindi = {
         href="/airport-car-rental-islamabad"
         className="text-[#5BAE4A] hover:underline"
       >
-        chauffeur-driven airport transfer
+        airport transfer with a professional driver
       </Link>
       , a{" "}
       <Link
@@ -660,7 +660,7 @@ export const carRentalPricesIslamabadRawalpindi = {
       >
         Rawalpindi
       </Link>
-      , RentKA provides transparent quotations, professional chauffeur-driven
+      , RentKA provides transparent quotations, professional driver
       services, airport transfers, one-way travel, and a wide range of vehicles
       for business, tourism, family travel, and corporate transportation across
       Pakistan.
@@ -674,13 +674,13 @@ faq: [
   {
   question: "How much does it cost to rent a car in Islamabad?",
   answer:
-    "Car rental prices depend on the type of vehicle, travel duration, destination, and whether your journey is within the city or outstation. Chauffeur-driven sedans generally cost less than SUVs, luxury vehicles, or larger vans. One-way journeys, airport transfers, and long-distance travel are quoted individually based on your travel requirements."
+    "Car rental prices depend on the type of vehicle, travel duration, destination, and whether your journey is within the city or outstation. sedan rentals with drivers generally cost less than SUVs, luxury vehicles, or larger vans. One-way journeys, airport transfers, and long-distance travel are quoted individually based on your travel requirements."
 },
 
 {
   question: "Can I rent a car with a driver in Islamabad and Rawalpindi?",
   answer:
-    "Yes. RentKA specializes in chauffeur-driven car rental services for airport transfers, business meetings, weddings, tourism, family travel, corporate transportation, and one-way trips across Pakistan."
+    "Yes. RentKA specializes in car rental with driver services for airport transfers, business meetings, weddings, tourism, family travel, corporate transportation, and one-way trips across Pakistan."
 },
 
 {
@@ -721,7 +721,7 @@ faq: [
 {
   question: "Can I book a vehicle for multiple days?",
   answer:
-    "Yes. RentKA provides daily, multi-day, and monthly chauffeur-driven rentals depending on your travel requirements."
+    "Yes. RentKA provides daily, multi-day, and monthly rentals with drivers depending on your travel requirements."
 },
 
 {
@@ -750,13 +750,13 @@ faq: [
 {
   question: "What documents are required for booking?",
   answer:
-    "Most chauffeur-driven bookings require basic contact information. Depending on the booking type, a CNIC, passport, or other identification may be requested."
+    "Most booking with a professional driver require basic contact information. Depending on the booking type, a CNIC, passport, or other identification may be requested."
 },
 
 {
   question: "Can tourists rent a car in Pakistan?",
   answer:
-    "Yes. Tourists visiting Pakistan frequently book chauffeur-driven transportation for airport transfers, sightseeing, northern tours, and intercity travel."
+    "Yes. Tourists visiting Pakistan frequently book transportation with a professional driver for airport transfers, sightseeing, northern tours, and intercity travel."
 },
 {
   question: "How early should I book a rental car?",
@@ -773,7 +773,7 @@ faq: [
 {
   question: "Do you offer monthly car rental?",
   answer:
-    "Yes. Monthly chauffeur-driven rentals are available for businesses, consultants, overseas Pakistanis, and customers requiring long-term transportation."
+    "Yes. Monthly rentals with drivers are available for businesses, consultants, overseas Pakistanis, and customers requiring long-term transportation."
 },
 
 {
@@ -785,7 +785,7 @@ faq: [
 {
   question: "Why should I choose RentKA?",
   answer:
-    "RentKA focuses on transparent pricing, professional chauffeur-driven services, airport transfers, one-way travel, corporate transportation, tourism, and reliable customer support across Islamabad, Rawalpindi, and many destinations throughout Pakistan."
+    "RentKA focuses on transparent pricing, professional service with a professional drivers, airport transfers, one-way travel, corporate transportation, tourism, and reliable customer support across Islamabad, Rawalpindi, and many destinations throughout Pakistan."
 },
   ],
 };

@@ -17,10 +17,10 @@ import type { Car } from "@/lib/useCars";
 
 export const metadata: Metadata = {
   title: { absolute:
-    "Rent a Car in Islamabad & Rawalpindi with Driver | Affordable Car Rental – RentKA",
+    "Car Rental with Driver Islamabad & Rawalpindi | RentKA",
   },
   description:
-    "Affordable car rental in Islamabad and Rawalpindi with driver. Book full-day city rides, airport transfers, and Murree trips. Verified drivers, transparent pricing, and reliable service.",
+    "Book car rental with driver in Islamabad and Rawalpindi for city travel, airport transfers, corporate transport and intercity trips with clear quotations.",
   keywords: [
     "rent a car islamabad",
     "rent a car rawalpindi",
@@ -35,13 +35,14 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:
-      "Rent a Car in Islamabad & Rawalpindi with Driver | RentKA",
+      "Car Rental with Driver Islamabad & Rawalpindi | RentKA",
     description:
-      "Book affordable with-driver car rental in Islamabad and Rawalpindi. Airport pickup, full-day city rides, and Murree trips available.",
+      "Book cars with professional drivers in Islamabad and Rawalpindi for airport, city, corporate and intercity travel.",
     url: "https://www.rentka.co",
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",
+    images: [{ url: "/hero-1.webp", alt: "Car rental with driver in Islamabad and Rawalpindi" }],
   },
 };
 
@@ -185,14 +186,17 @@ export default async function Page() {
         "@type": "Organization",
         "@id": ORGANIZATION_ID,
         name: "RentKA",
-        legalName: "RENTKA (SMC-PRIVATE) LIMITED",
+        legalName: "RentKA (SMC-PRIVATE) LIMITED",
+        description: "RentKA (SMC-PRIVATE) LIMITED is a professional car rental company with driver based in Islamabad, Pakistan. We provide airport transfers, car rental with driver, one-way intercity travel, corporate transportation, hotel transfers, monthly rentals, and professional driver services across Pakistan.",
         url: "https://www.rentka.co/",
         logo: { "@id": LOGO_ID },
         telephone: "+923020589999",
         email: "support@rentka.co",
         address: {
           "@type": "PostalAddress",
+          streetAddress: "Suite 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area",
           addressLocality: "Islamabad",
+          addressRegion: "Islamabad Capital Territory",
           addressCountry: "PK",
         },
         sameAs: [
@@ -207,13 +211,16 @@ export default async function Page() {
         "@type": "CarRental",
         "@id": LOCAL_BUSINESS_ID,
         name: "RentKA",
+        description: "Car rental with professional drivers for Islamabad, Rawalpindi, airport transfers and intercity travel across Pakistan.",
         url: "https://www.rentka.co/",
         image: { "@id": LOGO_ID },
         telephone: "+923020589999",
         parentOrganization: { "@id": ORGANIZATION_ID },
         address: {
           "@type": "PostalAddress",
+          streetAddress: "Suite 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area",
           addressLocality: "Islamabad",
+          addressRegion: "Islamabad Capital Territory",
           addressCountry: "PK",
         },
       },

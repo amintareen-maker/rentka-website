@@ -43,7 +43,7 @@ function matchesCategory(article: Article, group: string) {
       "one-way travel guide",
       "wedding transportation guide",
       "premium travel guide",
-      "chauffeur service guide",
+      "professional driver service guide",
       "family travel guide",
       "tourist transportation guide",
     ].includes(category);
@@ -262,7 +262,7 @@ export default function BlogHome() {
   const curatedSections = [
     {
       title: "Popular Intercity Routes",
-      description: "Plan comfortable chauffeur-driven journeys between Islamabad and major cities.",
+      description: "Plan comfortable journeys with a professional driver between Islamabad and major cities.",
       items: articles.filter((article) =>
         ["Intercity Travel Guide", "Road Trip Guide", "One-Way Travel Guide"].includes(article.category),
       ),
@@ -276,9 +276,9 @@ export default function BlogHome() {
     },
     {
       title: "Car Rental Services in Islamabad",
-      description: "Find the right chauffeur-driven service for work, family travel and special occasions.",
+      description: "Find the right car with driver for work, family travel and special occasions.",
       items: articles.filter((article) =>
-        ["Corporate Travel Guide", "Long-Term Rental Guide", "Wedding Transportation Guide", "Premium Travel Guide", "Chauffeur Service Guide", "Family Travel Guide"].includes(article.category),
+        ["Corporate Travel Guide", "Long-Term Rental Guide", "Wedding Transportation Guide", "Premium Travel Guide", "Professional Driver Service Guide", "Family Travel Guide"].includes(article.category),
       ),
     },
     {
@@ -307,7 +307,7 @@ export default function BlogHome() {
               Car Rental &amp; Travel Guides for Pakistan
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-              Helpful guidance for chauffeur-driven car rentals in Islamabad
+              Helpful guidance for car rental with driver in Islamabad
               and Rawalpindi, airport transfers, intercity journeys and
               unforgettable trips across northern Pakistan.
             </p>
@@ -342,7 +342,7 @@ export default function BlogHome() {
               <div className="relative aspect-[16/10] overflow-hidden rounded-[1.5rem] bg-[#E9F4E6]">
                 <Image
                   src="/blog/blog-cover1.webp"
-                  alt="RentKA chauffeur-driven car rental and travel guides"
+                  alt="RentKA car rental with driver and travel guides"
                   fill
                   sizes="(max-width: 1024px) 100vw, 48vw"
                   priority
@@ -393,7 +393,7 @@ export default function BlogHome() {
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
             Essential guidance for booking, airport pickups and one-way travel
-            with a professional chauffeur.
+            with a professional driver.
           </p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.35fr_0.85fr]">
@@ -474,7 +474,7 @@ export default function BlogHome() {
         <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
           <h2 className="text-2xl font-extrabold text-[#0F2B46]">All published guides</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Browse every RentKA travel and chauffeur-driven car rental guide.
+            Browse every RentKA travel and car rental with driver guide.
           </p>
           <ul className="mt-6 grid gap-x-8 gap-y-3 md:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
@@ -496,12 +496,12 @@ export default function BlogHome() {
           <div>
             <div className="inline-flex items-center gap-2 text-sm font-bold text-[#9AD08F]">
               <CarFront className="h-5 w-5" aria-hidden="true" />
-              Chauffeur-driven travel
+              Travel with a professional driver
             </div>
             <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">Planning your journey?</h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-slate-200">
-              Get a transparent quotation for chauffeur-driven airport
-              transfers, intercity travel, corporate transport and family trips.
+              Get a transparent quotation for airport transfers, intercity travel,
+              corporate transport and family trips with a professional driver.
             </p>
           </div>
           <div className="flex flex-col gap-3 md:items-end">

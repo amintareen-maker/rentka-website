@@ -93,7 +93,7 @@ export const oneWayCarRentalIslamabadGuide = {
 
       <>
         Compared with arranging multiple taxis or ride-hailing services over a
-        long distance, booking a professional chauffeur-driven vehicle provides
+        long distance, booking a professional vehicle with a professional driver provides
         greater comfort, predictable pricing and better luggage capacity.
       </>
     ],
@@ -279,7 +279,7 @@ export const oneWayCarRentalIslamabadGuide = {
     </>,
 
     <>
-      Chauffeur-driven transportation allows employees to continue working
+      transportation with a professional driver allows employees to continue working
       during the journey instead of driving themselves, making better use of
       travel time.
     </>,
@@ -387,7 +387,7 @@ export const oneWayCarRentalIslamabadGuide = {
   heading: "Why Choose RentKA",
   content: [
     <>
-      RentKA provides professional chauffeur-driven transportation throughout
+      RentKA provides professional transportation with a professional driver throughout
       Pakistan with transparent quotations and responsive customer support.
     </>,
 
@@ -441,7 +441,7 @@ export const oneWayCarRentalIslamabadGuide = {
     </>,
 
     <>
-      RentKA provides professional chauffeur-driven one-way transportation with
+      RentKA provides professional driver service, one-way transportation with
       transparent pricing and reliable customer support, helping passengers
       travel confidently throughout the country.
     </>
@@ -475,9 +475,9 @@ export const oneWayCarRentalIslamabadGuide = {
   },
 
   {
-    question: "Do you provide chauffeur-driven one-way trips?",
+    question: "Do you provide one-way trips with professional drivers?",
     answer:
-      "Yes. RentKA currently specialises in chauffeur-driven transportation."
+      "Yes. RentKA currently specialises in transportation with a professional driver."
   },
 
   {
@@ -537,7 +537,7 @@ export const oneWayCarRentalIslamabadGuide = {
   {
     question: "Why choose RentKA?",
     answer:
-      "RentKA provides transparent quotations, professional chauffeur-driven vehicles and responsive customer support throughout Pakistan."
+      "RentKA provides transparent quotations, professional vehicles with professional drivers and responsive customer support throughout Pakistan."
   }
 ]
 };

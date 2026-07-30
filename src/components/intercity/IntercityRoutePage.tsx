@@ -67,7 +67,7 @@ export default function IntercityRoutePage({ route }: Props) {
 
           <p className="mt-6 max-w-3xl text-xl leading-9 text-slate-300">
             Travel comfortably from <strong>{route.from}</strong> to{" "}
-            <strong>{route.to}</strong> with a professional chauffeur,
+            <strong>{route.to}</strong> with a professional driver,
             fuel included and transparent pricing.
           </p>
 
@@ -135,7 +135,7 @@ export default function IntercityRoutePage({ route }: Props) {
 
           <p className="mt-8 text-lg leading-9 text-slate-600">
 
-            Book a one-way chauffeur-driven car rental from{" "}
+            Book a one-way car rental with driver from{" "}
             <strong>{route.from}</strong> to{" "}
             <strong>{route.to}</strong>.
 
@@ -167,6 +167,24 @@ export default function IntercityRoutePage({ route }: Props) {
 
         </div>
 
+      </section>
+
+      <section className="bg-slate-50 py-16">
+        <div className="mx-auto max-w-5xl px-6">
+          <h2 className="text-3xl font-bold text-[#0F2B46]">
+            Planning pickup in {route.from} and arrival in {route.to}
+          </h2>
+          <p className="mt-6 text-lg leading-8 text-slate-600">
+            Share the exact pickup address in {route.from}, your preferred departure time,
+            passenger and luggage count, and the final drop-off point in {route.to}.
+            RentKA confirms the route, vehicle and included charges before the booking is reserved.
+          </p>
+          {route.seasonal && (
+            <p className="mt-4 text-lg leading-8 text-slate-600">
+              This route is seasonal, so road access and travel time should be reconfirmed close to departure.
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Related Routes */}
@@ -233,7 +251,7 @@ export default function IntercityRoutePage({ route }: Props) {
           <p>
             Compare vehicle options for your journey from our{" "}
             <Link href="/rent-a-car-islamabad" className="font-semibold text-[#347A2A] hover:underline">
-              Islamabad chauffeur-driven car rentals
+              Islamabad car rentals with driver
             </Link>{" "}
             or read the{" "}
             <Link href="/blog/one-way-car-rental-islamabad-guide" className="font-semibold text-[#347A2A] hover:underline">
