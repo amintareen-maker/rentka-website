@@ -164,8 +164,19 @@ const [dropPlaceId, setDropPlaceId] =
 
     submissionInProgress.current = true;
     setLoading(true);
-    const whatsappWindow = window.open("", "_blank");
-        try {
+    const whatsappTab = window.open("", "_blank");
+
+    try {
+      const formattedTravelDate = travelDate!.toLocaleDateString("en-GB");
+      const pickupMapLink =
+        pickupLat !== null && pickupLng !== null
+          ? `https://maps.google.com/?q=${pickupLat},${pickupLng}`
+          : "";
+      const dropMapLink =
+        dropLat !== null && dropLng !== null
+          ? `https://maps.google.com/?q=${dropLat},${dropLng}`
+          : "";
+
       const message = `
 Hi RentKA,
 
@@ -203,11 +214,7 @@ ${passengers}
 Travel Details
 
 Travel Date:
-${
-  travelDate
-    ? travelDate.toLocaleDateString("en-GB")
-    : ""
-}
+${formattedTravelDate}
 
 Pickup Time:
 ${pickupTime}
@@ -216,21 +223,13 @@ Pickup Address:
 ${pickupAddress}
 
 Pickup Google Maps:
-${
-  pickupLat && pickupLng
-    ? `https://maps.google.com/?q=${pickupLat},${pickupLng}`
-    : "Not available"
-}
+${pickupMapLink || "Not available"}
 
 Drop-off Address:
 ${dropAddress}
 
 Drop-off Google Maps:
-${
-  dropLat && dropLng
-    ? `https://maps.google.com/?q=${dropLat},${dropLng}`
-    : "Not available"
-}
+${dropMapLink || "Not available"}
 
 ━━━━━━━━━━━━━━
 
@@ -248,6 +247,33 @@ Thank you.
       const whatsappUrl = `https://wa.me/923020589999?text=${encodeURIComponent(
         message
       )}`;
+
+      const bookingPayload = {
+        tripType,
+        route: {
+          from: route.from,
+          to: route.to,
+          slug: route.slug || "",
+        },
+        vehicle,
+        price,
+        name: name.trim(),
+        phone: phone.trim(),
+        passengers,
+        travelDate: formattedTravelDate,
+        pickupTime,
+        pickupAddress: pickupAddress.trim(),
+        pickupLat,
+        pickupLng,
+        pickupPlaceId,
+        pickupMapLink,
+        dropAddress: dropAddress.trim(),
+        dropLat,
+        dropLng,
+        dropPlaceId,
+        dropMapLink,
+        notes: notes.trim(),
+      };
 
       const counterRef = doc(db, "meta", "counters");
       const leadNumber = await runTransaction(db, async (transaction) => {
@@ -317,8 +343,28 @@ Thank you.
       trackMetaPixel("Lead", trackingPayload);
       trackWhatsAppClick("one_way_drop");
 
-      if (whatsappWindow) {
-        whatsappWindow.location.href = whatsappUrl;
+      let emailSent = false;
+
+      try {
+        const emailResponse = await fetch("/api/intercity-booking", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(bookingPayload),
+        });
+
+        emailSent = emailResponse.ok;
+
+        if (!emailResponse.ok) {
+          console.error("Intercity booking email notification was not accepted.");
+        }
+      } catch (emailError) {
+        console.error("Intercity booking email request failed:", emailError);
+      }
+
+      if (whatsappTab) {
+        whatsappTab.location.href = whatsappUrl;
       } else {
         window.location.href = whatsappUrl;
       }
@@ -348,22 +394,37 @@ Thank you.
         console.error("Google Sheets lead sync failed:", sheetError);
       });
 
-      onClose();
+      if (emailSent) {
+        onClose();
 
-      setName("");
-      setPhone("");
-      setTravelDate(null);
-      setPickupTime("");
-      setPickupAddress("");
-      setDropAddress("");
-      setPassengers("1-2");
-      setNotes("");
-      setError(null);
+        setName("");
+        setPhone("");
+        setTravelDate(null);
+        setPickupTime("");
+
+        setPickupAddress("");
+        setPickupLat(null);
+        setPickupLng(null);
+        setPickupPlaceId("");
+
+        setDropAddress("");
+        setDropLat(null);
+        setDropLng(null);
+        setDropPlaceId("");
+
+        setPassengers("1-2");
+        setNotes("");
+        setError(null);
+      } else {
+        setError(
+          "Your WhatsApp booking is ready, but the email notification could not be sent."
+        );
+      }
     } catch (err) {
       console.error(err);
 
-      if (whatsappWindow && !whatsappWindow.closed) {
-        whatsappWindow.close();
+      if (whatsappTab && !whatsappTab.closed) {
+        whatsappTab.close();
       }
 
       setError(
