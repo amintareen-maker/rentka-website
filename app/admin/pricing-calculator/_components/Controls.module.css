@@ -1,0 +1,6 @@
+input.nativePickerBounds::-webkit-calendar-picker-indicator {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  inset: auto !important;
+}

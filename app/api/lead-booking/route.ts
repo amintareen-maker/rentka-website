@@ -317,7 +317,7 @@ export async function POST(request: Request) {
         <table style="width:100%;border-collapse:collapse;margin-bottom:26px;">${customerRows}</table>
 
         <h2 style="color:#0F2B46;font-size:18px;margin:0 0 10px;border-left:4px solid #5BAE4A;padding-left:10px;">Important Note</h2>
-        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;line-height:1.6;">Estimated rental only. Fuel, toll tax, parking, overtime, driver food and accommodation, and other applicable charges are excluded unless explicitly stated.</div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;line-height:1.6;">Estimated rental only. Charges do not include Fuel, toll tax, parking, overtime, driver food and accommodation, and other applicable charges are excluded unless explicitly stated.</div>
       </div>
       <div style="background:#e8f5e5;border-radius:0 0 18px 18px;padding:16px;text-align:center;color:#0F2B46;font-size:13px;">RentKA standard booking notification</div>
     </div>

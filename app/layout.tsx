@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import { Analytics } from "@vercel/analytics/react";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
 import WhatsAppTracking from "@/components/WhatsAppTracking";
+import { headers } from "next/headers";
 
 import type { Metadata } from "next";
 
@@ -29,14 +30,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const isInternalRoute = (await headers()).get("x-rentka-internal-route") === "1";
   return (
     <html lang="en">
       <head>
+        {!isInternalRoute && <>
         {/* Meta Pixel */}
 <Script id="meta-pixel" strategy="afterInteractive">
   {`
@@ -60,8 +63,9 @@ export default function RootLayout({
     fbq('track', 'PageView');
   `}
 </Script>
+        </>}
         {/* Google Tag Manager */}
-        <Script id="gtm-script" strategy="beforeInteractive">
+        {!isInternalRoute && <Script id="gtm-script" strategy="beforeInteractive">
           {`
             (function(w,d,s,l,i){w[l]=w[l]||[];
             w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
@@ -72,12 +76,12 @@ export default function RootLayout({
             f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','GTM-TFQKL6VZ');
           `}
-        </Script>
+        </Script>}
 
       </head>
 
-      <body className="antialiased bg-white text-slate-900 flex min-h-screen flex-col pt-10">
-        <noscript>
+      <body className={`antialiased bg-white text-slate-900 flex min-h-screen flex-col ${isInternalRoute ? "" : "pt-10"}`}>
+        {!isInternalRoute && <noscript>
   <img
     height="1"
     width="1"
@@ -85,31 +89,31 @@ export default function RootLayout({
     src="https://www.facebook.com/tr?id=2103048110620467&ev=PageView&noscript=1"
     alt=""
   />
-</noscript>
+        </noscript>}
         {/* Google Tag Manager (noscript) */}
-        <noscript>
+        {!isInternalRoute && <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-TFQKL6VZ"
             height="0"
             width="0"
             style={{ display: "none", visibility: "hidden" }}
           />
-        </noscript>
+        </noscript>}
 
         {/* Microsoft Clarity */}
-        <Script
+        {!isInternalRoute && <Script
           src="https://www.clarity.ms/tag/wjs72cq7ak"
           strategy="afterInteractive"
-        />
+        />}
 
-        <Header />
+        {!isInternalRoute && <Header />}
 
-        <WhatsAppWidget />
-        <WhatsAppTracking />
+        {!isInternalRoute && <WhatsAppWidget />}
+        {!isInternalRoute && <WhatsAppTracking />}
 
         <main className="flex-1">{children}</main>
 
-        <footer className="border-t bg-slate-50">
+        {!isInternalRoute && <footer className="border-t bg-slate-50">
           <div className="mx-auto max-w-7xl px-4 py-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="text-sm text-slate-600">
@@ -153,9 +157,9 @@ export default function RootLayout({
               </nav>
             </div>
           </div>
-        </footer>
+        </footer>}
 
-        <Analytics />
+        {!isInternalRoute && <Analytics />}
       </body>
     </html>
   );

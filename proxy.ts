@@ -11,13 +11,13 @@ const permanentRedirects: Record<string, string> = {
 export function proxy(request: NextRequest) {
   const destination = permanentRedirects[request.nextUrl.pathname];
 
-  if (!destination) {
-    return NextResponse.next();
-  }
+  if (destination) return NextResponse.redirect(new URL(destination, request.url), 308);
 
-  return NextResponse.redirect(new URL(destination, request.url), 308);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-rentka-internal-route", "1");
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
-  matcher: ["/rent-a-car/:path*", "/one-way-drop/:path*"],
+  matcher: ["/admin/:path*", "/rent-a-car/:path*", "/one-way-drop/:path*"],
 };
