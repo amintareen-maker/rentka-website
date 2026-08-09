@@ -9,11 +9,12 @@ import { Card,Field,input,Metric,Num,primary,secondary,Text } from "./Controls";
 import { PlaceInput,googleAutocompleteConfigured } from "./PlaceInput";
 import { stableRouteHash } from "../_lib/automatic-route";
 import type { AutomaticRouteRequest,AutomaticRouteResponse } from "../_lib/automatic-route";
+import { GooglePlacesProvider } from "./GooglePlacesProvider";
 const distanceLabels:Record<DistanceKey,string>={pickupOperational:"Origin to customer pickup KM",customerTrip:"Customer trip KM",outstation:"Outstation KM",driverReturn:"Driver return KM",buffer:"Buffer KM"};
 const expenseLabels={toll:"Toll",parking:"Parking",driverFood:"Driver food",driverAccommodation:"Driver accommodation",outstationSurcharge:"Outstation vehicle surcharge",miscellaneous:"Miscellaneous",operationalContingency:"Operational contingency",discount:"Discount"} as const;
 const routeShape=(item:TripPackage)=>JSON.stringify({stops:item.stops.map((stop)=>({id:stop.id,name:stop.name,enabled:stop.enabled,place:stop.place})),distances:item.distances,drivingMinutes:item.drivingMinutes});
 const outdate=(item:TripPackage):TripPackage=>item.automaticRoute?{...item,routeStatus:"outdated"}:item;
-export default function PricingCalculator({serverRoutesConfigured}:{serverRoutesConfigured:boolean}){
+function PricingCalculator({serverRoutesConfigured}:{serverRoutesConfigured:boolean}){
  const [state,setState]=useState<CalculatorState>(()=>createState());const [saved,setSaved]=useState<SavedQuotation[]>([]);const [saveName,setSaveName]=useState("");
  useEffect(()=>{const timer=window.setTimeout(()=>setSaved(readSaved()),0);return()=>clearTimeout(timer)},[]);
  const pkg=state.packages.find((p)=>p.id===state.activePackageId)??state.packages[0];const vehicle=state.vehiclePresets.find((v)=>v.id===state.trip.vehiclePresetId)??state.vehiclePresets[0];
@@ -57,4 +58,8 @@ export default function PricingCalculator({serverRoutesConfigured}:{serverRoutes
   <Card title="14. Customer quotation" action={<button className={primary} onClick={()=>copy(quote)}>Copy quotation</button>}><pre className="whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-6">{quote}</pre><button className={`${secondary} mt-3`} onClick={()=>copy(internalText)}>Copy internal costing</button></Card>
   <Card title="Save quotations"><div className="flex flex-col gap-2 sm:flex-row"><input className={input} value={saveName} onChange={(e)=>setSaveName(e.target.value)} placeholder="Quotation name"/><button className={primary} onClick={()=>{setSaved(persist(saveName,state));setSaveName("")}}>Save quotation</button><button className={secondary} onClick={()=>setState(createState())}>Reset</button></div><div className="mt-4 space-y-2">{saved.map((item)=><div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3"><div><b>{item.name}</b><div className="text-xs text-slate-500">{new Date(item.savedAt).toLocaleString("en-PK")}</div></div><div className="flex gap-2"><button className={secondary} onClick={()=>setState(item.state)}>Load</button><button className={secondary} onClick={()=>{const duplicate={...item.state};setState(duplicate)}}>Duplicate</button><button className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-700" onClick={()=>setSaved(removeSaved(item.id))}>Delete</button></div></div>)}</div></Card>
  </div></div>
+}
+
+export default function PricingCalculatorWithMaps(props:{serverRoutesConfigured:boolean}){
+ return <GooglePlacesProvider><PricingCalculator {...props}/></GooglePlacesProvider>;
 }
