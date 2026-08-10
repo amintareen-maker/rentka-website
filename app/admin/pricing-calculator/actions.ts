@@ -37,5 +37,12 @@ export async function logout() {
     path: "/",
     maxAge: 0,
   });
+  cookieStore.set(ADMIN_SESSION_COOKIE, "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/admin",
+    maxAge: 0,
+  });
   redirect("/admin/pricing-calculator");
 }
