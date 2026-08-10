@@ -22,7 +22,7 @@ export async function login(_state: LoginState, formData: FormData): Promise<Log
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    path: "/admin",
+    path: "/",
     maxAge: ADMIN_SESSION_MAX_AGE,
   });
   redirect("/admin/pricing-calculator");
@@ -34,7 +34,7 @@ export async function logout() {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    path: "/admin",
+    path: "/",
     maxAge: 0,
   });
   redirect("/admin/pricing-calculator");
