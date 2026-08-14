@@ -1,0 +1,7 @@
+"use server";
+import { revalidatePath } from "next/cache";
+import { hasAdminSession } from "../_lib/session";
+import { getAirportPricingConfig,saveAirportPricingConfig } from "@/lib/airport/config";
+
+const number=(form:FormData,key:string,min=0)=>Math.max(min,Number(form.get(key))||0);
+export async function saveAirportPricing(form:FormData){if(!(await hasAdminSession()))throw new Error("Unauthorized");const current=await getAirportPricingConfig();const vehicles=current.vehicles.map(v=>({...v,active:Boolean(form.get(`${v.id}.active`)),minimumFare:number(form,`${v.id}.minimumFare`),includedKm:number(form,`${v.id}.includedKm`),additionalKmRate:number(form,`${v.id}.additionalKmRate`),operationalKm:number(form,`${v.id}.operationalKm`),pickupAdjustment:number(form,`${v.id}.pickupAdjustment`),dropoffAdjustment:number(form,`${v.id}.dropoffAdjustment`),lateNightEnabled:Boolean(form.get(`${v.id}.lateNightEnabled`)),lateNightSurcharge:number(form,`${v.id}.lateNightSurcharge`),waitingAllowanceMinutes:number(form,`${v.id}.waitingAllowanceMinutes`),additionalWaitingRate:number(form,`${v.id}.additionalWaitingRate`),operationalAllowance:number(form,`${v.id}.operationalAllowance`),fuelIncluded:Boolean(form.get(`${v.id}.fuelIncluded`)),tollIncluded:Boolean(form.get(`${v.id}.tollIncluded`)),parkingIncluded:Boolean(form.get(`${v.id}.parkingIncluded`))}));await saveAirportPricingConfig({...current,quoteValidityMinutes:number(form,"quoteValidityMinutes",1),advancePercentage:Math.min(100,number(form,"advancePercentage")),vehicles});revalidatePath("/admin/airport-pricing")}

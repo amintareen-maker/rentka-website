@@ -5,6 +5,7 @@ import Link from "next/link";
 import Script from "next/script";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
+import AirportBookingEngine from "@/components/airport/AirportBookingEngine";
 
 export const metadata = {
   title: { absolute: "Islamabad Airport Transfer with Driver | RentKA" },
@@ -184,18 +185,18 @@ export default function IslamabadAirportTransferPage() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-7 md:mb-8">
 
               <a
-                href="https://wa.me/923020589999"
-                target="_blank"
+                href="#airport-booking"
                 className="bg-[#5BAE4A] hover:bg-[#4ca53d] text-white text-center px-6 md:px-7 py-3.5 md:py-4 rounded-2xl font-bold text-base md:text-lg transition duration-300 shadow-xl"
               >
-                WhatsApp Now
+                Calculate Exact Fare
               </a>
 
               <a
-                href="tel:+923020589999"
+                href="https://wa.me/923020589999"
+                target="_blank"
                 className="border border-white/20 bg-white/5 backdrop-blur text-center px-6 md:px-7 py-3.5 md:py-4 rounded-2xl font-semibold text-base md:text-lg hover:bg-white hover:text-[#0F2B46] transition duration-300"
               >
-                Call Now
+                WhatsApp Assistance
               </a>
 
             </div>
@@ -227,8 +228,7 @@ export default function IslamabadAirportTransferPage() {
           <div className="w-full">
 
             <a
-              href="https://wa.me/923020589999?text=Hi%20RentKA%2C%20I%20want%20to%20book%20Islamabad%20Airport%20Transfer."
-              target="_blank"
+              href="#airport-booking"
               className="group block bg-white text-[#0F2B46] rounded-[32px] p-6 md:p-9 shadow-[0_20px_70px_rgba(0,0,0,0.25)] hover:shadow-[0_25px_90px_rgba(0,0,0,0.35)] hover:-translate-y-1 transition duration-300"
             >
 
@@ -237,11 +237,11 @@ export default function IslamabadAirportTransferPage() {
                 <div>
 
                   <span className="text-[#5BAE4A] font-bold text-xs md:text-sm uppercase tracking-[2px]">
-                    Starting Rates
+                    Instant route-based quote
                   </span>
 
                   <h2 className="text-3xl md:text-5xl font-black leading-tight mt-3 tracking-[-1px]">
-                    Islamabad Airport Transfer
+                    See Your Exact Airport Fare
                   </h2>
 
                 </div>
@@ -252,67 +252,18 @@ export default function IslamabadAirportTransferPage() {
 
               </div>
 
-              <div className="space-y-5">
-
-                <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
-
-                  <span className="font-semibold text-base md:text-xl">
-                    Corolla
-                  </span>
-
-                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-                    From Rs 5,000
-                  </span>
-
-                </div>
-
-                <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
-
-                  <span className="font-semibold text-base md:text-xl">
-                    Honda Civic
-                  </span>
-
-                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-                    From Rs 7,000
-                  </span>
-
-                </div>
-
-                <div className="flex justify-between items-center gap-3 border-b border-gray-200 pb-4">
-
-                  <span className="font-semibold text-base md:text-xl">
-                    Honda BR-V
-                  </span>
-
-                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-                    From Rs 8,000
-                  </span>
-
-                </div>
-
-                <div className="flex justify-between items-center gap-3">
-
-                  <span className="font-semibold text-base md:text-xl">
-                    Prado
-                  </span>
-
-                  <span className="font-black text-[#5BAE4A] text-lg md:text-2xl whitespace-nowrap">
-                    From Rs 15,000
-                  </span>
-
-                </div>
-
-              </div>
+              <p className="rounded-2xl bg-slate-50 p-5 text-lg leading-relaxed text-slate-600">
+                Airport transfers from Rs 5,000. Calculate the exact fare for your route, travel time, luggage, and vehicle below.
+              </p>
 
               <div className="mt-7 flex items-center justify-between gap-4">
 
                 <p className="text-sm md:text-base text-gray-500 leading-relaxed">
-                  Airport transfer pricing may vary depending on route,
-                  timing, luggage requirements, and vehicle availability.
+                  Google route distance and current airport pricing determine the quotation shown before you submit.
                 </p>
 
                 <span className="hidden md:block text-sm font-semibold text-[#5BAE4A] whitespace-nowrap">
-                  Tap to Book
+                  Calculate fare
                 </span>
 
               </div>
@@ -321,6 +272,24 @@ export default function IslamabadAirportTransferPage() {
 
           </div>
 
+        </div>
+      </section>
+
+      <AirportBookingEngine />
+
+      <section className="bg-white px-4 py-16 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="max-w-4xl">
+            <span className="text-xs font-bold uppercase tracking-[2px] text-[#5BAE4A] md:text-sm">Islamabad Airport Pickup & Drop-off</span>
+            <h2 className="mt-4 text-3xl font-black leading-tight tracking-[-1px] text-[#0F2B46] md:text-5xl">Private Islamabad Airport Transfer Service, Day or Night</h2>
+            <p className="mt-6 text-base leading-8 text-slate-600 md:text-lg">RentKA provides an Islamabad Airport Pickup Service and Islamabad Airport Drop-off Service between Islamabad International Airport and homes, hotels, offices, embassies, hospitals, and destinations across Islamabad and Rawalpindi. The airport is also widely searched by travellers using the former Benazir Bhutto International Airport name. Whether you need an Islamabad to Airport Car Service or an Airport to City Transfer in Islamabad, the instant quote above explains the route-based fare before you submit.</p>
+          </div>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <article className="rounded-3xl border border-slate-200 p-6"><h3 className="text-xl font-black">24/7 airport taxi alternative</h3><p className="mt-3 leading-7 text-slate-600">Pre-book early-morning arrivals, late-night departures, or daytime travel with a private airport chauffeur in Islamabad. Flight details help RentKA coordinate timing and monitor schedule changes when operationally available.</p></article>
+            <article className="rounded-3xl border border-slate-200 p-6"><h3 className="text-xl font-black">Family, business and VIP transfers</h3><p className="mt-3 leading-7 text-slate-600">Choose a sedan for individual or business travel, a larger vehicle for families and luggage, or a premium option for executives and VIP guests. Drivers and vehicles are checked through RentKA&apos;s partner process, with professional coordination and luggage assistance.</p></article>
+            <article className="rounded-3xl border border-slate-200 p-6"><h3 className="text-xl font-black">Transparent fare and journey planning</h3><p className="mt-3 leading-7 text-slate-600">The calculator uses the Google route distance and the selected vehicle rules rather than presenting a generic taxi estimate. Typical travel between Islamabad city and the airport is often around 30 to 50 minutes, but traffic, exact location, weather, and security checks can change the journey time.</p></article>
+          </div>
+          <p className="mt-8 rounded-2xl bg-slate-50 p-5 leading-7 text-slate-600"><strong className="text-[#0F2B46]">What is included?</strong> Fuel and a professional driver are identified in each quotation. Any toll, parking, waiting, or timing-related item is shown with the selected vehicle so customers can compare fixed inclusions with route-dependent charges before requesting availability.</p>
         </div>
       </section>
 
@@ -481,38 +450,44 @@ export default function IslamabadAirportTransferPage() {
 
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
             {[
               {
                 number: "1",
-                title: "Share Details",
+                title: "Enter Trip Details",
                 description:
-                  "Send your travel date, pickup time, airport, and destination on WhatsApp.",
+                  "Choose pickup or drop-off, route, date, time, passengers, and luggage in the instant quote form.",
               },
               {
                 number: "2",
-                title: "Receive Quote",
+                title: "See Exact Fare",
                 description:
-                  "Our team shares vehicle options, pricing, and availability instantly.",
+                  "Review route distance, estimated travel time, vehicle options, and the calculated fare.",
               },
               {
                 number: "3",
-                title: "Reserve Booking",
+                title: "Choose Your Vehicle",
                 description:
-                  "Confirm your airport transfer with a 20% advance payment through JazzCash or bank transfer.",
+                  "Select the vehicle that fits your passenger and luggage requirements.",
               },
               {
                 number: "4",
-                title: "Driver Assigned",
+                title: "Submit Booking",
                 description:
-                  "Driver and vehicle details are shared before arrival for smooth coordination.",
+                  "Send your contact and optional flight details for RentKA to check availability.",
               },
               {
                 number: "5",
-                title: "Airport Pickup",
+                title: "Pay Advance",
                 description:
-                  "Enjoy a comfortable, safe, and professional airport transfer experience.",
+                  "After availability is confirmed, RentKA will share the advance payment instructions. Payment is not collected on this page yet.",
+              },
+              {
+                number: "6",
+                title: "Driver Assigned",
+                description:
+                  "Driver and vehicle details are shared before travel. WhatsApp remains available for assistance throughout.",
               },
             ].map((step, index) => (
               <div
