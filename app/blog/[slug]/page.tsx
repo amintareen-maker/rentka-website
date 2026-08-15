@@ -240,7 +240,7 @@ if (!articleContent) {
 
           {/* Article */}
 
-          <article className="rounded-3xl bg-white p-10 shadow">
+          <article className="min-w-0 rounded-3xl bg-white p-10 shadow">
 <ArticleContent
   introduction={articleContent.introduction}
   sections={articleContent.sections}

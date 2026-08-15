@@ -31,6 +31,7 @@ import { familyCarRentalIslamabad } from "./family-car-rental-islamabad";
 import { toyotaCorollaRentalIslamabadGuide } from "./toyota-corolla-rental-islamabad-guide";
 import { toyotaPradoRentalIslamabadGuide } from "./toyota-prado-rental-islamabad-guide";
 import { toyotaHiaceRentalIslamabadGuide } from "./toyota-hiace-rental-islamabad-guide";
+import { altoVsCorollaPakistan } from "./alto-vs-corolla-pakistan";
 
 export const articleContents = {
   "how-to-rent-a-car-in-islamabad-rawalpindi":
@@ -132,5 +133,8 @@ export const articleContents = {
 
   "toyota-hiace-rental-islamabad-guide":
     toyotaHiaceRentalIslamabadGuide,
+
+  "alto-vs-corolla-pakistan":
+    altoVsCorollaPakistan,
 
 };

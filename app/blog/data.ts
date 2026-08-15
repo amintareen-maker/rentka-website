@@ -2,6 +2,26 @@ import { Article } from "./types";
 
 export const articles: Article[] = [
   {
+    slug: "alto-vs-corolla-pakistan",
+    category: "Vehicle Comparison Guide",
+    title: "Suzuki Alto vs Toyota Corolla: Which Should You Rent in Pakistan?",
+    seoTitle: "Suzuki Alto vs Toyota Corolla for Rent in Pakistan | RentKA",
+    metaDescription: "Compare Alto and Corolla fuel economy, passenger space, luggage, city travel and long-distance comfort before choosing a rental car in Pakistan.",
+    description: "Compare Suzuki Alto and Toyota Corolla for fuel economy, passengers, luggage, city travel and longer journeys in Pakistan.",
+    keywords: [
+      "Suzuki Alto vs Toyota Corolla",
+      "Alto vs Corolla Pakistan",
+      "Alto or Corolla for long trip",
+      "Alto vs Corolla fuel average",
+      "car rental Islamabad",
+    ],
+    image: "/blog/alto-vs-corolla-pakistan.webp",
+    accent: "bg-[#E9F4E6] text-[#347A2A]",
+    author: "RentKA Editorial Team",
+    date: "2026-08-15",
+    readTime: "11 min read",
+  },
+  {
     slug: "how-to-rent-a-car-in-islamabad-rawalpindi",
 
     category: "Car Rental Guide",
