@@ -118,6 +118,28 @@ export function getAirportPricingCacheStatus() {
 export async function getAirportPricingConfig(): Promise<AirportPricingConfig> {
   return (await getAirportPricingConfigWithMeta()).config;
 }
+
+export type PublicAirportStartingFare = {
+  vehicleName: string;
+  startingFare: number;
+  passengers: number;
+  luggage: LuggageLevel;
+  fuelIncluded: boolean;
+};
+
+export async function getPublicAirportStartingFares(): Promise<PublicAirportStartingFare[]> {
+  const config = await getAirportPricingConfig();
+  return config.vehicles
+    .filter((vehicle) => vehicle.active)
+    .map((vehicle) => ({
+      vehicleName: vehicle.name,
+      startingFare: vehicle.minimumFare,
+      passengers: vehicle.passengers,
+      luggage: vehicle.luggage,
+      fuelIncluded: vehicle.fuelIncluded,
+    }));
+}
+
 export async function saveAirportPricingConfig(config: AirportPricingConfig) {
   const validated = validateAirportPricingConfig(config);
   await ref().set({ ...validated, version: validated.version + 1, updatedAt: new Date().toISOString() });
