@@ -104,6 +104,30 @@ export default function HeroBanner() {
 
 </div>
 
+<nav aria-label="RentKA services" className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-3">
+  <Link
+    href="/rent-a-car-islamabad"
+    className="inline-flex min-h-16 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 font-semibold text-[var(--rentka-blue)] shadow-sm transition hover:border-[var(--rentka-green)] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-green)]"
+  >
+    <span aria-hidden="true">🚗</span>
+    <span>Rent a Car</span>
+  </Link>
+  <Link
+    href="/airport-car-rental-islamabad"
+    className="inline-flex min-h-16 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 font-semibold text-[var(--rentka-blue)] shadow-sm transition hover:border-[var(--rentka-green)] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-green)]"
+  >
+    <span aria-hidden="true">✈️</span>
+    <span>Airport Transfer</span>
+  </Link>
+  <Link
+    href="/one-way-drop"
+    className="col-span-2 inline-flex min-h-16 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 font-semibold text-[var(--rentka-blue)] shadow-sm transition hover:border-[var(--rentka-green)] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-green)] lg:col-span-1 lg:justify-start"
+  >
+    <span aria-hidden="true">🛣️</span>
+    <span>One-Way Drop</span>
+  </Link>
+</nav>
+
 <div className="mt-6 flex flex-wrap gap-3 text-sm text-gray-600">
   <span>✔ Verified Vendors</span>
   <span>✔ SECP Registered</span>
