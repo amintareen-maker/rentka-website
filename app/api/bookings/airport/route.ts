@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { after, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { sendAirportBookingNotification, type AirportBookingNotification } from "@/lib/airport/notification";
+import { isValidAirportPhone, normalizeAirportPhone } from "@/lib/airport/phone";
 
 export const runtime = "nodejs";
 
@@ -12,9 +13,9 @@ export async function POST(request: Request) {
   try {
     const body = await request.json() as Record<string, unknown>;
     stage = "request_validation";
-    const phone = typeof body.phone === "string" ? body.phone.replace(/[\s-]/g, "") : "";
-    if (typeof body.quoteId !== "string" || typeof body.name !== "string" || body.name.trim().length < 2 || !/^((\+92)|0)?3\d{9}$/.test(phone)) {
-      return NextResponse.json({ error: "Enter your name and a valid Pakistani mobile number." }, { status: 400 });
+    const phone = normalizeAirportPhone(body.phone);
+    if (typeof body.quoteId !== "string" || typeof body.name !== "string" || body.name.trim().length < 2 || !isValidAirportPhone(phone)) {
+      return NextResponse.json({ error: "Enter your name and a valid phone / WhatsApp number." }, { status: 400 });
     }
     const customerName = body.name.trim();
 
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
         quoteId: body.quoteId as string,
         service: "airportTransfer",
         tripType: quote.tripType === "airportDropoff" ? "airportDropoff" : "airportPickup",
-        customer: { name: customerName, phone: String(body.phone), email: typeof body.email === "string" ? body.email.trim() : "" },
+        customer: { name: customerName, phone, email: typeof body.email === "string" ? body.email.trim() : "" },
         pickup: quote.pickup,
         destination: quote.destination,
         distanceKm: quote.distanceKm,
