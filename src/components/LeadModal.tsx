@@ -255,7 +255,7 @@ Customer Name: ${name.trim()}
 Phone: ${phone.trim()}
 Email: ${email.trim() || "Not provided"}
 
-Estimated rental only. Fuel, toll tax, parking, overtime, and additional charges are excluded unless stated otherwise.
+Quoted rental rate excludes fuel, toll tax, parking charges and overtime.
 
 Please confirm availability.
 `;

@@ -252,6 +252,7 @@ export default async function Page() {
     <HeroBanner />
     
       <HomePageClient initialCars={initialCars}>
+        <section className="border-b border-slate-200 bg-white"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-[var(--rentka-blue)]">Need a car in Lahore?</p><p className="mt-1 text-sm text-slate-600">View current Lahore cars and with-driver package prices.</p></div><Link href="/rent-a-car-lahore" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--rentka-green)] px-5 py-3 font-bold text-white">Explore Lahore Car Rental →</Link></div></section>
         <RouteGrid
           limit={6}
           showViewAll

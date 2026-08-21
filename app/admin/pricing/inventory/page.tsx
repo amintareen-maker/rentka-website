@@ -1,0 +1,36 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { hasAdminSession } from "../../_lib/session";
+import { createVendor, saveInventory } from "../actions";
+import { isOperatingZone, loadOperations, OPERATING_ZONES, type InventoryRow, type RateSet } from "../_lib/operations";
+
+export const metadata: Metadata = { title: "Normal Rental Operations | RentKA Admin", robots: { index: false, follow: false, noarchive: true } };
+const input = "mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-[#5BAE4A] focus:ring-2 focus:ring-[#5BAE4A]/20";
+const RateFields = ({ name, values }: { name: string; values?: RateSet }) => <div><h4 className="font-bold text-[#0F2B46]">{name === "withinCity" ? "Within City" : "Outstation"}</h4><div className="mt-2 grid gap-3 sm:grid-cols-3">{(["daily", "weekly", "monthly"] as const).map((duration) => <label key={duration} className="text-xs font-semibold capitalize text-slate-600">{duration}{duration === "daily" ? " *" : ""}<input className={input} name={`${name}.${duration}`} type="number" min="0" max="10000000" step="1" required={duration === "daily"} defaultValue={values?.[duration] ?? ""} /></label>)}</div></div>;
+
+function InventoryForm({ row, zoneId, models, vendors }: { row?: InventoryRow; zoneId: "twin_cities" | "lahore"; models: Awaited<ReturnType<typeof loadOperations>>["models"]; vendors: Awaited<ReturnType<typeof loadOperations>>["vendors"] }) {
+  const legacy = row?.source === "legacy";
+  return <form action={saveInventory} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <input type="hidden" name="zoneId" value={zoneId}/><input type="hidden" name="source" value={legacy ? "legacy" : "operations"}/><input type="hidden" name="inventoryId" value={row?.id ?? ""}/>
+    <div className="rounded-xl border border-[#0F2B46]/15 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wider text-slate-500">Current context</p><div className="mt-2 grid gap-2 text-sm font-bold text-[#0F2B46] sm:grid-cols-3"><p>City/Zone: {OPERATING_ZONES[zoneId].label}</p><p>Vehicle: {row?.modelName ?? "Select below"}</p><p>Vendor: {row?.vendorName ?? "Select below"}</p></div></div>
+    {legacy ? <><input type="hidden" name="modelKey" value={row.modelKey}/><input type="hidden" name="vendorId" value={row.vendorId}/></> : <div className="grid gap-4 md:grid-cols-2"><label className="text-sm font-semibold text-slate-700">Vehicle model<select name="modelKey" className={input} required defaultValue={row?.modelKey ?? ""}><option value="" disabled>Select an existing model</option>{models.map((model) => <option key={model.key} value={model.key}>{model.name}</option>)}</select></label><label className="text-sm font-semibold text-slate-700">Vendor<select name="vendorId" className={input} required defaultValue={row?.vendorId ?? ""}><option value="" disabled>Select a {OPERATING_ZONES[zoneId].label} vendor</option>{vendors.map((vendor) => <option key={`${vendor.source}-${vendor.id}`} value={vendor.id}>{vendor.name}</option>)}</select></label></div>}
+    <div className="grid gap-5 lg:grid-cols-2"><RateFields name="withinCity" values={row?.withinCity}/><RateFields name="outsideCity" values={row?.outsideCity}/></div>
+    {!legacy && <label className="block text-sm font-semibold text-slate-700">Optional image override<input name="imageOverride" type="url" placeholder="https://..." className={input} defaultValue={row?.imageOverride ?? ""}/><span className="mt-1 block text-xs font-normal text-slate-500">Leave blank to reuse the existing model image.</span></label>}
+    <div className="flex flex-wrap items-center justify-between gap-4"><label className="flex items-center gap-2 text-sm font-bold text-slate-700"><input name="active" type="checkbox" defaultChecked={row?.active ?? false}/>Active</label><button className="rounded-lg bg-[#5BAE4A] px-5 py-2.5 text-sm font-bold text-white">{row ? "Save changes" : "Create inventory record"}</button></div>
+  </form>;
+}
+
+export default async function InventoryPage({ searchParams }: { searchParams: Promise<{ zone?: string; saved?: string }> }) {
+  if (!(await hasAdminSession())) redirect("/admin/pricing-calculator");
+  const params = await searchParams;
+  if (!params.zone || !isOperatingZone(params.zone)) redirect("/admin/pricing");
+  const zoneId = params.zone;
+  const { models, vendors, inventory } = await loadOperations(zoneId);
+  return <main className="min-h-screen bg-slate-100 p-4 md:p-8"><div className="mx-auto max-w-6xl space-y-7">
+    <header><Link href="/admin/pricing" className="text-sm font-bold text-[#0F2B46] underline">← Pricing &amp; Operations</Link><p className="mt-5 text-sm font-bold uppercase tracking-widest text-[#5BAE4A]">Operating zone</p><h1 className="mt-1 text-3xl font-black text-[#0F2B46]">{OPERATING_ZONES[zoneId].label}</h1><p className="mt-2 text-slate-600">Vehicle, vendor and rate changes below apply only to this displayed zone.</p>{zoneId === "lahore" && <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900"><span>Private preparation area: these records are not read by the public website.</span><Link href="/admin/pricing/preview" className="rounded-lg bg-[#0F2B46] px-4 py-2 text-white">Preview Lahore Customer Flow</Link></div>}{params.saved && <p className="mt-3 rounded-lg border border-green-200 bg-green-50 p-3 text-sm font-semibold text-green-800">{params.saved}</p>}</header>
+    <section className="rounded-2xl border border-slate-200 bg-white p-5"><h2 className="text-xl font-black text-[#0F2B46]">Create zone vendor</h2><p className="mt-1 text-sm text-slate-600">The new vendor is explicitly scoped to {OPERATING_ZONES[zoneId].label}.</p><form action={createVendor} className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto]"><input type="hidden" name="zoneId" value={zoneId}/><label className="text-sm font-semibold text-slate-700">Vendor name<input name="name" required maxLength={120} className={input}/></label><label className="text-sm font-semibold text-slate-700">Phone (optional)<input name="phone" maxLength={40} className={input}/></label><button className="self-end rounded-lg bg-[#0F2B46] px-5 py-2.5 text-sm font-bold text-white">Create vendor</button></form></section>
+    <section><h2 className="text-2xl font-black text-[#0F2B46]">Add inventory</h2><p className="mt-1 text-sm text-slate-600">Models and their default images come from existing car records.</p><div className="mt-4"><InventoryForm zoneId={zoneId} models={models} vendors={vendors}/></div></section>
+    <section><h2 className="text-2xl font-black text-[#0F2B46]">Current inventory</h2><p className="mt-1 text-sm text-slate-600">{inventory.length} record{inventory.length === 1 ? "" : "s"} in this zone.</p><div className="mt-4 space-y-4">{inventory.map((row) => <InventoryForm key={`${row.source}-${row.id}`} row={row} zoneId={zoneId} models={models} vendors={vendors}/>)}{inventory.length === 0 && <p className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-slate-500">No inventory records yet.</p>}</div></section>
+  </div></main>;
+}

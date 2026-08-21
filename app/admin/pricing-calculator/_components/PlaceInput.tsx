@@ -26,9 +26,10 @@ interface PlaceInputProps {
   onTextChange: (value: string) => void;
   onSelect: (place: ResolvedPlace) => void;
   placeholder?: string;
+  selectionRequired?: boolean;
 }
 
-export function PlaceInput({ id, value, place, onTextChange, onSelect, placeholder }: PlaceInputProps) {
+export function PlaceInput({ id, value, place, onTextChange, onSelect, placeholder, selectionRequired = false }: PlaceInputProps) {
   const mapsLoader = useGooglePlacesLoader();
   const generatedId = useId();
   const statusId = `${id ?? generatedId}-status`;
@@ -70,6 +71,7 @@ export function PlaceInput({ id, value, place, onTextChange, onSelect, placehold
       value={value}
       placeholder={placeholder}
       autoComplete="off"
+      required={selectionRequired}
       onChange={(event) => {
         onTextChange(event.target.value);
         setPlaceError(false);
@@ -91,7 +93,7 @@ export function PlaceInput({ id, value, place, onTextChange, onSelect, placehold
         </Autocomplete>
       ) : textInput}
       {place && <span className="mt-1 block text-xs font-medium text-green-700">Resolved: {place.formattedAddress}</span>}
-      {searchStatus === "unavailable" && <span id={statusId} className="mt-1 block text-xs text-amber-700">Autocomplete unavailable — manual entry remains enabled.</span>}
+      {searchStatus === "unavailable" && <span id={statusId} className="mt-1 block text-xs text-amber-700">{selectionRequired ? "Google location selection is required, but autocomplete is unavailable." : "Autocomplete unavailable — manual entry remains enabled."}</span>}
       {searchStatus === "loading" && <span id={statusId} className="mt-1 block text-xs text-slate-500">Loading Places autocomplete…</span>}
       {searchStatus === "error" && <span id={statusId} className="mt-1 block text-xs text-red-700">Places search unavailable. Check the browser key, APIs, billing, and referrer restrictions.</span>}
     </div>

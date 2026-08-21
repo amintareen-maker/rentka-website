@@ -44,6 +44,7 @@ export default function Header() {
           <div className="hidden items-center gap-10 md:flex">
             <nav className="flex items-center gap-8 text-sm font-medium text-slate-700">
               <Link href="/rent-a-car-islamabad" className="transition hover:text-[var(--rentka-blue)]">Islamabad</Link>
+              <Link href="/rent-a-car-lahore" className="transition hover:text-[var(--rentka-blue)]">Lahore</Link>
               <Link href="/airport-car-rental-islamabad" className="transition hover:text-[var(--rentka-blue)]">Airport Transfer</Link>
               <Link href="/one-way-drop" className="transition hover:text-[var(--rentka-blue)]">One-Way Trips</Link>
               <Link href="/blog" className="transition hover:text-[var(--rentka-blue)]">Travel Guides</Link>
@@ -64,6 +65,7 @@ export default function Header() {
             {moreOpen && (
               <div id="mobile-more-menu" className="absolute right-0 top-full z-50 mt-1 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white p-2 shadow-xl">
                 <Link href="/rent-a-car-islamabad" onClick={() => setMoreOpen(false)} className="block rounded-lg px-4 py-3 hover:bg-slate-50 hover:text-[var(--rentka-blue)]">Islamabad &amp; Rawalpindi</Link>
+                <Link href="/rent-a-car-lahore" onClick={() => setMoreOpen(false)} className="block rounded-lg px-4 py-3 hover:bg-slate-50 hover:text-[var(--rentka-blue)]">Lahore Car Rental</Link>
                 <Link href="/blog" onClick={() => setMoreOpen(false)} className="block rounded-lg px-4 py-3 hover:bg-slate-50 hover:text-[var(--rentka-blue)]">Travel Guides</Link>
                 <Link href="/about" onClick={() => setMoreOpen(false)} className="block rounded-lg px-4 py-3 hover:bg-slate-50 hover:text-[var(--rentka-blue)]">About RentKA</Link>
                 <Link href="/contact" onClick={() => setMoreOpen(false)} className="block rounded-lg px-4 py-3 hover:bg-slate-50 hover:text-[var(--rentka-blue)]">Contact</Link>

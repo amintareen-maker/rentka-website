@@ -3,8 +3,10 @@ import type { MetadataRoute } from "next";
 import { articles } from "./blog/data";
 import { intercityRoutes } from "../src/data/intercityRoutes";
 import { SITE_URL, VEHICLE_CITIES, VEHICLE_MODELS, VEHICLE_SERVICE } from "../src/lib/seo";
+import { getEligibleLahoreModels } from "../src/lib/normal-rental/public-inventory";
+import { NORMAL_RENTAL_ZONES } from "../src/lib/normal-rental/zones";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
     { path: "/", priority: 1, changeFrequency: "weekly" as const },
     { path: "/rent-a-car-islamabad", priority: 0.9, changeFrequency: "weekly" as const },
@@ -32,6 +34,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
+  const lahoreModels = NORMAL_RENTAL_ZONES.lahore.publicEnabled ? await getEligibleLahoreModels() : [];
+  const lahorePages: MetadataRoute.Sitemap = NORMAL_RENTAL_ZONES.lahore.publicEnabled ? [
+    { url: `${SITE_URL}/rent-a-car-lahore`, changeFrequency: "weekly", priority: 0.9 },
+    ...lahoreModels.map((model) => ({
+      url: `${SITE_URL}/cars/${model.modelSlug}/lahore/${VEHICLE_SERVICE}`,
+      changeFrequency: "weekly" as const, priority: 0.8,
+    })),
+  ] : [];
+
   const routePages = intercityRoutes
     .filter((route) => route.active)
     .map((route) => ({
@@ -47,5 +58,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...vehiclePages, ...routePages, ...articlePages];
+  return [...staticPages, ...vehiclePages, ...lahorePages, ...routePages, ...articlePages];
 }

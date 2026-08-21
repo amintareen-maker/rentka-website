@@ -1,0 +1,36 @@
+.popper {
+  z-index: 80;
+  max-width: calc(100vw - 2rem);
+}
+
+.calendar {
+  max-width: calc(100vw - 2rem);
+  font-size: 0.9rem;
+}
+
+.calendar :global(.react-datepicker__month-container),
+.calendar :global(.react-datepicker__month) {
+  max-width: 100%;
+}
+
+:global(.pac-container) {
+  z-index: 100 !important;
+  max-width: calc(100vw - 2rem);
+  overflow-x: hidden;
+}
+
+:global(.pac-item) {
+  white-space: normal;
+}
+
+@media (max-width: 359px) {
+  .calendar {
+    font-size: 0.8rem;
+  }
+
+  .calendar :global(.react-datepicker__day),
+  .calendar :global(.react-datepicker__day-name) {
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+  }
+}

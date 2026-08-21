@@ -6,6 +6,9 @@ import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import LahoreBookingClient from "@/components/lahore/LahoreBookingClient";
+import { getEligibleLahoreModel, getEligibleLahoreModels, toPublicLahoreInventory } from "@/lib/normal-rental/public-inventory";
+import { getNormalRentalBookingContext, NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import {
   ORGANIZATION_ID,
@@ -33,6 +36,20 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: VehiclePageProps): Promise<Metadata> {
   const { slug, city, service } = await params;
+
+  if (city === "lahore") {
+    if (!NORMAL_RENTAL_ZONES.lahore.publicEnabled || service !== VEHICLE_SERVICE) return { robots: { index: false, follow: false } };
+    const model = await getEligibleLahoreModel(slug);
+    if (!model) return { robots: { index: false, follow: false } };
+    const url = `https://www.rentka.co/cars/${slug}/lahore/${service}`;
+    const pageTitle = `${model.modelName} with Driver in Lahore | RentKA`;
+    const pageDescription = `Rent ${model.modelName} with a professional driver in Lahore for city or Outstation travel. View current package prices and request availability with RentKA.`;
+    return {
+      title: { absolute: pageTitle }, description: pageDescription,
+      alternates: { canonical: url }, robots: { index: true, follow: true },
+      openGraph: { title: pageTitle, description: pageDescription, url, images: [{ url: model.inventory[0].imageURL || "/hero-car.png", alt: `${model.modelName} with driver in Lahore` }] },
+    };
+  }
 
   if (!isValidVehicleRoute(slug, city, service)) {
     return {
@@ -84,6 +101,40 @@ export default async function Page({
   params,
 }: VehiclePageProps) {
  const { slug, city, service } = await params;
+
+  if (city === "lahore") {
+    if (!NORMAL_RENTAL_ZONES.lahore.publicEnabled || service !== VEHICLE_SERVICE) notFound();
+    const [model, eligibleModels] = await Promise.all([getEligibleLahoreModel(slug), getEligibleLahoreModels()]);
+    if (!model) notFound();
+    const context = getNormalRentalBookingContext("lahore", "lahore");
+    const url = `https://www.rentka.co/cars/${model.modelSlug}/lahore/${VEHICLE_SERVICE}`;
+    const minimum = Math.min(...model.inventory.map((item) => item.pricing.withDriver.withinCity.daily ?? Infinity));
+    const related = eligibleModels.filter((item) => item.modelSlug !== model.modelSlug).slice(0, 3);
+    const breadcrumbItems = [
+      { name: "Home", href: "/" }, { name: "Rent a Car Lahore", href: "/rent-a-car-lahore" },
+      { name: `${model.modelName} With Driver`, href: `/cars/${model.modelSlug}/lahore/${VEHICLE_SERVICE}` },
+    ];
+    const faq = [
+      { question: `What is the price of ${model.modelName} with driver in Lahore?`, answer: `Current Lahore rental prices start from PKR ${minimum.toLocaleString("en-PK")} per day, subject to your selected package, travel details and availability.` },
+      { question: `Can I book ${model.modelName} for Outstation travel from Lahore?`, answer: "Yes. Choose Outstation in the booking form, select a Google-verified pickup and destination, and RentKA will confirm availability and final requirements." },
+    ];
+    const schemas = [
+      breadcrumbJsonLd(breadcrumbItems),
+      { "@context": "https://schema.org", "@type": "Service", name: `${model.modelName} with Driver in Lahore`, url, provider: { "@id": ORGANIZATION_ID }, areaServed: { "@type": "City", name: "Lahore" }, description: `With-driver ${model.modelName} rental for Within Lahore and Outstation travel.` },
+      { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })) },
+    ];
+    return <>
+      {schemas.map((schema, index) => <Script key={index} id={`lahore-car-schema-${index}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replaceAll("<", "\\u003c") }}/>) }
+      <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+        <Breadcrumbs items={breadcrumbItems}/>
+        <header className="mt-7 max-w-3xl"><p className="text-sm font-bold uppercase tracking-widest text-[var(--rentka-green)]">Lahore · Driver included</p><h1 className="mt-2 text-3xl font-extrabold capitalize text-[var(--rentka-blue)] sm:text-4xl">{model.modelName} with Driver in Lahore</h1><p className="mt-4 leading-7 text-slate-600">Choose a current Within Lahore or Outstation package, add your trip details and request availability from RentKA. Prices currently start from PKR {minimum.toLocaleString("en-PK")} per day.</p></header>
+        <section aria-labelledby="lahore-model-booking" className="mt-10"><h2 id="lahore-model-booking" className="mb-6 text-2xl font-extrabold text-[var(--rentka-blue)]">View Packages &amp; Request Booking</h2><LahoreBookingClient inventory={toPublicLahoreInventory(model.inventory)} context={{ cityLabel: context.cityLabel }} variant="prelaunch"/></section>
+        <section className="mt-14 grid gap-5 sm:grid-cols-2" aria-labelledby="lahore-model-travel"><h2 id="lahore-model-travel" className="sr-only">Lahore travel options</h2><article className="rounded-2xl bg-slate-50 p-6"><h3 className="text-xl font-bold text-[var(--rentka-blue)]">Within Lahore</h3><p className="mt-3 leading-7 text-slate-600">Request pickup for daily travel, appointments, business meetings, weddings or family commitments across Lahore.</p></article><article className="rounded-2xl bg-[var(--rentka-blue)] p-6 text-white"><h3 className="text-xl font-bold">Outstation From Lahore</h3><p className="mt-3 leading-7 text-slate-200">Select your Lahore pickup and destination, then RentKA will check the car and route requirements before confirmation.</p></article></section>
+        <section className="mt-14" aria-labelledby="lahore-model-faq"><h2 id="lahore-model-faq" className="text-2xl font-extrabold text-[var(--rentka-blue)]">Frequently Asked Questions</h2><div className="mt-5 space-y-5">{faq.map((item) => <article key={item.question}><h3 className="font-bold text-slate-900">{item.question}</h3><p className="mt-2 leading-7 text-slate-600">{item.answer}</p></article>)}</div></section>
+        {related.length > 0 && <section className="mt-14" aria-labelledby="related-lahore-cars"><h2 id="related-lahore-cars" className="text-xl font-bold text-[var(--rentka-blue)]">More Cars Available in Lahore</h2><div className="mt-5 flex flex-wrap gap-3">{related.map((item) => <Link key={item.modelSlug} href={`/cars/${item.modelSlug}/lahore/${VEHICLE_SERVICE}`} className="rounded-xl bg-slate-100 px-4 py-3 font-semibold hover:bg-slate-200">{item.modelName} with driver</Link>)}</div></section>}
+      </main>
+    </>;
+  }
 
   if (!isValidVehicleRoute(slug, city, service)) {
     notFound();

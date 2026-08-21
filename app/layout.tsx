@@ -130,6 +130,9 @@ export default async function RootLayout({
                 <Link href="/rent-a-car-rawalpindi" className="text-slate-600 hover:text-slate-900">
                   Rawalpindi Car Rental
                 </Link>
+                <Link href="/rent-a-car-lahore" className="text-slate-600 hover:text-slate-900">
+                  Lahore Car Rental
+                </Link>
                 <Link href="/airport-car-rental-islamabad" className="text-slate-600 hover:text-slate-900">
                   Airport Transfer
                 </Link>
