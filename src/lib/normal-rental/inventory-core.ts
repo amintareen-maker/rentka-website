@@ -142,3 +142,11 @@ export function groupNormalRentalInventoryCards(inventory: LahoreBookingInventor
   }
   return [...cards.values()];
 }
+
+export function shouldOpenInventoryComparison(card: NormalRentalInventoryCard) {
+  return !card.separate && card.options.length > 1;
+}
+
+export function normalRentalModelHref(item: Pick<NormalizedNormalRentalInventory, "modelSlug">) {
+  return `/cars/${item.modelSlug}/lahore/with-driver`;
+}

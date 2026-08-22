@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { groupNormalRentalInventoryCards, normalizeNormalRentalInventory } from "../src/lib/normal-rental/inventory-core.ts";
+import { groupNormalRentalInventoryCards, normalizeNormalRentalInventory, normalRentalModelHref, shouldOpenInventoryComparison } from "../src/lib/normal-rental/inventory-core.ts";
 import { getNormalRentalBookingContext, NORMAL_RENTAL_ZONES, resolveNormalRentalLeadCode } from "../src/lib/normal-rental/zones.ts";
 
 const rate = (within, outside) => ({ withDriver: { withinCity: { daily: within, weekly: within * 6 }, outsideCity: { daily: outside, monthly: outside * 25 } } });
@@ -58,6 +58,29 @@ test("separate inventory uses its explicit public label", () => {
   const inventory = [{ ...validLahore, data: { ...validLahore.data, showAsSeparateCard: true, publicLabel: "Corolla New Shape" } }];
   const cards = groupNormalRentalInventoryCards(resolveLahore({ inventory }));
   assert.equal(cards[0].label, "Corolla New Shape");
+});
+test("one grouped inventory option opens booking directly", () => {
+  const card = groupNormalRentalInventoryCards(resolveLahore())[0];
+  assert.equal(shouldOpenInventoryComparison(card), false);
+  assert.equal(card.options[0].inventoryId, "inventory-lhr");
+});
+test("multiple grouped inventory options open comparison and retain exact IDs", () => {
+  const first = resolveLahore()[0];
+  const card = groupNormalRentalInventoryCards([first, { ...first, inventoryId: "inventory-lhr-2", modelYearLabel: "2022–2024" }])[0];
+  assert.equal(shouldOpenInventoryComparison(card), true);
+  assert.deepEqual(card.options.map((item) => item.inventoryId), ["inventory-lhr", "inventory-lhr-2"]);
+});
+test("a separate inventory card always opens booking directly", () => {
+  const inventory = [{ ...validLahore, data: { ...validLahore.data, showAsSeparateCard: true } }];
+  const card = groupNormalRentalInventoryCards(resolveLahore({ inventory }))[0];
+  assert.equal(shouldOpenInventoryComparison(card), false);
+  assert.equal(card.options.length, 1);
+});
+test("inventory variants consolidate on their underlying model URL", () => {
+  const first = resolveLahore()[0];
+  const variant = { ...first, publicLabel: "Toyota Corolla New Shape", modelYearLabel: "2022 and Above", showAsSeparateCard: true };
+  assert.equal(normalRentalModelHref(first), "/cars/toyota-corolla/lahore/with-driver");
+  assert.equal(normalRentalModelHref(variant), "/cars/toyota-corolla/lahore/with-driver");
 });
 test("Lahore uses LHR normal-rental code and Twin Cities IDs remain unchanged", () => {
   const context = getNormalRentalBookingContext("lahore");
