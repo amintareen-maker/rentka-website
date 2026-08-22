@@ -74,7 +74,10 @@ export async function saveInventory(form: FormData) {
   if (imageOverride && !/^https:\/\//i.test(imageOverride)) throw new Error("Image override must be an HTTPS URL.");
   const modelYearLabel = required(form, "modelYearLabel");
   if (modelYearLabel.length > 40 || /[\u0000-\u001f\u007f]/.test(modelYearLabel)) throw new Error("Invalid model year / year range.");
-  await saveOperationsInventory({ id: idValue || undefined, zoneId, model, vendor, active, withinCity, outsideCity, imageOverride, modelYearLabel });
+  const showAsSeparateCard = form.get("showAsSeparateCard") === "on";
+  const publicLabel = typeof form.get("publicLabel") === "string" ? String(form.get("publicLabel")).trim() : "";
+  if (publicLabel.length > 120 || /[\u0000-\u001f\u007f]/.test(publicLabel)) throw new Error("Invalid public vehicle label.");
+  await saveOperationsInventory({ id: idValue || undefined, zoneId, model, vendor, active, withinCity, outsideCity, imageOverride, modelYearLabel, showAsSeparateCard, publicLabel });
   done(zoneId, idValue ? "Inventory updated" : "Inventory created");
 }
 

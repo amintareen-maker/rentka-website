@@ -43,6 +43,8 @@ export type InventoryRow = {
   imageURL: string;
   imageOverride: string;
   modelYearLabel: string;
+  showAsSeparateCard: boolean;
+  publicLabel: string;
   source: "legacy" | "operations";
 };
 
@@ -125,6 +127,8 @@ export async function loadOperations(zoneId: OperatingZoneId) {
         imageURL: text(data.imageURL),
         imageOverride: "",
         modelYearLabel: text(data.modelYearLabel),
+        showAsSeparateCard: false,
+        publicLabel: "",
         source: "legacy",
       });
     }
@@ -147,6 +151,8 @@ export async function loadOperations(zoneId: OperatingZoneId) {
       imageURL: model?.imageURL || "",
       imageOverride: text(data.imageOverride),
       modelYearLabel: text(data.modelYearLabel),
+      showAsSeparateCard: data.showAsSeparateCard === true,
+      publicLabel: text(data.publicLabel),
       source: "operations",
     });
   }
@@ -164,6 +170,7 @@ export async function createOperationsVendor(zoneId: OperatingZoneId, name: stri
 export async function saveOperationsInventory(input: {
   id?: string; zoneId: OperatingZoneId; model: ModelOption; vendor: VendorOption;
   active: boolean; withinCity: RateSet; outsideCity: RateSet; imageOverride: string; modelYearLabel: string;
+  showAsSeparateCard: boolean; publicLabel: string;
 }) {
   const db = getAdminDb();
   const collection = db.collection("normalRentalInventory");
@@ -185,6 +192,8 @@ export async function saveOperationsInventory(input: {
     pricing: { withDriver: { withinCity: input.withinCity, outsideCity: input.outsideCity } },
     imageOverride: input.imageOverride || null,
     modelYearLabel: input.modelYearLabel,
+    showAsSeparateCard: input.showAsSeparateCard,
+    publicLabel: input.publicLabel,
     updatedAt: FieldValue.serverTimestamp(),
     ...(!input.id ? { createdAt: FieldValue.serverTimestamp() } : {}),
   }, { merge: true });

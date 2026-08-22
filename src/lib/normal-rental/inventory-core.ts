@@ -21,12 +21,14 @@ export type NormalizedNormalRentalInventory = {
   transmission?: string;
   modelYear?: number;
   modelYearLabel?: string;
+  showAsSeparateCard: boolean;
+  publicLabel?: string;
   pricing: NormalRentalPricing;
 };
 
 export type LahoreBookingInventory = Pick<NormalizedNormalRentalInventory,
   "inventoryId" | "modelKey" | "modelName" | "modelSlug" | "imageURL" | "category" | "seatingCapacity" |
-  "transmission" | "modelYear" | "modelYearLabel" | "pricing"
+  "transmission" | "modelYear" | "modelYearLabel" | "showAsSeparateCard" | "publicLabel" | "pricing"
 > & Partial<Pick<NormalizedNormalRentalInventory, "vendorId" | "vendorName">>;
 
 export type ResolverDocument = { id: string; data: Record<string, unknown> };
@@ -81,6 +83,7 @@ export function normalizeNormalRentalInventory(input: ResolverInput): Normalized
         imageURL: text(car.data.imageURL), category: text(car.data.category) || undefined,
         seatingCapacity: text(car.data.seatingCapacity) || undefined, transmission: text(car.data.transmission) || undefined,
         modelYear: number(car.data.modelYear), modelYearLabel: text(car.data.modelYearLabel) || undefined,
+        showAsSeparateCard: false,
         pricing: resolvedPricing,
       }];
     });
@@ -110,7 +113,32 @@ export function normalizeNormalRentalInventory(input: ResolverInput): Normalized
       imageURL: override && validHttpsUrl(override) ? override : defaultImage,
       category: text(sourceCar.data.category) || undefined, seatingCapacity: text(sourceCar.data.seatingCapacity) || undefined,
       transmission: text(sourceCar.data.transmission) || undefined,
-      modelYearLabel: text(inventory.data.modelYearLabel) || undefined, pricing: resolvedPricing,
+      modelYearLabel: text(inventory.data.modelYearLabel) || undefined,
+      showAsSeparateCard: inventory.data.showAsSeparateCard === true,
+      publicLabel: text(inventory.data.publicLabel) || undefined, pricing: resolvedPricing,
     }];
   });
+}
+
+export type NormalRentalInventoryCard = {
+  key: string;
+  label: string;
+  separate: boolean;
+  options: LahoreBookingInventory[];
+};
+
+export function normalRentalPublicLabel(item: Pick<NormalizedNormalRentalInventory, "modelName" | "modelYearLabel" | "publicLabel">) {
+  return item.publicLabel || (item.modelYearLabel ? `${item.modelName} — ${item.modelYearLabel}` : item.modelName);
+}
+
+export function groupNormalRentalInventoryCards(inventory: LahoreBookingInventory[]): NormalRentalInventoryCard[] {
+  const cards = new Map<string, NormalRentalInventoryCard>();
+  for (const item of inventory) {
+    const separate = item.showAsSeparateCard === true;
+    const key = separate ? `inventory:${item.inventoryId}` : `model:${item.modelKey}`;
+    const current = cards.get(key);
+    if (current) current.options.push(item);
+    else cards.set(key, { key, label: separate ? normalRentalPublicLabel(item) : item.modelName, separate, options: [item] });
+  }
+  return [...cards.values()];
 }

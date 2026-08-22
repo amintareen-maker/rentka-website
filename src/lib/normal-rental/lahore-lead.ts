@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { resolveNormalRentalInventory } from "@/lib/normal-rental/inventory-resolver";
+import { normalRentalPublicLabel } from "@/lib/normal-rental/inventory-core";
 import { getNormalRentalBookingContext, resolveNormalRentalLeadCode } from "@/lib/normal-rental/zones";
 import { isValidPakistanPlace } from "@/lib/normal-rental/place-validation";
 import { publicLahoreOptionId } from "@/lib/normal-rental/public-inventory";
@@ -61,7 +62,9 @@ export async function createLahoreLead(request: Request, source: "admin_lahore_p
     transaction.update(counterRef, { leadCounter: next });
     transaction.create(leadRef, {
       leadId: generated, name: customerName, phone, email: email || null,
-      carName: selected.modelName, country: "PK", city: context.cityLabel, cityId: context.cityId,
+      carName: selected.modelName, inventoryId: selected.inventoryId,
+      publicVehicleLabel: selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : null,
+      country: "PK", city: context.cityLabel, cityId: context.cityId,
       zoneId: context.zoneId, cityCode, service: "withDriver", modelYear: selected.modelYearLabel ?? selected.modelYear ?? null,
       vendorName: selected.vendorName, vendorId: selected.vendorId, pricingType, duration, price: rate,
       pickupDate, preferredTime, pickupAddress, pickupLatitude, pickupLongitude, pickupPlaceId, pickupMapLink: mapsLink(pickupLatitude, pickupLongitude),

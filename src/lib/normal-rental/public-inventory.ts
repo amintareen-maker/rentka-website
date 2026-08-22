@@ -24,6 +24,7 @@ export function toPublicLahoreInventory(inventory: NormalizedNormalRentalInvento
     inventoryId: publicLahoreOptionId(item.inventoryId), modelKey: item.modelKey, modelName: item.modelName,
     modelSlug: item.modelSlug, imageURL: item.imageURL, category: item.category,
     seatingCapacity: item.seatingCapacity, transmission: item.transmission, modelYear: item.modelYear,
-    modelYearLabel: item.modelYearLabel, pricing: item.pricing,
+    modelYearLabel: item.modelYearLabel, showAsSeparateCard: item.showAsSeparateCard,
+    publicLabel: item.publicLabel, pricing: item.pricing,
   }));
 }

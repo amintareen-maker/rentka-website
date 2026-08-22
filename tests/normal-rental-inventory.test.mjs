@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeNormalRentalInventory } from "../src/lib/normal-rental/inventory-core.ts";
+import { groupNormalRentalInventoryCards, normalizeNormalRentalInventory } from "../src/lib/normal-rental/inventory-core.ts";
 import { getNormalRentalBookingContext, NORMAL_RENTAL_ZONES, resolveNormalRentalLeadCode } from "../src/lib/normal-rental/zones.ts";
 
 const rate = (within, outside) => ({ withDriver: { withinCity: { daily: within, weekly: within * 6 }, outsideCity: { daily: outside, monthly: outside * 25 } } });
@@ -37,6 +37,27 @@ test("Lahore model year belongs to the inventory record", () => {
 });
 test("Lahore inventory without a model year remains eligible", () => {
   assert.equal(resolveLahore()[0].modelYearLabel, undefined);
+});
+test("existing inventory defaults to grouped public cards", () => {
+  const first = resolveLahore()[0];
+  const cards = groupNormalRentalInventoryCards([first, { ...first, inventoryId: "inventory-lhr-2" }]);
+  assert.equal(first.showAsSeparateCard, false);
+  assert.equal(cards.length, 1);
+  assert.equal(cards[0].options.length, 2);
+});
+test("separate inventory gets its own card and public label fallback", () => {
+  const inventory = [{ ...validLahore, data: { ...validLahore.data, showAsSeparateCard: true, modelYearLabel: "2023 and Above" } }];
+  const first = resolveLahore({ inventory })[0];
+  const cards = groupNormalRentalInventoryCards([first]);
+  assert.equal(cards.length, 1);
+  assert.equal(cards[0].separate, true);
+  assert.equal(cards[0].label, "Toyota Corolla — 2023 and Above");
+  assert.equal(cards[0].options.length, 1);
+});
+test("separate inventory uses its explicit public label", () => {
+  const inventory = [{ ...validLahore, data: { ...validLahore.data, showAsSeparateCard: true, publicLabel: "Corolla New Shape" } }];
+  const cards = groupNormalRentalInventoryCards(resolveLahore({ inventory }));
+  assert.equal(cards[0].label, "Corolla New Shape");
 });
 test("Lahore uses LHR normal-rental code and Twin Cities IDs remain unchanged", () => {
   const context = getNormalRentalBookingContext("lahore");
