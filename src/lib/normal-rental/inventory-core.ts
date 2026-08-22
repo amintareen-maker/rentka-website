@@ -109,8 +109,8 @@ export function normalizeNormalRentalInventory(input: ResolverInput): Normalized
       vendorId, vendorName: text(vendor.name), active: true,
       imageURL: override && validHttpsUrl(override) ? override : defaultImage,
       category: text(sourceCar.data.category) || undefined, seatingCapacity: text(sourceCar.data.seatingCapacity) || undefined,
-      transmission: text(sourceCar.data.transmission) || undefined, modelYear: number(sourceCar.data.modelYear),
-      modelYearLabel: text(sourceCar.data.modelYearLabel) || undefined, pricing: resolvedPricing,
+      transmission: text(sourceCar.data.transmission) || undefined,
+      modelYearLabel: text(inventory.data.modelYearLabel) || undefined, pricing: resolvedPricing,
     }];
   });
 }

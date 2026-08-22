@@ -31,6 +31,13 @@ test("valid HTTPS image override wins", () => {
   assert.equal(resolveLahore({ inventory: [{ ...validLahore, data: { ...validLahore.data, imageOverride: override } }] })[0].imageURL, override);
 });
 test("Lahore pricing remains independent from legacy pricing", () => assert.equal(resolveLahore()[0].pricing.withDriver.outsideCity.daily, 9000));
+test("Lahore model year belongs to the inventory record", () => {
+  const inventory = [{ ...validLahore, data: { ...validLahore.data, modelYearLabel: "2022–2024" } }];
+  assert.equal(resolveLahore({ inventory })[0].modelYearLabel, "2022–2024");
+});
+test("Lahore inventory without a model year remains eligible", () => {
+  assert.equal(resolveLahore()[0].modelYearLabel, undefined);
+});
 test("Lahore uses LHR normal-rental code and Twin Cities IDs remain unchanged", () => {
   const context = getNormalRentalBookingContext("lahore");
   assert.equal(NORMAL_RENTAL_ZONES.lahore.publicEnabled, true); assert.equal(resolveNormalRentalLeadCode(context), "LHR");

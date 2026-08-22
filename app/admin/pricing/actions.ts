@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { hasAdminSession } from "../_lib/session";
 import {
-  createOperationsVendor, isOperatingZone, loadOperations, normalizeModelKey,
+  createOperationsVendor, deleteOperationsInventory, isOperatingZone, loadOperations, normalizeModelKey,
   saveOperationsInventory, updateLegacyInventory, type RateSet,
 } from "./_lib/operations";
 
@@ -72,6 +72,18 @@ export async function saveInventory(form: FormData) {
   if (idValue && !inventory.some((item) => item.id === idValue && item.source === "operations")) throw new Error("Invalid inventory record.");
   const imageOverride = typeof form.get("imageOverride") === "string" ? String(form.get("imageOverride")).trim() : "";
   if (imageOverride && !/^https:\/\//i.test(imageOverride)) throw new Error("Image override must be an HTTPS URL.");
-  await saveOperationsInventory({ id: idValue || undefined, zoneId, model, vendor, active, withinCity, outsideCity, imageOverride });
+  const modelYearLabel = required(form, "modelYearLabel");
+  if (modelYearLabel.length > 40 || /[\u0000-\u001f\u007f]/.test(modelYearLabel)) throw new Error("Invalid model year / year range.");
+  await saveOperationsInventory({ id: idValue || undefined, zoneId, model, vendor, active, withinCity, outsideCity, imageOverride, modelYearLabel });
   done(zoneId, idValue ? "Inventory updated" : "Inventory created");
+}
+
+export async function deleteInventory(form: FormData) {
+  if (!(await hasAdminSession())) throw new Error("Unauthorized");
+  const zoneId = zone(form);
+  const source = required(form, "source");
+  const id = required(form, "inventoryId");
+  if (source !== "operations") throw new Error("Only zone inventory records can be deleted here.");
+  await deleteOperationsInventory({ id, zoneId });
+  done(zoneId, "Inventory deleted");
 }

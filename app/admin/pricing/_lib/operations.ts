@@ -42,6 +42,7 @@ export type InventoryRow = {
   outsideCity: RateSet;
   imageURL: string;
   imageOverride: string;
+  modelYearLabel: string;
   source: "legacy" | "operations";
 };
 
@@ -123,6 +124,7 @@ export async function loadOperations(zoneId: OperatingZoneId) {
         outsideCity: rateSet(withDriver.outsideCity),
         imageURL: text(data.imageURL),
         imageOverride: "",
+        modelYearLabel: text(data.modelYearLabel),
         source: "legacy",
       });
     }
@@ -144,6 +146,7 @@ export async function loadOperations(zoneId: OperatingZoneId) {
       outsideCity: rateSet(withDriver.outsideCity),
       imageURL: model?.imageURL || "",
       imageOverride: text(data.imageOverride),
+      modelYearLabel: text(data.modelYearLabel),
       source: "operations",
     });
   }
@@ -160,7 +163,7 @@ export async function createOperationsVendor(zoneId: OperatingZoneId, name: stri
 
 export async function saveOperationsInventory(input: {
   id?: string; zoneId: OperatingZoneId; model: ModelOption; vendor: VendorOption;
-  active: boolean; withinCity: RateSet; outsideCity: RateSet; imageOverride: string;
+  active: boolean; withinCity: RateSet; outsideCity: RateSet; imageOverride: string; modelYearLabel: string;
 }) {
   const db = getAdminDb();
   const collection = db.collection("normalRentalInventory");
@@ -181,9 +184,21 @@ export async function saveOperationsInventory(input: {
     active: input.active,
     pricing: { withDriver: { withinCity: input.withinCity, outsideCity: input.outsideCity } },
     imageOverride: input.imageOverride || null,
+    modelYearLabel: input.modelYearLabel,
     updatedAt: FieldValue.serverTimestamp(),
     ...(!input.id ? { createdAt: FieldValue.serverTimestamp() } : {}),
   }, { merge: true });
+}
+
+export async function deleteOperationsInventory(input: { id: string; zoneId: OperatingZoneId }) {
+  const ref = getAdminDb().collection("normalRentalInventory").doc(input.id);
+  await getAdminDb().runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists || snapshot.data()?.zoneId !== input.zoneId) {
+      throw new Error("Inventory context does not match the selected zone.");
+    }
+    transaction.delete(ref);
+  });
 }
 
 export async function updateLegacyInventory(input: {
