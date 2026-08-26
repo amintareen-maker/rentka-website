@@ -3,6 +3,7 @@ import { after, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { sendAirportBookingNotification, type AirportBookingNotification } from "@/lib/airport/notification";
 import { isValidAirportPhone, normalizeAirportPhone } from "@/lib/airport/phone";
+import { attemptAutomaticOperationalIntake } from "@/lib/dispatch/automatic-intake";
 
 export const runtime = "nodejs";
 
@@ -80,6 +81,7 @@ export async function POST(request: Request) {
       return nextBooking;
     });
     const persistedAt = Date.now();
+    await attemptAutomaticOperationalIntake("airport", bookingRef.id);
     after(async () => {
       const emailStartedAt = Date.now();
       const emailSent = await sendAirportBookingNotification(booking);

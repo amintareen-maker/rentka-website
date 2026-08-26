@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { adminVehicleDetails } from "@/lib/normal-rental/lead-output";
 
 export const runtime = "nodejs";
 
@@ -10,6 +11,7 @@ type LeadBookingPayload = {
   vendorName: string | null;
   vendorId: string | null;
   modelYear: string | number | null;
+  publicVehicleLabel?: string | null;
   country: string | null;
   city: string;
   service: string;
@@ -56,6 +58,10 @@ function isNullableString(value: unknown): value is string | null {
   return value === null || isString(value);
 }
 
+function isOptionalNullableString(value: unknown): value is string | null | undefined {
+  return value === undefined || isNullableString(value);
+}
+
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
@@ -79,6 +85,7 @@ function isLeadBookingPayload(value: unknown): value is LeadBookingPayload {
     isNullableString(payload.vendorName) &&
     isNullableString(payload.vendorId) &&
     isStringNumberOrNull(payload.modelYear) &&
+    isOptionalNullableString(payload.publicVehicleLabel) &&
     isNullableString(payload.country) &&
     isString(payload.city) &&
     isString(payload.service) &&
@@ -217,14 +224,16 @@ export async function POST(request: Request) {
     ? payload.reviewLink
     : null;
   const dayLabel = `${payload.numberOfDays} ${payload.numberOfDays === 1 ? "Day" : "Days"}`;
+  const vehicle = adminVehicleDetails(payload);
 
   const bookingRows = [
     detailRow("Lead ID", display(payload.leadId)),
-    detailRow("Car", display(payload.carName)),
+    detailRow("Vehicle", display(vehicle.vehicle)),
+    ...(vehicle.baseModel ? [detailRow("Base Model", display(vehicle.baseModel))] : []),
     detailRow("Car ID", display(payload.carId)),
     detailRow("Vendor", display(payload.vendorName)),
     detailRow("Vendor ID", display(payload.vendorId)),
-    detailRow("Model", display(payload.modelYear)),
+    ...(vehicle.modelYear ? [detailRow("Model Year", display(vehicle.modelYear))] : []),
     detailRow("Country", display(payload.country)),
     detailRow("City", display(payload.city)),
     detailRow("Service", display(payload.service)),

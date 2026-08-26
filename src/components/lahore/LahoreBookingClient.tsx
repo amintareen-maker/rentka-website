@@ -9,6 +9,7 @@ import { PlaceInput } from "../../../app/admin/pricing-calculator/_components/Pl
 import type { ResolvedPlace } from "../../../app/admin/pricing-calculator/_lib/types";
 import { groupNormalRentalInventoryCards, normalRentalModelHref, normalRentalPublicLabel, shouldOpenInventoryComparison, type LahoreBookingInventory } from "@/lib/normal-rental/inventory-core";
 import { parseTestLeadResponse } from "@/lib/normal-rental/test-lead-response";
+import { formatLahoreWhatsAppVehicleLines } from "@/lib/normal-rental/lead-output";
 import type { NormalRentalBookingContext } from "@/lib/normal-rental/zones";
 import styles from "../../../app/admin/pricing/preview/PreviewClient.module.css";
 
@@ -147,7 +148,8 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
       committedLead = lead;
       setCreated(lead);
       const destination = packageType === "outsideCity" ? `\nTravelling To: ${payload.destinationAddress}` : "";
-      const message = `Hi RentKA\n\nI submitted a ${prelaunch ? "Lahore car rental request" : "private Lahore test request"}.\n\nBooking reference: *${lead.leadId}*\nCity: ${context.cityLabel}\nCar: ${selected.modelName}\nService: With Driver\nPackage: ${packageType} - ${duration}\nPickup: ${payload.pickupAddress}${destination}\nDate: ${payload.pickupDate}\nTime: ${payload.preferredTime}\nDays: ${payload.numberOfDays}\nDaily Rental: PKR ${lead.dailyRentalRate.toLocaleString("en-PK")}\nEstimated Rental: PKR ${lead.estimatedRentalAmount.toLocaleString("en-PK")}\n\nCustomer: ${payload.customerName}\nPhone: ${payload.phone}\nEmail: ${payload.email || "Not provided"}\n\nPlease confirm availability.`;
+      const vehicleLines = formatLahoreWhatsAppVehicleLines({ carName: selected.modelName, modelYear: selected.modelYearLabel ?? selected.modelYear, publicVehicleLabel: selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : selected.publicLabel, pricingType: packageType, duration, rate: currentRate });
+      const message = `Hi RentKA\n\nI submitted a ${prelaunch ? "Lahore car rental request" : "private Lahore test request"}.\n\nBooking reference: *${lead.leadId}*\nCity: ${context.cityLabel}\n${vehicleLines.join("\n")}\nRental Duration: ${duration}\nPickup: ${payload.pickupAddress}${destination}\nDate: ${payload.pickupDate}\nTime: ${payload.preferredTime}\nDays: ${payload.numberOfDays}\nEstimated Rental: PKR ${lead.estimatedRentalAmount.toLocaleString("en-PK")}\n\nCustomer: ${payload.customerName}\nPhone: ${payload.phone}\nEmail: ${payload.email || "Not provided"}\n\nPlease confirm availability.`;
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
 
@@ -155,7 +157,8 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
 
       const common = {
         leadId: lead.leadId, carName: selected.modelName, carId: selected.inventoryId, vendorName: selected.vendorName,
-        vendorId: selected.vendorId, modelYear: selected.modelYearLabel ?? selected.modelYear ?? null, country: "PK", city: context.cityLabel,
+        vendorId: selected.vendorId, modelYear: selected.modelYearLabel ?? selected.modelYear ?? null,
+        publicVehicleLabel: selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : null, country: "PK", city: context.cityLabel,
         service: "With Driver", pricingType: packageType, duration, originalPrice: currentRate,
         dailyRentalRate: lead.dailyRentalRate, numberOfDays: payload.numberOfDays, estimatedRentalAmount: lead.estimatedRentalAmount,
         pickupDate: payload.pickupDate, preferredTime: payload.preferredTime, pickupAddress: payload.pickupAddress,
@@ -170,7 +173,7 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
       };
       const sheetPayload = {
         leadId: lead.leadId, name: payload.customerName, phone: payload.phone, email: payload.email, carName: selected.modelName,
-        vendorName: selected.vendorName, vendorId: selected.vendorId, modelYear: String(common.modelYear ?? ""), country: "PK",
+        vendorName: selected.vendorName, vendorId: selected.vendorId, modelYear: String(common.modelYear ?? ""), publicVehicleLabel: common.publicVehicleLabel ?? "", country: "PK",
         city: context.cityLabel, service: "withDriver", serviceType: packageType, packageName: packageType, packageDuration: duration,
         packagePrice: String(currentRate), pickupDate: payload.pickupDate, preferredTime: payload.preferredTime,
         source: payload.source, status: "new", pickupAddress: payload.pickupAddress,

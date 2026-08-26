@@ -1,0 +1,21 @@
+import type { NormalRentalZoneId } from "../normal-rental/zones";
+import type { AuditActor } from "./types";
+
+export const OPERATIONAL_SOURCE_TYPES = ["twin_cities_normal","lahore_normal","one_way_drop","airport","ta_connections","manual"] as const;
+export const MANUAL_SOURCE_TYPES = ["phone","whatsapp","corporate","walk_in","other"] as const;
+export const MANUAL_SERVICE_TYPES = ["with_driver","outstation","airport_transfer","one_way_drop","monthly_rental","wedding_car"] as const;
+export const DEFAULT_MANUAL_SERVICE="with_driver" as const;
+export const MANUAL_SERVICE_LABELS:Record<typeof MANUAL_SERVICE_TYPES[number],string>={with_driver:"With Driver",outstation:"Outstation",airport_transfer:"Airport Transfer",one_way_drop:"One-Way Drop",monthly_rental:"Monthly Rental",wedding_car:"Wedding Car"};
+export const MANUAL_DESTINATION_REQUIRED = ["outstation","airport_transfer","one_way_drop"] as const;
+export const MANUAL_TIME_VALUES=Array.from({length:48},(_,index)=>`${String(Math.floor(index/2)).padStart(2,"0")}:${index%2?"30":"00"}`);
+export const PAYMENT_STATUSES = ["awaiting","partial","sufficient","waived_or_credit"] as const;
+export const PAYOUT_STATUSES = ["pending","reviewed"] as const;
+export const READINESS_STATUSES = ["awaiting_advance","advance_recorded","needs_vendor_payout","override_approved","ready_for_dispatch","cancelled"] as const;
+export type OperationalSourceType=typeof OPERATIONAL_SOURCE_TYPES[number]; export type ManualSourceType=typeof MANUAL_SOURCE_TYPES[number];
+export type ManualServiceType=typeof MANUAL_SERVICE_TYPES[number];
+export type PaymentStatus=typeof PAYMENT_STATUSES[number]; export type PayoutStatus=typeof PAYOUT_STATUSES[number]; export type ReadinessStatus=typeof READINESS_STATUSES[number];
+export type MoneySnapshot={customerTotalMinor:number;originalCustomerTotalMinor:number;customerDiscountTotalMinor:number;finalCustomerTotalMinor:number;advancePercentage?:number;requiredAdvanceMinor:number;receivedAmountMinor:number;balanceMinor:number;refundCreditDueMinor:number;paymentStatus:PaymentStatus};
+export type OperationalLocation={address:string;placeId:string;lat:number;lng:number;mapLink:string};
+export type OperationalBooking={id:string;bookingId:string;source:{type:OperationalSourceType;collection:string;documentId:string;key:string;manualChannel?:ManualSourceType};sourceSnapshot:Record<string,unknown>;zoneId:NormalRentalZoneId;serviceType:string;customer:{name:string;phone:string;email?:string};itinerary:{travelDate:string;pickupTime:string;pickup:string;pickupLocation?:OperationalLocation;destinationOrUsage?:string;destinationLocation?:OperationalLocation;notes?:string};requestedVehicle:{categoryOrModel:string;vehicleSnapshot?:Record<string,unknown>;passengers?:number};customerFinancials:MoneySnapshot;internalFinancials:{vendorPayoutMinor?:number;payoutStatus:PayoutStatus;payoutNotes?:string;reviewedAt?:string;reviewedBy?:AuditActor};lifecycle:"active"|"cancelled"|"not_proceeding";readinessStatus:ReadinessStatus;paymentOverride?:{approved:boolean;reason:string;approvedAt:string;approvedBy:AuditActor};responsibilities?:Record<string,unknown>;createdAt:string;updatedAt:string;createdBy:AuditActor;updatedBy:AuditActor};
+export type OperationalEventType="operational_booking_created"|"source_booking_normalized"|"payment_recorded"|"customer_discount_applied"|"vendor_payout_reviewed"|"payment_override_approved"|"booking_cancelled"|"readiness_changed";
+export type OperationalEvent={type:OperationalEventType;timestamp:unknown;actor:AuditActor;metadata?:Record<string,unknown>};

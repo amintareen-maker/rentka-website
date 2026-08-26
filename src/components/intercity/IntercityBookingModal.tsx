@@ -30,6 +30,7 @@ import {
   trackMetaPixel,
   trackWhatsAppClick,
 } from "@/lib/tracking";
+import { requestAutomaticDispatchIntake } from "@/lib/dispatch/automatic-intake-client";
 
 const SHEETS_WEBHOOK =
   "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
@@ -291,7 +292,7 @@ Thank you.
       const travelDateValue = travelDate!.toISOString();
       const value = typeof price === "number" && price > 0 ? price : 1;
 
-      await addDoc(collection(db, "leads"), {
+      const sourceDocument = await addDoc(collection(db, "leads"), {
         leadId,
         name: name.trim(),
         phone: phone.trim(),
@@ -316,6 +317,12 @@ Thank you.
         source: "one_way_drop",
         status: "new",
         createdAt: serverTimestamp(),
+      });
+
+      await requestAutomaticDispatchIntake({
+        sourceType: "one_way_drop",
+        sourceDocumentId: sourceDocument.id,
+        bookingId: leadId,
       });
 
       const trackingPayload = {

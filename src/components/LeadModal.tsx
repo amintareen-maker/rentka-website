@@ -18,6 +18,7 @@ import {
   trackMetaPixel,
   trackWhatsAppClick,
 } from "@/lib/tracking";
+import { requestAutomaticDispatchIntake } from "@/lib/dispatch/automatic-intake-client";
 
 const WHATSAPP_NUMBER = "923020589999";
 const GOOGLE_MAP_LIBRARIES: "places"[] = ["places"];
@@ -298,6 +299,12 @@ Please confirm availability.
         reviewSent: false,
         reviewToken,
         createdAt: serverTimestamp(),
+      });
+
+      await requestAutomaticDispatchIntake({
+        sourceType: "twin_cities_normal",
+        sourceDocumentId: docRef.id,
+        bookingId: leadId,
       });
 
       const reviewLink = `https://www.rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;

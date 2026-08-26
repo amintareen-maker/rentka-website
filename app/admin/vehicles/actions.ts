@@ -1,0 +1,4 @@
+"use server";
+import { revalidatePath } from "next/cache"; import { redirect } from "next/navigation";
+import { hasAdminSession } from "../_lib/session"; import { parseVehicleForm } from "@/lib/dispatch/validation"; import { saveDispatchVehicle } from "@/lib/dispatch/vehicles";
+export async function saveVehicle(form: FormData) { if (!(await hasAdminSession())) throw new Error("Unauthorized"); const id=String(form.get("id")??"").trim()||undefined; try { await saveDispatchVehicle(id,parseVehicleForm(form)); } catch(error){redirect(`/admin/vehicles?${id?`edit=${encodeURIComponent(id)}&`:""}error=${encodeURIComponent(error instanceof Error?error.message:"Unable to save vehicle.")}`)} revalidatePath("/admin/vehicles"); revalidatePath("/admin/vendors"); redirect("/admin/vehicles?saved=Vehicle saved"); }
