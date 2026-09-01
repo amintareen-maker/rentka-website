@@ -12,6 +12,8 @@ export type DriverStatus = typeof DRIVER_STATUSES[number];
 export type DocumentationState = typeof DOCUMENTATION_STATES[number];
 export type CheckState = typeof CHECK_STATES[number];
 export type AuditActor = { type: "shared_admin_session" };
+export const DRIVER_VEHICLE_ELIGIBILITY_MODES=["any_vendor_vehicle","specific_vehicles","models_or_categories"] as const;
+export type DriverVehicleEligibility={mode:typeof DRIVER_VEHICLE_ELIGIBILITY_MODES[number];vehicleIds?:string[];allowedModelsOrCategories?:string[]};
 
 export type DispatchVendor = {
   id: string; name: string; contactName?: string; primaryPhone: string; primaryPhoneNormalized: string;
@@ -43,5 +45,6 @@ export type DispatchDriver = {
   id: string; name: string; mobileNumber: string; mobileNumberNormalized: string; whatsappNumber: string;
   whatsappNumberNormalized: string; vendorId: string; zoneIds: NormalRentalZoneId[]; priority: DispatchPriority;
   status: DriverStatus; active: boolean; notes?: string; documentation: DriverDocumentation;
+  vehicleEligibility?: DriverVehicleEligibility;
   createdAt: string; updatedAt: string; createdBy: AuditActor; updatedBy: AuditActor;
 };

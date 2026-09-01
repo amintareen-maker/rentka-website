@@ -54,7 +54,7 @@ export async function saveDispatchVehicle(id: string | undefined, input: Vehicle
 }
 
 export async function saveDispatchDriver(id: string | undefined, input: DriverInput) {
-  await requireVendor(input.vendorId, input.zoneIds);
+  await requireVendor(input.vendorId, input.zoneIds);const eligibility=input.vehicleEligibility;if(eligibility?.mode==="specific_vehicles"){const ids=eligibility.vehicleIds??[];const docs=await Promise.all(ids.map(vehicleId=>getAdminDb().collection(DISPATCH_COLLECTIONS.vehicles).doc(vehicleId).get()));if(docs.some(doc=>!doc.exists||doc.data()?.vendorId!==input.vendorId))throw new Error("Every permitted vehicle must belong to the selected vendor.");}if(eligibility?.mode==="models_or_categories"){const vendorVehicles=await getAdminDb().collection(DISPATCH_COLLECTIONS.vehicles).where("vendorId","==",input.vendorId).get(),allowed=new Set(vendorVehicles.docs.flatMap(doc=>{const data=doc.data();return[`model:${String(data.make??"").trim()} ${String(data.model??"").trim()}`.toLowerCase(),`category:${String(data.category??"").trim()}`.toLowerCase()]}));if((eligibility.allowedModelsOrCategories??[]).some(value=>!allowed.has(value.toLowerCase())))throw new Error("Every permitted model/category must exist in the selected vendor fleet.");}
   const collection = getAdminDb().collection(DISPATCH_COLLECTIONS.drivers); const ref = id ? collection.doc(id) : collection.doc();
   const current = id ? await ref.get() : null;
   if (id && !current?.exists) throw new Error("Driver not found.");

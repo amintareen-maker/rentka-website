@@ -1,0 +1,3 @@
+import type { Metadata } from "next";import PartnerApplicationForm from "./PartnerApplicationForm";
+export const metadata:Metadata={title:"Partner with RentKA",description:"Apply to join RentKA as a driver, owner-driver or fleet partner.",robots:{index:true,follow:true}};
+export default function Page(){return <main className="min-h-screen bg-slate-50 px-4 py-8"><div className="mx-auto max-w-2xl"><header className="mb-6 text-center"><p className="text-sm font-black uppercase tracking-[.2em] text-[#5BAE4A]">RentKA Partners</p><h1 className="mt-2 text-3xl font-black text-[#0F2B46]">Partner with RentKA</h1><p className="mt-2 text-slate-600">A practical, secure application for drivers and fleet partners.</p></header><PartnerApplicationForm/></div></main>}
