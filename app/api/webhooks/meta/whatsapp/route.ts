@@ -1,0 +1,10 @@
+import { NextResponse } from "next/server";
+import { getMetaWhatsAppConfig } from "@/lib/messaging/meta-whatsapp-config";
+import { parseMetaWhatsAppStatusEvents,verifyMetaWebhookChallenge,verifyMetaWebhookSignature } from "@/lib/messaging/meta-whatsapp-webhook";
+import { persistMetaWhatsAppStatusEvents } from "@/lib/messaging/meta-whatsapp-webhook-repository";
+
+export const runtime="nodejs";
+export const dynamic="force-dynamic";
+
+export async function GET(request:Request){const url=new URL(request.url),config=getMetaWhatsAppConfig(),mode=url.searchParams.get("hub.mode"),token=url.searchParams.get("hub.verify_token"),challenge=url.searchParams.get("hub.challenge");if(!config.webhookVerifyToken)return new NextResponse("Webhook verification is not configured.",{status:503});if(!verifyMetaWebhookChallenge({mode,token,challenge,expectedToken:config.webhookVerifyToken}))return new NextResponse("Forbidden",{status:403});return new NextResponse(challenge,{status:200,headers:{"Content-Type":"text/plain; charset=utf-8","Cache-Control":"no-store"}})}
+export async function POST(request:Request){const rawBody=await request.text(),config=getMetaWhatsAppConfig(),signature=request.headers.get("x-hub-signature-256");if(!config.appSecret)return NextResponse.json({ok:false,error:"Webhook signature verification is not configured."},{status:503});if(!verifyMetaWebhookSignature(rawBody,signature,config.appSecret))return NextResponse.json({ok:false,error:"Invalid signature."},{status:403});let payload:unknown;try{payload=JSON.parse(rawBody)}catch{return NextResponse.json({ok:false,error:"Malformed webhook payload."},{status:400})}const events=parseMetaWhatsAppStatusEvents(payload);if(!events.length)return NextResponse.json({ok:true,ignored:true},{status:200});try{const result=await persistMetaWhatsAppStatusEvents(events);return NextResponse.json({ok:true,...result},{status:200})}catch(error){console.error("Meta WhatsApp webhook persistence failed.",error instanceof Error?error.message:"Unknown error");return NextResponse.json({ok:false,error:"Webhook persistence failed."},{status:500})}}
