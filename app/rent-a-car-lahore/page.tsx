@@ -9,6 +9,7 @@ import { resolveNormalRentalInventory } from "@/lib/normal-rental/inventory-reso
 import { toPublicLahoreInventory } from "@/lib/normal-rental/public-inventory";
 import { getNormalRentalBookingContext, NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
 import { ORGANIZATION_ID } from "@/lib/seo";
+import PreferredSourceButton from "@/components/PreferredSourceButton";
 
 export const dynamic = "force-dynamic";
 
@@ -123,6 +124,9 @@ export default async function LahoreRentalPage() {
       <section className="border-y border-slate-200 bg-slate-50"><div className="mx-auto max-w-5xl px-4 py-14 sm:px-6 sm:py-18 lg:px-8"><p className="text-sm font-bold uppercase tracking-widest text-[var(--rentka-green)]">Helpful answers</p><h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] sm:text-4xl">Lahore Car Rental FAQs</h2><div className="mt-8 divide-y divide-slate-200 rounded-3xl border border-slate-200 bg-white px-6 sm:px-8">{faqs.map((faq) => <article key={faq.question} className="py-6"><h3 className="text-lg font-extrabold text-[var(--rentka-blue)]">{faq.question}</h3><p className="mt-3 leading-7 text-slate-600">{faq.answer}</p></article>)}</div></div></section>
 
       <section className="px-4 py-14 sm:px-6 sm:py-18 lg:px-8"><div className="mx-auto grid max-w-7xl gap-7 rounded-[2rem] bg-[var(--rentka-blue)] p-8 text-white sm:p-10 md:grid-cols-[1fr_auto] md:items-center"><div><h2 className="text-3xl font-extrabold">Ready to Plan Your Lahore Rental?</h2><p className="mt-3 max-w-2xl leading-7 text-slate-200">Choose a current Lahore vehicle above, or review RentKA’s booking terms and support information before requesting availability.</p></div><nav aria-label="Lahore booking resources" className="flex flex-col gap-3 sm:flex-row md:flex-col"><a href="#lahore-cars" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[var(--rentka-green)] px-6 py-3 font-bold">Choose a Lahore car</a><Link href="/contact" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/30 px-6 py-3 font-bold">Contact RentKA</Link><div className="flex justify-center gap-4 text-sm"><Link href="/terms" className="underline">Terms</Link><Link href="/cancellation-policy" className="underline">Cancellation policy</Link></div></nav></div></section>
+      <div className="mx-auto max-w-5xl px-4 pb-14 sm:px-6 sm:pb-18 lg:px-8">
+        <PreferredSourceButton contentType="lahore_landing" placement="landing_page_footer" />
+      </div>
     </main>
   </>;
 }

@@ -14,6 +14,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { LOCAL_BUSINESS_ID, LOGO_ID, ORGANIZATION_ID, WEBSITE_ID } from "@/lib/seo";
 import type { Car } from "@/lib/useCars";
+import PreferredSourceButton from "@/components/PreferredSourceButton";
 
 export const metadata: Metadata = {
   title: { absolute:
@@ -511,6 +512,9 @@ export default async function Page() {
 
         </div>
       </section>
+      <div className="mx-auto max-w-5xl px-4 pb-16">
+        <PreferredSourceButton contentType="homepage" placement="landing_page_footer" />
+      </div>
     </>
   );
 }

@@ -6,6 +6,7 @@ import Script from "next/script";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
 import AirportBookingEngine from "@/components/airport/AirportBookingEngine";
+import PreferredSourceButton from "@/components/PreferredSourceButton";
 import {
   getPublicAirportStartingFares,
   type PublicAirportStartingFare,
@@ -655,6 +656,9 @@ export default async function IslamabadAirportTransferPage() {
         </div>
       </section>
 
+      <div className="mx-auto max-w-5xl px-4 pb-16 md:pb-20">
+        <PreferredSourceButton contentType="airport_transfer" placement="landing_page_footer" />
+      </div>
     </main>
     </>
   );

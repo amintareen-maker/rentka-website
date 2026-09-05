@@ -8,7 +8,7 @@ export type AssignmentSelection={driverId:string;vehicleId:string;offerId:string
 export function requireAvailableOffer(offers:DispatchOfferRecord[],selection:AssignmentSelection){
  const offer=offers.find(item=>item.id===selection.offerId&&item.driverId===selection.driverId);
  if(!offer)throw new Error("Select an AVAILABLE response for this Driver.");
- if(offer.responseStatus!=="available")throw new Error(offer.responseStatus==="declined"?"This Driver declined the booking.":"This Driver does not have an AVAILABLE response.");
+ if(offer.responseStatus!=="available"&&offer.responseStatus!=="accepted")throw new Error(offer.responseStatus==="declined"?"This Driver declined the booking.":"This Driver does not have an AVAILABLE or ACCEPTED response.");
  return offer;
 }
 

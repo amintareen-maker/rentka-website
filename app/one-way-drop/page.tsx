@@ -11,6 +11,7 @@ import RoundTripCTA from "@/components/intercity/RoundTripCTA";
 import IntercityFAQ from "@/components/intercity/IntercityFAQ";
 
 import GoogleReviews from "@/components/GoogleReviews";
+import PreferredSourceButton from "@/components/PreferredSourceButton";
 
 import { intercityRoutes } from "@/data/intercityRoutes";
 
@@ -780,6 +781,9 @@ export default function OneWayDropPage() {
 
         </section>
 
+        <div className="mx-auto max-w-5xl px-6 pb-20">
+          <PreferredSourceButton contentType="one_way" placement="landing_page_footer" />
+        </div>
       </main>
 
     </>

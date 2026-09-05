@@ -1,0 +1,5 @@
+"use client";
+import { driverTripTransitionAction } from "./actions";
+import type { TripStatus } from "@/lib/dispatch/trip-operations-types";
+export default function TripAction({token,bookingOperationalId,assignmentId,nextStatus,nextAction}:{token:string;bookingOperationalId:string;assignmentId:string;nextStatus:TripStatus;nextAction:string}){return <form action={driverTripTransitionAction} className="mt-4" onSubmit={event=>{if(nextStatus==="completed"&&!window.confirm("Confirm the customer trip is complete. This cannot be reversed."))event.preventDefault()}}><input type="hidden" name="token" value={token}/><input type="hidden" name="bookingOperationalId" value={bookingOperationalId}/><input type="hidden" name="assignmentId" value={assignmentId}/><input type="hidden" name="requestedStatus" value={nextStatus}/><button className="w-full rounded-2xl bg-green-700 px-5 py-5 text-xl font-black text-white">{nextAction}</button>{nextStatus==="completed"&&<p className="mt-2 text-center text-xs text-slate-600">Only complete after the customer trip has ended. Confirmation is required and audited.</p>}</form>}
+

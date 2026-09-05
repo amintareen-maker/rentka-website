@@ -11,7 +11,7 @@ export type VehicleStatus = typeof VEHICLE_STATUSES[number];
 export type DriverStatus = typeof DRIVER_STATUSES[number];
 export type DocumentationState = typeof DOCUMENTATION_STATES[number];
 export type CheckState = typeof CHECK_STATES[number];
-export type AuditActor = { type: "shared_admin_session" };
+export type AuditActor = { type: "shared_admin_session" } | { type:"assigned_driver";driverId:string;assignmentId:string };
 export const DRIVER_VEHICLE_ELIGIBILITY_MODES=["any_vendor_vehicle","specific_vehicles","models_or_categories"] as const;
 export type DriverVehicleEligibility={mode:typeof DRIVER_VEHICLE_ELIGIBILITY_MODES[number];vehicleIds?:string[];allowedModelsOrCategories?:string[]};
 

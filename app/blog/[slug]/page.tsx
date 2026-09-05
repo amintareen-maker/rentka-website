@@ -9,6 +9,7 @@ import { ORGANIZATION_ID } from "@/lib/seo";
 import { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import Link from "next/link";
 import { intercityRoutes } from "@/data/intercityRoutes";
+import PreferredSourceButton from "@/components/PreferredSourceButton";
 
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
@@ -246,6 +247,7 @@ if (!articleContent) {
   sections={articleContent.sections}
   faq={articleContent.faq}
 />
+            <PreferredSourceButton contentType="blog_article" />
             <div className="mt-10 rounded-2xl bg-[#E9F4E6] p-6">
               <p className="font-semibold text-[#0F2B46]">Ready to compare suitable vehicles and pricing?</p>
               <Link href={commercialLink.href} className="mt-3 inline-flex font-bold text-[#347A2A] hover:underline">

@@ -22,6 +22,7 @@ import GoogleReviews from "@/components/GoogleReviews";
 import CityVehicleSelector from "@/components/city-pages/CityVehicleSelector";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
+import PreferredSourceButton from "@/components/PreferredSourceButton";
 
 export const metadata: Metadata = {
   title: { absolute:
@@ -549,6 +550,9 @@ export default function IslamabadRentalPage() {
             </div>
           </div>
         </section>
+        <div className="mx-auto max-w-5xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+          <PreferredSourceButton contentType="rent_a_car" placement="landing_page_footer" />
+        </div>
       </main>
     </>
   );
