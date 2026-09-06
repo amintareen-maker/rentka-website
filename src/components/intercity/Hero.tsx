@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import {
   ArrowLeftRight,
@@ -38,17 +37,6 @@ export default function Hero() {
     const [bookingOpen, setBookingOpen] =
   useState(false);
 
-  useEffect(() => {
-    if (from === to) {
-      const nextCity = cities.find(
-        (city) => city !== from
-      );
-
-      if (nextCity) {
-        setTo(nextCity);
-      }
-    }
-  }, [from, to, cities]);
 
   const selectedRoute = intercityRoutes.find(
     (route) =>
@@ -115,6 +103,7 @@ export default function Hero() {
 
             </p>
 
+            <a href="#one-way-fare" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-[#5BAE4A] px-5 py-3 font-bold text-white lg:hidden">Choose route &amp; see fare ↓</a>
             <div className="mt-10 flex flex-wrap gap-8">
 
               <div>
@@ -159,7 +148,7 @@ export default function Hero() {
 
                     {/* Booking Widget */}
 
-          <div className="rounded-[32px] bg-white p-8 shadow-2xl">
+          <div id="one-way-fare" className="scroll-mt-40 rounded-[32px] bg-white p-5 md:p-8 shadow-2xl">
 
             <div className="mb-8">
 
@@ -191,7 +180,7 @@ export default function Hero() {
 
               <select
                 value={from}
-                onChange={(e) => setFrom(e.target.value)}
+                onChange={(e) => { const nextFrom = e.target.value; setFrom(nextFrom); if (nextFrom === to) setTo(cities.find(city => city !== nextFrom) ?? to); }}
                 className="w-full rounded-xl border border-slate-300 p-4 outline-none transition focus:border-[#5BAE4A]"
               >
                 {cities.map((city) => (
@@ -208,6 +197,7 @@ export default function Hero() {
               <button
                 type="button"
                 onClick={swapCities}
+                aria-label="Swap pickup and destination"
                 className="rounded-full border bg-slate-50 p-3 transition hover:bg-[#5BAE4A] hover:text-white"
               >
                 <ArrowLeftRight size={22} />

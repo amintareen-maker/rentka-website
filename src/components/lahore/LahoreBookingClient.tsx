@@ -73,6 +73,15 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
   const dateTrigger = useRef<HTMLButtonElement>(null);
   const timeTrigger = useRef<HTMLButtonElement>(null);
   const timeContainer = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (!error) return;
+    requestAnimationFrame(() => {
+      errorRef.current?.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+      document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus({ preventScroll: true });
+    });
+  }, [error]);
 
   useEffect(() => {
     const outside = (event: MouseEvent) => {
@@ -124,8 +133,11 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
 
   async function submit(formData: FormData) {
     if (!selected || !currentRate) return;
-    if (!pickupPlace) { setError("Please select a pickup location from the Google suggestions."); return; }
-    if (packageType === "outsideCity" && !destinationPlace) { setError("Please select a destination from the Google suggestions."); return; }
+    const focusField = (selector: string) => requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true }));
+    if (!pickupPlace) { setError("Please select a pickup location from the Google suggestions."); focusField("#lahore-preview-pickup"); return; }
+    if (packageType === "outsideCity" && !destinationPlace) { setError("Please select a destination from the Google suggestions."); focusField("#lahore-preview-destination"); return; }
+    if (!String(formData.get("customerName") || "").trim()) { setError("Please enter your name."); focusField("input[name='customerName']"); return; }
+    if (!String(formData.get("phone") || "").trim()) { setError("Please enter your phone number."); focusField("input[name='phone']"); return; }
     setLoading(true); setError("");
     const whatsappWindow = window.open("", "_blank");
     let committedLead: CreatedLead | undefined;
@@ -216,7 +228,7 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
       {packageType === "outsideCity" && <label className="block text-sm font-semibold text-slate-700">Destination<PlaceInput id="lahore-preview-destination" value={destinationAddress} place={destinationPlace} placeholder="Search destination" selectionRequired onTextChange={(address) => { setDestinationAddress(address); setDestinationPlace(undefined); }} onSelect={(place) => { setDestinationAddress(place.formattedAddress); setDestinationPlace(place); setError(""); }}/></label>}
       <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm font-semibold text-slate-700">Number of days<input className={input} required name="numberOfDays" type="number" min="1" max="30" defaultValue="1"/></label><label className="text-sm font-semibold text-slate-700">Customer name<input className={input} required name="customerName" autoComplete="name"/></label></div>
       <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm font-semibold text-slate-700">Phone / WhatsApp<input className={input} required name="phone" inputMode="tel" autoComplete="tel"/></label><label className="text-sm font-semibold text-slate-700">Email <span className="font-normal text-slate-500">(optional)</span><input className={input} name="email" type="email" autoComplete="email"/></label></div>
-      {error && <p role="alert" className="text-sm font-semibold text-red-700">{error}</p>}<button disabled={loading || !currentRate} className="w-full rounded-lg bg-[#5BAE4A] py-3 font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] focus-visible:ring-offset-2 disabled:opacity-50">{loading ? (prelaunch ? "Creating booking request…" : "Creating private test lead…") : (prelaunch ? "Request Lahore Booking" : "Submit Private Lahore Test")}</button></form>}
+      {error && <p ref={errorRef} tabIndex={-1} role="alert" className="text-sm font-semibold text-red-700">{error}</p>}<button disabled={loading || !currentRate} className="w-full rounded-lg bg-[#5BAE4A] py-3 font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] focus-visible:ring-offset-2 disabled:opacity-50">{loading ? (prelaunch ? "Creating booking request…" : "Creating private test lead…") : (prelaunch ? "Request Lahore Booking" : "Submit Private Lahore Test")}</button></form>}
     </div></div>}
   </></GooglePlacesProvider>;
 }

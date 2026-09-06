@@ -1,23 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { trackMetaPixel } from "@/lib/tracking";
 
 export default function WhatsAppWidget() {
+  const pathname = usePathname();
+  const bookingPage = pathname.startsWith("/one-way-drop") || pathname === "/airport-car-rental-islamabad";
+  const [manualPath, setManualPath] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
 
   useEffect(() => {
+    if (bookingPage) return;
     const timer = setTimeout(() => {
       setChatOpen(true);
     }, 6000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [bookingPage]);
 
   return (
     <div className="fixed bottom-24 right-6 z-50">
 
-      {chatOpen && (
+      {chatOpen && (!bookingPage || manualPath === pathname) && (
         <div className="bg-white w-72 rounded-2xl shadow-xl border border-slate-200 p-4 mb-3 animate-fade-in relative">
           <p className="text-sm font-semibold text-slate-900 mb-1">
             👋 Need help choosing a car?
@@ -52,7 +57,8 @@ export default function WhatsAppWidget() {
       )}
 
       <button
-        onClick={() => setChatOpen((prev) => !prev)}
+        aria-label="WhatsApp assistance"
+        onClick={() => { setManualPath(pathname); setChatOpen((prev) => bookingPage && manualPath !== pathname ? true : !prev); }}
         className="bg-[var(--rentka-green)] hover:bg-[var(--rentka-green-hover)] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:scale-105 transition-all duration-300"
       >
         <svg

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   addDoc,
   collection,
@@ -31,6 +31,8 @@ import {
   trackWhatsAppClick,
 } from "@/lib/tracking";
 import { requestAutomaticDispatchIntake } from "@/lib/dispatch/automatic-intake-client";
+
+const GOOGLE_LIBRARIES: "places"[] = ["places"];
 
 const SHEETS_WEBHOOK =
   "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
@@ -94,9 +96,9 @@ const [dropLng, setDropLng] =
 const [dropPlaceId, setDropPlaceId] =
   useState("");
 
-  const pickupAutocomplete = useRef<any>(null);
+  const pickupAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
 
-  const dropAutocomplete = useRef<any>(null);
+  const dropAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
 
   const [passengers, setPassengers] =
     useState("1-2");
@@ -105,7 +107,7 @@ const [dropPlaceId, setDropPlaceId] =
   id: "google-map-script",
   googleMapsApiKey:
     process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
-  libraries: ["places"],
+  libraries: GOOGLE_LIBRARIES,
 });
 
   const [notes, setNotes] = useState("");
@@ -123,34 +125,52 @@ const [dropPlaceId, setDropPlaceId] =
     return `PKR ${price.toLocaleString()}`;
   }, [price]);
 
+  const modalRef = useRef<HTMLDivElement>(null);
+  const [readyWhatsApp, setReadyWhatsApp] = useState("");
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    modalRef.current?.focus({ preventScroll: true });
+    return () => { document.body.style.overflow = overflow; previous?.focus(); };
+  }, [open, isLoaded]);
+
+  function showFieldError(message: string, label: string) {
+    setError(message);
+    const field = modalRef.current?.querySelector<HTMLElement>(label === "Travel Date" ? "#intercity-date" : `[aria-label="${label}"]`);
+    field?.focus({ preventScroll: true });
+    field?.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  }
+
   function validateForm() {
     if (!name.trim()) {
-      setError("Please enter your name.");
+      showFieldError("Please enter your name.", "Full Name");
       return false;
     }
 
     if (!phone.trim()) {
-      setError("Please enter your phone number.");
+      showFieldError("Please enter your phone number.", "Phone Number");
       return false;
     }
 
     if (!travelDate) {
-      setError("Please select travel date.");
+      showFieldError("Please select travel date.", "Travel Date");
       return false;
     }
 
     if (!pickupTime) {
-      setError("Please select pickup time.");
+      showFieldError("Please select pickup time.", "Pickup Time");
       return false;
     }
 
     if (!pickupAddress.trim()) {
-      setError("Please enter pickup location.");
+      showFieldError("Please enter pickup location.", "Pickup Address");
       return false;
     }
 
     if (!dropAddress.trim()) {
-      setError("Please enter drop-off location.");
+      showFieldError("Please enter drop-off location.", "Drop-off Address");
       return false;
     }
 
@@ -160,6 +180,7 @@ const [dropPlaceId, setDropPlaceId] =
   }
 
   async function handleContinue() {
+    if (readyWhatsApp) { window.open(readyWhatsApp, "_blank", "noopener,noreferrer"); return; }
     if (submissionInProgress.current) return;
     if (!validateForm()) return;
 
@@ -350,6 +371,11 @@ Thank you.
       trackMetaPixel("Lead", trackingPayload);
       trackWhatsAppClick("one_way_drop");
 
+      // The record and tracking are complete; open WhatsApp before waiting for email.
+      const completeWhatsAppUrl = `${whatsappUrl}${encodeURIComponent("\nBooking ID: " + leadId)}`;
+      setReadyWhatsApp(completeWhatsAppUrl);
+      if (whatsappTab && !whatsappTab.closed) whatsappTab.location.href = completeWhatsAppUrl;
+
       let emailSent = false;
 
       try {
@@ -370,11 +396,6 @@ Thank you.
         console.error("Intercity booking email request failed:", emailError);
       }
 
-      if (whatsappTab) {
-        whatsappTab.location.href = whatsappUrl;
-      } else {
-        window.location.href = whatsappUrl;
-      }
 
       const formData = new URLSearchParams({
         leadId,
@@ -397,36 +418,17 @@ Thank you.
 
       void fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
         method: "POST",
+        keepalive: true,
       }).catch((sheetError) => {
         console.error("Google Sheets lead sync failed:", sheetError);
       });
 
-      if (emailSent) {
-        onClose();
+      // If popups were blocked or closed, navigate only after notifications
+      // have been started so the booking integrations remain intact.
+      if (!whatsappTab || whatsappTab.closed) window.location.href = completeWhatsAppUrl;
 
-        setName("");
-        setPhone("");
-        setTravelDate(null);
-        setPickupTime("");
+      if (!emailSent) console.error("Booking saved; email notification unavailable.");
 
-        setPickupAddress("");
-        setPickupLat(null);
-        setPickupLng(null);
-        setPickupPlaceId("");
-
-        setDropAddress("");
-        setDropLat(null);
-        setDropLng(null);
-        setDropPlaceId("");
-
-        setPassengers("1-2");
-        setNotes("");
-        setError(null);
-      } else {
-        setError(
-          "Your WhatsApp booking is ready, but the email notification could not be sent."
-        );
-      }
     } catch (err) {
       console.error(err);
 
@@ -473,27 +475,31 @@ if (!isLoaded) {
       <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
 
         <div
-  className="relative w-full max-w-2xl rounded-3xl bg-white shadow-2xl"
-  onMouseDown={(e) => {
-    const active = document.activeElement as HTMLElement | null;
-
-    if (
-      active &&
-      (active instanceof HTMLInputElement ||
-        active instanceof HTMLTextAreaElement ||
-        active instanceof HTMLSelectElement)
-    ) {
-      active.blur();
-    }
+  className="relative flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl"
+  ref={modalRef}
+  role="dialog"
+  tabIndex={-1}
+  onKeyDown={(event) => {
+    if (event.key === "Escape") { onClose(); return; }
+    if (event.key !== "Tab") return;
+    const controls = modalRef.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input, select, textarea, a[href]');
+    if (!controls?.length) return;
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (event.shiftKey && (document.activeElement === first || document.activeElement === modalRef.current)) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }}
+  aria-modal="true"
+  aria-labelledby="intercity-booking-title"
 >
 
           {/* Header */}
 
-          <div className="bg-gradient-to-r from-[#0F2B46] to-[#163C5F] p-8 text-white">
+          <div className="bg-gradient-to-r from-[#0F2B46] to-[#163C5F] shrink-0 p-4 md:p-8 text-white">
 
             <button
               onClick={onClose}
+              aria-label="Close booking"
               className="absolute right-6 top-6 rounded-full bg-white/10 p-2 transition hover:bg-white/20"
             >
               <X size={22} />
@@ -503,7 +509,7 @@ if (!isLoaded) {
               Intercity Booking
             </span>
 
-            <h2 className="mt-6 text-3xl font-bold">
+            <h2 id="intercity-booking-title" className="mt-3 pr-8 text-2xl md:text-3xl font-bold">
 
               Complete Your Booking
 
@@ -520,18 +526,14 @@ if (!isLoaded) {
           {/* Body */}
 
           <div
-  className="max-h-[75vh] overflow-y-auto p-8"
-  onScroll={() => {
-    const active = document.activeElement as HTMLElement | null;
-    active?.blur();
-  }}
+  className="min-h-0 overflow-y-auto overscroll-contain p-4 md:p-8"
 >
                       {/* Trip Type */}
 
             
             {/* Summary */}
 
-            <div className="mt-8 rounded-2xl border bg-slate-50 p-6">
+            <div className="rounded-2xl border bg-slate-50 p-4">
 
               <div className="flex items-center justify-between">
 
@@ -561,7 +563,7 @@ if (!isLoaded) {
 
               </div>
 
-              <div className="mt-5 grid gap-3 text-sm text-slate-600 md:grid-cols-3">
+              <div className="mt-3 grid gap-1 text-sm text-slate-600 md:grid-cols-3">
 
                 <div>✅ Driver Included</div>
 
@@ -575,7 +577,7 @@ if (!isLoaded) {
 
             {/* Customer Details */}
 
-            <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
 
               <div>
 
@@ -588,6 +590,8 @@ if (!isLoaded) {
                 </label>
 
                 <input
+                  disabled={Boolean(readyWhatsApp)}
+                  aria-label="Full Name" autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full rounded-xl border p-4 outline-none focus:border-[#5BAE4A]"
@@ -607,6 +611,8 @@ if (!isLoaded) {
                 </label>
 
                 <input
+                  disabled={Boolean(readyWhatsApp)}
+                  aria-label="Phone Number" type="tel" inputMode="tel" autoComplete="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full rounded-xl border p-4 outline-none focus:border-[#5BAE4A]"
@@ -625,14 +631,16 @@ if (!isLoaded) {
 
                 <label className="mb-2 flex items-center gap-2 text-sm font-medium">
 
-                  <Calendar size={16} />
+                  <Calendar size={16} /><span id="intercity-date-label" className="sr-only">Travel Date</span>
 
                   Travel Date *
 
                 </label>
 
                 <DatePicker
-                selected={travelDate}
+                disabled={Boolean(readyWhatsApp)}
+                ariaLabelledBy="intercity-date-label" id="intercity-date"
+                  selected={travelDate}
                 onChange={(date: Date | null) =>
                     setTravelDate(date)
                 }
@@ -655,7 +663,9 @@ if (!isLoaded) {
                 </label>
 
                 <select
-  value={pickupTime}
+                  disabled={Boolean(readyWhatsApp)}
+  aria-label="Pickup Time"
+                  value={pickupTime}
   onChange={(e) => setPickupTime(e.target.value)}
   className="w-full rounded-xl border p-4 outline-none focus:border-[#5BAE4A]"
 >
@@ -748,7 +758,9 @@ if (place.geometry?.location) {
 }}
   >
     <input
-      value={pickupAddress}
+                  disabled={Boolean(readyWhatsApp)}
+      aria-label="Pickup Address"
+                  value={pickupAddress}
       onChange={(e) =>
         setPickupAddress(e.target.value)
       }
@@ -791,7 +803,9 @@ if (place.geometry?.location) {
     }}
   >
     <input
-      value={dropAddress}
+                  disabled={Boolean(readyWhatsApp)}
+      aria-label="Drop-off Address"
+                  value={dropAddress}
       onChange={(e) =>
         setDropAddress(e.target.value)
       }
@@ -816,6 +830,7 @@ if (place.geometry?.location) {
               </label>
 
               <select
+                  disabled={Boolean(readyWhatsApp)}
                 value={passengers}
                 onChange={(e) =>
                   setPassengers(e.target.value)
@@ -847,6 +862,7 @@ if (place.geometry?.location) {
               </label>
 
               <textarea
+                disabled={Boolean(readyWhatsApp)}
                 rows={5}
                 value={notes}
                 onChange={(e) =>
@@ -864,15 +880,17 @@ if (place.geometry?.location) {
             </div>
                         {/* Error */}
 
-            {error && (
-              <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
+            {/* Footer */}
+
+            <div className="sticky bottom-0 mt-4 border-t bg-white pt-3 pb-2">            {error && (
+              <div role="alert" className="mb-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
                 {error}
               </div>
             )}
 
-            {/* Footer */}
 
-            <div className="mt-8 border-t pt-8">
+              {readyWhatsApp && <button type="button" onClick={()=>setReadyWhatsApp("")} className="mb-2 w-full text-sm font-semibold underline">Edit details for a new booking request</button>}
+              {readyWhatsApp && <a href={readyWhatsApp} target="_blank" rel="noreferrer" className="mb-3 block rounded-xl bg-green-100 p-3 text-center font-bold text-green-900">Booking saved — Open WhatsApp</a>}
 
               <button
                 type="button"
@@ -910,7 +928,7 @@ if (place.geometry?.location) {
                   <>
                     <MessageSquare size={20} />
 
-                    Continue to WhatsApp
+                    {readyWhatsApp ? "Open WhatsApp again" : "Continue to WhatsApp"}
                   </>
                 )}
               </button>

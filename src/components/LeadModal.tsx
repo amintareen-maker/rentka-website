@@ -126,6 +126,8 @@ export default function LeadModal({ open, onClose, context }: Props) {
   const pickupAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
   const destinationAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
   const submissionInProgress = useRef(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLParagraphElement>(null);
 
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -142,6 +144,32 @@ export default function LeadModal({ open, onClose, context }: Props) {
   const modelYearDisplay = context.modelYearLabel ?? context.modelYear ?? null;
   const serviceLabel = context.service ? "With Driver" : null;
   const dayLabel = `${numberOfDays} ${numberOfDays === 1 ? "Day" : "Days"}`;
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [open]);
+
+  useEffect(() => {
+    if (!error || !open) return;
+    const frame = requestAnimationFrame(() => {
+      const selectors: Record<string, string> = {
+        "Please select a pickup date.": "#lead-pickup-date",
+        "Please select a preferred pickup time.": "#lead-preferred-time",
+        "Please enter a pickup location.": "input[placeholder='Enter pickup location']",
+        "Please enter where you are travelling to.": "input[placeholder='e.g. Murree, Lahore, Peshawar']",
+        "Please enter your name.": "input[aria-label='Customer name']",
+        "Please enter your phone number.": "input[aria-label='Phone number']",
+      };
+      const selector = selectors[error];
+      const target = (selector ? modalRef.current?.querySelector<HTMLElement>(selector) : null) ?? errorRef.current;
+      target?.focus({ preventScroll: true });
+      target?.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [error, open]);
 
   useEffect(() => {
     if (outstation) return;
@@ -494,8 +522,9 @@ Please confirm availability.
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative z-10 mx-4 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 shadow-xl sm:p-8">
-        <h2 className="text-xl font-semibold text-[var(--rentka-blue)]">Complete Your Booking Request</h2>
+      <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="lead-modal-title" className="relative z-10 mx-2 flex max-h-[calc(100dvh-1rem)] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl sm:mx-4 sm:max-h-[90vh]">
+        <div className="shrink-0 bg-white px-5 pt-5 sm:px-8 sm:pt-8">
+        <h2 id="lead-modal-title" className="text-xl font-semibold text-[var(--rentka-blue)]">Complete Your Booking Request</h2>
         <p className="mb-4 text-sm font-medium text-[var(--rentka-green)]">Fill form, Submit, Chat, Confirm</p>
 
         {(context.carName || context.country || context.city || serviceLabel || modelYearDisplay) && (
@@ -511,6 +540,8 @@ Please confirm availability.
             )}
           </div>
         )}
+        </div>
+        <div className="min-h-0 overflow-y-auto px-5 pb-5 sm:px-8 sm:pb-8">
 
         {success ? (
           <div className="space-y-5 text-center">
@@ -584,8 +615,8 @@ Please confirm availability.
                   {destinationPlaceId && <p className="text-xs font-medium text-[#5BAE4A]">Destination selected ✓</p>}
                 </div>
               )}
-              <input type="text" placeholder="Your name *" className="w-full rounded-lg border px-3 py-2" value={name} onChange={(event) => setName(event.target.value)} />
-              <input type="tel" inputMode="tel" placeholder="Phone number *" className="w-full rounded-lg border px-3 py-2" value={phone} onChange={(event) => setPhone(event.target.value)} />
+              <input aria-label="Customer name" aria-invalid={Boolean(error && !name.trim())} autoComplete="name" type="text" placeholder="Your name *" className="w-full rounded-lg border px-3 py-2" value={name} onChange={(event) => { setName(event.target.value); setError(null); }} />
+              <input aria-label="Phone number" aria-invalid={Boolean(error && !phone.trim())} autoComplete="tel" type="tel" inputMode="tel" placeholder="Phone number *" className="w-full rounded-lg border px-3 py-2" value={phone} onChange={(event) => { setPhone(event.target.value); setError(null); }} />
               <input type="email" inputMode="email" placeholder="Email (optional)" className="w-full rounded-lg border px-3 py-2" value={email} onChange={(event) => setEmail(event.target.value)} />
             </div>
 
@@ -600,14 +631,17 @@ Please confirm availability.
               <p className="mt-2 text-xs leading-relaxed text-slate-500">Rental amount only. Fuel, toll tax, parking, and additional charges are not included unless explicitly stated.</p>
             </div>
 
-            {error && <p className="mt-2 text-sm text-red-600" role="alert">{error}</p>}
-            <button className="mt-5 w-full rounded-lg bg-[var(--rentka-green)] py-3 font-semibold text-white shadow-sm transition hover:opacity-90 disabled:opacity-50" disabled={loading} onClick={handleSubmit}>
+            {error && <p ref={errorRef} tabIndex={-1} className="mt-2 text-sm text-red-600" role="alert">{error}</p>}
+            <div className="sticky bottom-0 -mx-5 mt-4 border-t bg-white px-5 pt-3 sm:-mx-8 sm:px-8">
+            <button className="w-full rounded-lg bg-[var(--rentka-green)] py-3 font-semibold text-white shadow-sm transition hover:opacity-90 disabled:opacity-50" disabled={loading} onClick={handleSubmit}>
               {loading ? "Submitting..." : "Check Availability Now"}
             </button>
             <p className="mt-3 text-center text-xs text-slate-500">We respond within minutes during (8 AM – 8 PM). Quick WhatsApp confirmation • No payment required now</p>
             <p className="mt-2 text-center text-xs text-slate-500">By submitting, you agree to our <a href="/terms" className="underline hover:text-[var(--rentka-blue)]" target="_blank" rel="noopener noreferrer">Terms</a> &amp; <a href="/privacy" className="underline hover:text-slate-700" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</p>
+            </div>
           </>
         )}
+        </div>
       </div>
     </div>
   );
