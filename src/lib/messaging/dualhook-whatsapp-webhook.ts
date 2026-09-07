@@ -2,13 +2,27 @@ import { createHash } from "node:crypto";
 
 export const DUALHOOK_FIELDS=["messages","smb_message_echoes","smb_app_state_sync","history"] as const;
 export type DualhookField=typeof DUALHOOK_FIELDS[number];
-export type DualhookWebhookEvent={eventId:string;field:DualhookField;wabaId:string;phoneNumberId:string;status?:string;messageId?:string;timestamp?:string};
+export type DualhookWebhookEvent={
+  eventId:string;
+  eventType:"inbound_message"|"message_status"|DualhookField;
+  field:DualhookField;
+  wabaId:string;
+  phoneNumberId:string;
+  direction?:"inbound";
+  status?:string;
+  messageId?:string;
+  senderWaId?:string;
+  timestamp?:string;
+  messageType?:string;
+  textBody?:string;
+};
 
 export function verifyDualhookWebhookChallenge(input:{mode:string|null;token:string|null;challenge:string|null;expectedToken?:string}){
   return Boolean(input.expectedToken&&input.mode==="subscribe"&&input.token===input.expectedToken&&input.challenge!==null);
 }
 
 const text=(v:unknown)=>typeof v==="string"?v:"";
+const eventHash=(value:string)=>createHash("sha256").update(value).digest("hex");
 export function parseDualhookWebhookPayload(payload:unknown,expected:{wabaId?:string;phoneNumberId?:string},rawBody=""):DualhookWebhookEvent[]{
   if(!payload||typeof payload!=="object")return[];
   const root=payload as Record<string,unknown>;
@@ -25,8 +39,30 @@ export function parseDualhookWebhookPayload(payload:unknown,expected:{wabaId?:st
       const value=change.value as Record<string,unknown>,metadata=value.metadata&&typeof value.metadata==="object"?value.metadata as Record<string,unknown>:undefined,phoneNumberId=text(metadata?.phone_number_id);
       if(!phoneNumberId||!expected.phoneNumberId||phoneNumberId!==expected.phoneNumberId)return[];
       const statuses=field==="messages"&&Array.isArray(value.statuses)?value.statuses:[];
-      if(statuses.length){for(const item of statuses){if(!item||typeof item!=="object")continue;const status=item as Record<string,unknown>,messageId=text(status.id);if(!messageId)continue;events.push({eventId:createHash("sha256").update(`${rawBody}|${wabaId}|${phoneNumberId}|${field}|${messageId}|${text(status.status)}|${text(status.timestamp)}`).digest("hex"),field:field as DualhookField,wabaId,phoneNumberId,status:text(status.status)||undefined,messageId,timestamp:text(status.timestamp)||undefined})}}
-      else events.push({eventId:createHash("sha256").update(`${rawBody}|${wabaId}|${phoneNumberId}|${field}|${JSON.stringify(value)}`).digest("hex"),field:field as DualhookField,wabaId,phoneNumberId});
+      if(statuses.length){
+        for(const item of statuses){
+          if(!item||typeof item!=="object")continue;
+          const status=item as Record<string,unknown>,messageId=text(status.id);
+          if(!messageId)continue;
+          events.push({eventId:eventHash(`${rawBody}|${wabaId}|${phoneNumberId}|${field}|${messageId}|${text(status.status)}|${text(status.timestamp)}`),eventType:"message_status",field:field as DualhookField,wabaId,phoneNumberId,status:text(status.status)||undefined,messageId,timestamp:text(status.timestamp)||undefined});
+        }
+        continue;
+      }
+      const messages=field==="messages"&&Array.isArray(value.messages)?value.messages:[];
+      if(messages.length){
+        for(const item of messages){
+          if(!item||typeof item!=="object")continue;
+          const message=item as Record<string,unknown>,messageId=text(message.id),senderWaId=text(message.from),timestamp=text(message.timestamp),messageType=text(message.type);
+          if(!messageId||!senderWaId||!timestamp||!messageType)continue;
+          const messageText=message.text&&typeof message.text==="object"?message.text as Record<string,unknown>:undefined;
+          const textBody=messageType==="text"?text(messageText?.body):"";
+          const legacyEventId=eventHash(`${rawBody}|${wabaId}|${phoneNumberId}|${field}|${JSON.stringify(value)}`);
+          const eventId=messages.length===1?legacyEventId:eventHash(`${legacyEventId}|${messageId}|${timestamp}`);
+          events.push({eventId,eventType:"inbound_message",field:field as DualhookField,wabaId,phoneNumberId,direction:"inbound",messageId,senderWaId,timestamp,messageType,...(messageType==="text"?{textBody}:{})});
+        }
+        continue;
+      }
+      events.push({eventId:eventHash(`${rawBody}|${wabaId}|${phoneNumberId}|${field}|${JSON.stringify(value)}`),eventType:field as DualhookField,field:field as DualhookField,wabaId,phoneNumberId});
     }
   }
   return [...new Map(events.map(event=>[event.eventId,event])).values()];
