@@ -1,0 +1,20 @@
+import type { OperationalBooking } from "./booking-types";
+import type { MatchCandidate } from "./matching-types";
+import { generalArea } from "./offer-core.ts";
+
+export const OFFER_EXPIRY_PRESETS=["15","30","60","120","240","custom"] as const;
+export type OfferExpiryPreset=typeof OFFER_EXPIRY_PRESETS[number];
+export type BroadcastRecipient={candidateId:string;driverId:string;driverName:string;vendorName:string;compatibility:string;recommended:boolean;reasons:string[]};
+export type BroadcastSafePreview={bookingId:string;pickupArea:string;destinationArea:string;travelDate:string;pickupTime:string;vehicleRequirement:string;dutySummary:string;approvedPayoutMinor:number};
+
+export function resolveOfferExpiry(preset:string,custom:string|undefined,now=new Date()){
+  if(preset==="custom"){
+    if(!custom||!/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.test(custom))throw new Error("Choose a valid custom offer expiry.");
+    const value=new Date(custom);if(Number.isNaN(value.getTime())||value.getTime()<=now.getTime())throw new Error("Offer expiry must be in the future.");return value.toISOString();
+  }
+  const minutes=Number(preset||"30");if(![15,30,60,120,240].includes(minutes))throw new Error("Choose a valid offer expiry.");return new Date(now.getTime()+minutes*60000).toISOString();
+}
+export function selectBroadcastRecipients(candidateIds:string[],eligible:MatchCandidate[]){const selected=[...new Set(candidateIds.map(value=>value.trim()).filter(Boolean))];if(!selected.length)throw new Error("Select at least one Driver before approving the broadcast.");const resolved=selected.map(id=>eligible.find(candidate=>candidate.id===id));if(resolved.some(candidate=>!candidate))throw new Error("A selected Driver is no longer eligible. Refresh Smart Matching.");const candidates=resolved as MatchCandidate[],driverIds=candidates.map(candidate=>candidate.driver.id);if(new Set(driverIds).size!==driverIds.length)throw new Error("Select each Driver only once.");return candidates}
+export function broadcastRecipients(eligible:MatchCandidate[],top:MatchCandidate[]):BroadcastRecipient[]{const recommendedDrivers=new Set(top.map(candidate=>candidate.driver.id)),seen=new Set<string>();return eligible.filter(candidate=>{if(seen.has(candidate.driver.id))return false;seen.add(candidate.driver.id);return true}).map(candidate=>({candidateId:candidate.id,driverId:candidate.driver.id,driverName:candidate.driver.name,vendorName:candidate.vendor.name,compatibility:candidate.compatibility,recommended:recommendedDrivers.has(candidate.driver.id),reasons:candidate.reasons}))}
+export function createBroadcastSafePreview(booking:OperationalBooking):BroadcastSafePreview{if(booking.internalFinancials.payoutStatus!=="reviewed"||booking.internalFinancials.vendorPayoutMinor===undefined)throw new Error("Vendor payout must be reviewed before broadcast approval.");return{bookingId:booking.bookingId,pickupArea:generalArea(booking.itinerary.pickup),destinationArea:generalArea(booking.itinerary.destinationOrUsage),travelDate:booking.itinerary.travelDate,pickupTime:booking.itinerary.pickupTime,vehicleRequirement:booking.requestedVehicle.categoryOrModel,dutySummary:typeof booking.sourceSnapshot.durationHours==="number"?`${booking.serviceType} · ${booking.sourceSnapshot.durationHours} hours`:booking.serviceType,approvedPayoutMinor:booking.internalFinancials.vendorPayoutMinor}}
+export function assertBroadcastBookingCurrent(booking:OperationalBooking,payoutSnapshotMinor:number){if(booking.lifecycle!=="active")throw new Error("Booking changed. Refresh Smart Matching before approving.");if(booking.readinessStatus!=="ready_for_dispatch"||booking.internalFinancials.payoutStatus!=="reviewed"||booking.internalFinancials.vendorPayoutMinor===undefined)throw new Error("Booking changed. Refresh Smart Matching before approving.");if(booking.internalFinancials.vendorPayoutMinor!==payoutSnapshotMinor)throw new Error("Vendor payout changed. Refresh Smart Matching before approving.");if(booking.assignment?.status==="assigned")throw new Error("Booking is already assigned.");return booking}

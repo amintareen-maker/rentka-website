@@ -15,6 +15,7 @@ export type DualhookWebhookEvent={
   timestamp?:string;
   messageType?:string;
   textBody?:string;
+  errorCode?:string;
 };
 
 export function verifyDualhookWebhookChallenge(input:{mode:string|null;token:string|null;challenge:string|null;expectedToken?:string}){
@@ -44,7 +45,8 @@ export function parseDualhookWebhookPayload(payload:unknown,expected:{wabaId?:st
           if(!item||typeof item!=="object")continue;
           const status=item as Record<string,unknown>,messageId=text(status.id);
           if(!messageId)continue;
-          events.push({eventId:eventHash(`${rawBody}|${wabaId}|${phoneNumberId}|${field}|${messageId}|${text(status.status)}|${text(status.timestamp)}`),eventType:"message_status",field:field as DualhookField,wabaId,phoneNumberId,status:text(status.status)||undefined,messageId,timestamp:text(status.timestamp)||undefined});
+          const error=Array.isArray(status.errors)&&status.errors[0]&&typeof status.errors[0]==="object"?status.errors[0] as Record<string,unknown>:undefined;
+          events.push({eventId:eventHash(`${rawBody}|${wabaId}|${phoneNumberId}|${field}|${messageId}|${text(status.status)}|${text(status.timestamp)}`),eventType:"message_status",field:field as DualhookField,wabaId,phoneNumberId,status:text(status.status)||undefined,messageId,timestamp:text(status.timestamp)||undefined,...(error?.code!==undefined?{errorCode:String(error.code)}:{})});
         }
         continue;
       }

@@ -1,0 +1,38 @@
+export const WHATSAPP_OUTBOUND_PURPOSES=["driver_offer","driver_final_instructions","customer_driver_details"] as const;
+export const WHATSAPP_OUTBOUND_STATUSES=["not_queued","queued","sending","provider_accepted","sent","delivered","read","failed","cancelled","outcome_unknown"] as const;
+export type WhatsAppOutboundPurpose=typeof WHATSAPP_OUTBOUND_PURPOSES[number];
+export type WhatsAppOutboundStatus=typeof WHATSAPP_OUTBOUND_STATUSES[number];
+export type WhatsAppOutboundMessageJob={
+  id:string;
+  purpose:WhatsAppOutboundPurpose;
+  bookingOperationalId:string;
+  bookingId:string;
+  broadcastId?:string;
+  offerId?:string;
+  assignmentId?:string;
+  recipientType:"driver"|"customer";
+  recipientReferenceId:string;
+  provider:"dualhook";
+  messageKind:"text"|"template";
+  templateName?:string;
+  templateLanguage?:string;
+  status:WhatsAppOutboundStatus;
+  attemptCount:number;
+  idempotencyKey:string;
+  providerMessageId?:string;
+  createdAt:string;
+  queuedAt?:string;
+  providerAcceptedAt?:string;
+  lastAttemptAt?:string;
+  nextAttemptAt?:string;
+  sentAt?:string;
+  deliveredAt?:string;
+  readAt?:string;
+  failedAt?:string;
+  failureCode?:string;
+  failureRetryable?:boolean;
+  claimedAt?:string;
+  claimedBy?:string;
+};
+
+export type WhatsAppOutboundJobInput=Pick<WhatsAppOutboundMessageJob,"purpose"|"bookingOperationalId"|"bookingId"|"recipientType"|"recipientReferenceId"|"provider"|"messageKind"|"createdAt">&Partial<Pick<WhatsAppOutboundMessageJob,"broadcastId"|"offerId"|"assignmentId"|"templateName"|"templateLanguage">>;

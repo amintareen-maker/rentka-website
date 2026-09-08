@@ -1,5 +1,7 @@
 export type WhatsAppTemplateComponent={
   type:string;
+  sub_type?:string;
+  index?:string;
   parameters?:Array<Record<string,unknown>>;
 };
 

@@ -9,15 +9,17 @@ export function requireAvailableOffer(offers:DispatchOfferRecord[],selection:Ass
  const offer=offers.find(item=>item.id===selection.offerId&&item.driverId===selection.driverId);
  if(!offer)throw new Error("Select an AVAILABLE response for this Driver.");
  if(offer.responseStatus!=="available"&&offer.responseStatus!=="accepted")throw new Error(offer.responseStatus==="declined"?"This Driver declined the booking.":"This Driver does not have an AVAILABLE or ACCEPTED response.");
+ if(offer.responseStatus==="accepted"&&offer.offerRevision!==undefined&&offer.agreedPayoutMinor===undefined)throw new Error("The accepted Driver payout is incomplete. Refresh the offer before assignment.");
  return offer;
 }
 
-export function validateAssignmentSelection(input:{booking:OperationalBooking;matches:MatchProjection;offers:DispatchOfferRecord[];vendors:DispatchVendor[];drivers:DispatchDriver[];vehicles:DispatchVehicle[];selection:AssignmentSelection}){
+export function validateAssignmentSelection(input:{booking:OperationalBooking;matches:MatchProjection;offers:DispatchOfferRecord[];vendors:DispatchVendor[];drivers:DispatchDriver[];vehicles:DispatchVehicle[];selection:AssignmentSelection;activeBroadcastId?:string}){
  const{booking,matches,offers,vendors,drivers,vehicles,selection}=input;
  if(booking.lifecycle!=="active")throw new Error("A cancelled or not-proceeding booking cannot be assigned.");
  if(booking.readinessStatus!=="ready_for_dispatch")throw new Error("Booking is no longer Ready for Dispatch.");
  if(booking.internalFinancials.payoutStatus!=="reviewed"||booking.internalFinancials.vendorPayoutMinor===undefined)throw new Error("Vendor payout must be reviewed before assignment.");
  const offer=requireAvailableOffer(offers,selection),candidate=matches.eligible.find(item=>item.driver.id===selection.driverId&&item.vehicle.id===selection.vehicleId);
+ if(offer.broadcastId&&offer.broadcastId!==input.activeBroadcastId)throw new Error("The selected Driver agreement is stale. Refresh matching details.");
  if(!matches.ready||!candidate)throw new Error("The selected Driver and Vehicle are no longer an eligible pair. Refresh matching details.");
  const driver=drivers.find(item=>item.id===selection.driverId),vehicle=vehicles.find(item=>item.id===selection.vehicleId),vendor=vendors.find(item=>item.id===candidate.vendor.id);
  if(!driver)throw new Error("Selected Driver no longer exists.");if(!vehicle)throw new Error("Selected Vehicle no longer exists.");if(!vendor)throw new Error("Selected Vendor no longer exists.");
