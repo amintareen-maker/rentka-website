@@ -391,6 +391,13 @@ export default async function IslamabadAirportTransferPage() {
             <article className="rounded-3xl border border-slate-200 p-6"><h3 className="text-xl font-black">Transparent fare and journey planning</h3><p className="mt-3 leading-7 text-slate-600">The calculator uses the Google route distance and the selected vehicle rules rather than presenting a generic taxi estimate. Typical travel between Islamabad city and the airport is often around 30 to 50 minutes, but traffic, exact location, weather, and security checks can change the journey time.</p></article>
           </div>
           <p className="mt-8 rounded-2xl bg-slate-50 p-5 leading-7 text-slate-600"><strong className="text-[#0F2B46]">What is included?</strong> Fuel and a professional driver are identified in each quotation. Any toll, parking, waiting, or timing-related item is shown with the selected vehicle so customers can compare fixed inclusions with route-dependent charges before requesting availability.</p>
+          <p className="mt-5 leading-7 text-slate-600">
+            Staying in the city after your transfer? Explore our{" "}
+            <Link href="/rent-a-car-islamabad" className="font-semibold text-[#347A2A] hover:underline">
+              car rental in Islamabad
+            </Link>{" "}
+            for local and outstation travel.
+          </p>
         </div>
       </section>
 

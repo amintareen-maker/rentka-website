@@ -99,9 +99,9 @@ const faqs = [
       "Yes. Customers frequently book Prado, Hiace, Corolla and SUVs for Murree, Nathia Gali, Naran and northern travel.",
   },
   {
-    question: "Which areas of Islamabad do you serve?",
+    question: "Can RentKA pick me up anywhere in Islamabad?",
     answer:
-      "We serve Islamabad, Rawalpindi, DHA, Bahria Town, Blue Area and surrounding sectors.",
+      "Pickup can be arranged from the major Islamabad sectors and areas listed on this page, subject to vehicle and driver availability. Share your exact pickup point when booking so RentKA can confirm availability.",
   },
   {
     question: "Can I arrange an airport transfer from Islamabad?",
@@ -342,6 +342,24 @@ export default function IslamabadRentalPage() {
 
         <div className="mx-auto max-w-7xl space-y-16 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
           <CityVehicleSelector city="islamabad" />
+
+          <section className="rounded-[2rem] border border-slate-200 bg-slate-50 p-7 sm:p-10">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--rentka-green)]">
+              Rental information
+            </p>
+            <h2 className="mt-2 text-3xl font-extrabold text-[var(--rentka-blue)] md:text-4xl">
+              Islamabad Rental Options and Inclusions
+            </h2>
+            <p className="mt-4 max-w-4xl leading-7 text-slate-600">
+              RentKA provides cars with professional drivers for within-city and
+              outstation travel. Airport transfers and one-way trips use their
+              dedicated pricing and inclusion structures, while standard daily
+              driver service includes up to 12 hours where applicable. After
+              availability and the final quotation are confirmed, a 20% advance
+              is required to secure the booking. Fuel, toll and parking treatment
+              depends on the selected service, package and confirmed quotation.
+            </p>
+          </section>
 
           <section>
             <div className="mb-8">

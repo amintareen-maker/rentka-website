@@ -14,6 +14,7 @@ import type { Car } from "@/lib/useCars";
 
 type ModelOption = {
   model: string;
+  slug: string;
   imageURL?: string;
   category?: string;
   seatingCapacity?: string;
@@ -25,31 +26,37 @@ type ModelOption = {
 const priorityModels = [
   {
     label: "Suzuki Alto",
+    slug: "suzuki-alto",
     aliases: ["suzukialto", "alto"],
     useCase: "Economical city travel",
   },
   {
     label: "Toyota Corolla",
+    slug: "toyota-corolla",
     aliases: ["toyotacorolla", "corolla"],
     useCase: "Comfortable everyday travel",
   },
   {
     label: "Honda Civic",
+    slug: "honda-civic",
     aliases: ["hondacivic", "civic"],
     useCase: "Executive and business travel",
   },
   {
     label: "Honda BR-V",
+    slug: "honda-br-v",
     aliases: ["hondabrv", "brv"],
     useCase: "Family travel with luggage",
   },
   {
     label: "Toyota Prado",
+    slug: "toyota-prado",
     aliases: ["toyotaprado", "prado"],
     useCase: "Premium and outstation travel",
   },
   {
     label: "Toyota Hiace",
+    slug: "toyota-hiace",
     aliases: ["toyotahiace", "hiace"],
     useCase: "Groups and larger families",
   },
@@ -168,6 +175,7 @@ export default function CityVehicleSelector({
       return [
         {
           model: representative.model?.trim() || priority.label,
+          slug: priority.slug,
           imageURL: representative.imageURL,
           category: representative.category,
           seatingCapacity: representative.seatingCapacity,
@@ -293,6 +301,14 @@ export default function CityVehicleSelector({
                     View Prices &amp; Select
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </button>
+                  {city === "islamabad" && (
+                    <Link
+                      href={`/cars/${option.slug}/islamabad/with-driver`}
+                      className="mt-3 inline-flex justify-center font-semibold text-[var(--rentka-blue)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--rentka-green)]"
+                    >
+                      View {option.model} rental details
+                    </Link>
+                  )}
                 </div>
               </article>
             ))}

@@ -1,4 +1,6 @@
 /* eslint-disable react/jsx-key, react/no-unescaped-entities */
+import Link from "next/link";
+
 export const islamabadToPeshawarCarRentalGuide = {
   introduction: (
     <>
@@ -12,6 +14,14 @@ export const islamabadToPeshawarCarRentalGuide = {
       <p>
         The journey covers approximately 185 kilometres and normally takes 2.5 to 3 hours,
         depending on traffic, weather, rest stops and local road conditions.
+      </p>
+
+      <p>
+        For pickup and other travel in the capital, compare{" "}
+        <Link href="/rent-a-car-islamabad" className="font-semibold text-[#347A2A] hover:underline">
+          vehicle rental in Islamabad
+        </Link>{" "}
+        before confirming the onward journey.
       </p>
 
       <p>

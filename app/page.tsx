@@ -359,27 +359,24 @@ export default async function Page() {
 
           <div>
             <h2 className="text-2xl font-semibold mb-3">
-              Rent a Car in Islamabad & Rawalpindi with Driver
+              Explore RentKA Services in the Twin Cities
             </h2>
             <p className="text-slate-700 leading-relaxed">
-              RentKA offers affordable{" "}
+              Choose the RentKA service page for your pickup city:{" "}
               <Link
                 href="/rent-a-car-islamabad"
                 className="text-[var(--rentka-blue)] hover:underline"
               >
-                car rental in Islamabad
+                Islamabad car rental options
               </Link>{" "}
-              and{" "}
+              or{" "}
               <Link
                 href="/rent-a-car-rawalpindi"
                 className="text-[var(--rentka-blue)] hover:underline"
               >
-                car rental in Rawalpindi
-              </Link>{" "}
-              with professional drivers and transparent pricing. Whether you need a
-              full-day city ride, airport transfer, or outstation trip, we connect
-              you with verified local vendors to ensure reliable service without
-              unnecessary complications.
+                Rawalpindi car rental options
+              </Link>
+              , both with professional drivers and quotations confirmed before booking.
             </p>
             <p className="mt-3 text-slate-700 leading-relaxed">
               Looking to rent a car with driver in Islamabad or Rawalpindi? Request availability and pricing today.

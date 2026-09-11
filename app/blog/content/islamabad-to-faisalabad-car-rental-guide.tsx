@@ -1,4 +1,6 @@
 /* eslint-disable react/jsx-key, react/no-unescaped-entities */
+import Link from "next/link";
+
 export const islamabadToFaisalabadCarRentalGuide = {
   introduction: (
     <>
@@ -12,6 +14,14 @@ export const islamabadToFaisalabadCarRentalGuide = {
       <p>
         The journey covers approximately 320 kilometres and normally takes 3.5 to 4.5 hours,
         depending on traffic, weather, rest stops and local road conditions.
+      </p>
+
+      <p>
+        Need transport before or after the intercity journey? See the{" "}
+        <Link href="/rent-a-car-islamabad" className="font-semibold text-[#347A2A] hover:underline">
+          Islamabad car rental service
+        </Link>{" "}
+        for current vehicle options.
       </p>
 
       <p>
