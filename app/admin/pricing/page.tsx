@@ -6,6 +6,8 @@ import { hasAdminSession } from "../_lib/session";
 export const metadata: Metadata = { title: "RentKA Operations & Pricing | RentKA Admin", robots: { index: false, follow: false, noarchive: true } };
 
 const cards = [
+  { title: "Marketing", description: "Manage WhatsApp audiences, campaigns, contacts and message history.", href: "/admin/whatsapp-campaigns", action: "Open Marketing" },
+  { title: "WhatsApp Campaigns", description: "Manage file audiences, review campaigns and import contacts from CSV.", href: "/admin/whatsapp-campaigns", action: "Open Campaigns" },
   { title: "Islamabad / Rawalpindi", description: "Manage existing cars, vendors, availability, within-city and outstation rates.", href: "/admin/pricing/inventory?zone=twin_cities", action: "Manage Cars & Rates" },
   { title: "Lahore", description: "Prepare private Lahore vendors and inventory before the public launch.", href: "/admin/pricing/inventory?zone=lahore", action: "Manage Cars & Rates" },
   { title: "Airport Pricing", description: "Open the existing Islamabad Airport pricing configuration.", href: "/admin/airport-pricing", action: "Manage Airport Rates" },

@@ -1,0 +1,5 @@
+First Name,Middle Name,Last Name,File As,Organization Name,Phone 1 - Label,Phone 1 - Value,Phone 2 - Label,Phone 2 - Value,E-mail 1 - Value
+Sample,,One,,,Mobile,03020589999,Work,+447911123456,
+Sample,,Duplicate,,,Mobile,923020589999,,,
+Email,,Only,,,,,,,sample@example.invalid
+Sample,,Mixed,,,Home,not-a-number,Mobile,+971501234567,

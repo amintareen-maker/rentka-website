@@ -1,0 +1,20 @@
+export const INTRODUCTION_CAMPAIGN_ID = "rentka-introduction-v1";
+export const SEND_STATUSES = ["pending", "locked", "sending", "accepted", "sent", "delivered", "read", "failed", "suppressed", "unknown"] as const;
+export type SendStatus = typeof SEND_STATUSES[number];
+export type SendMode = "send" | "resume" | "retry";
+export type SendRecord = {
+  sendId: string; campaignId: string; audienceId: string; audienceName: string;
+  membershipId: string; contactId: string; phoneE164: string; displayName: string;
+  templateName: string; templateLanguage: string; provider: "dualhook";
+  providerMessageId: string | null; status: SendStatus; attemptCount: number;
+  attemptedAt: string | null; acceptedAt: string | null; sentAt: string | null;
+  deliveredAt: string | null; readAt: string | null; failedAt: string | null;
+  errorCode: string | null; errorMessage: string | null; retryable: boolean;
+  batchId: string; createdAt: string; updatedAt: string; leaseUntil: number;
+};
+export type SendCounts = Record<SendStatus, number> & { imported: number; attempted: number; acceptedTotal: number; sentTotal: number; deliveredTotal: number; readTotal: number };
+export type SendState = "ready" | "sending" | "partially_sent" | "completed" | "paused" | "failed" | "cancelled";
+export type SendSummary = { campaignId: string; status: SendState; counts: SendCounts; targetCount: number; lastSendAt: string | null; phase: "preparing" | "sending" | "finished"; approvalId: string };
+export type SendRun = SendSummary & { audienceId: string; audienceName: string; mode: SendMode; totalMembers: number; cursor: number; leaseOwner: string | null; leaseUntil: number };
+export type ManifestEntry = { membershipId: string; contactId: string; phoneE164: string; displayName: string; approved: boolean; reason: string | null };
+export type GateStatus = { enabled: boolean; headerReady: boolean; headerUrl: string; headerMime: string | null; blockers: string[] };
