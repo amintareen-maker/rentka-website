@@ -2,6 +2,7 @@ import type { MatchCandidate, MatchProjection, SupplyRecipientProjection } from 
 import type { DispatchOfferRecord, DriverOfferProjection } from "@/lib/dispatch/offer-types";
 import type { OperationalBooking } from "@/lib/dispatch/booking-types";
 import { createBroadcastSafePreview,supplyBroadcastRecipients } from "@/lib/dispatch/broadcast-approval-core";
+import { supplierResponsePresentation } from "@/lib/dispatch/admin-presentation";
 import { setMatchOverrideAction } from "./actions";
 import OfferControls from "./OfferControls";
 import BroadcastApproval from "./BroadcastApproval";
@@ -68,10 +69,10 @@ export default function MatchPanel({
     {projection.supplyRecipients&&<SupplyRecipientPanel projection={projection.supplyRecipients}/>}
 
     {offers.length > 0 && <div className="mt-4 rounded-xl bg-slate-100 p-3">
-      <h4 className="font-black">Driver Responses</h4>
-      <div className="mt-2 grid gap-2 text-sm">{offers.map(offer => <div key={offer.id} className="rounded bg-white p-2">
-        <b>{offer.recipientDisplayName??offer.driverName??offer.vendorName??"Historical recipient"}</b>{offer.vehicleRegistration?` — ${offer.vehicleRegistration}`:""} · <b>{offer.responseStatus === "available" ? "🟢 AVAILABLE" : offer.responseStatus === "declined" ? "🔴 DECLINED" : offer.responseStatus === "no_response" ? "⚪ NO RESPONSE" : offer.offerStage.replaceAll("_", " ")}</b>{offer.responseAt && ` · ${new Date(offer.responseAt).toLocaleString("en-PK")}`}
-      </div>)}</div>
+      <h4 className="font-black">Supplier Response Summary</h4>
+      <div className="mt-2 grid gap-2 text-sm">{offers.map(offer => {const response=supplierResponsePresentation(offer);return <div key={offer.id} className="rounded bg-white p-2">
+        <b>{response.recipientName}</b>{offer.vehicleRegistration?` — ${offer.vehicleRegistration}`:""} · {response.supplierType} · <b>{response.responseLabel}</b>{offer.responseAt && ` · ${new Date(offer.responseAt).toLocaleString("en-PK")}`}
+      </div>})}</div>
       <p className="mt-2 text-xs font-bold">Availability only — no driver or vehicle is assigned.</p>
     </div>}
 

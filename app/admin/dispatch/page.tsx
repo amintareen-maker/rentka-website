@@ -302,7 +302,7 @@ export default async function Page({
     broadcastPanel,
   ] = await Promise.all([
     q.open ? listOperationalEvents(q.open) : Promise.resolve([]),
-    q.matches ? getDispatchOfferPanel(q.matches) : Promise.resolve(null),
+    q.open ? getDispatchOfferPanel(q.open) : Promise.resolve(null),
     q.matches ? getAssignmentPanel(q.matches) : Promise.resolve(null),
     q.open ? getDriverInstructionsPanel(q.open) : Promise.resolve(null),
     q.open ? getCustomerDriverDetailsPanel(q.open) : Promise.resolve(null),
@@ -544,13 +544,10 @@ export default async function Page({
                 </div>
               )}
               {q.open === b.id &&
-                q.matches === b.id &&
                 offerPanel &&
                 offerPanel.offers.length > 0 && (
                   <section className="mt-5 rounded-xl border-2 border-indigo-700 bg-indigo-50 p-4">
-                    <h3 className="font-black">
-                      Secure Supplier Offer Portals
-                    </h3>
+                    <h3 className="font-black">Supplier Responses</h3>
                     <div className="mt-3 space-y-3">
                       {offerPanel.offers.map((offer) =>
                         offer.recipientType === "vendor" ? (
