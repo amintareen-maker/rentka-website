@@ -11,16 +11,18 @@ export type DocumentReviewState = typeof DOCUMENT_REVIEW_STATES[number];
 export type ExtractionField = { value: string; confidence: number; source: "embedded_text"; accepted?: boolean };
 export type ExtractionResult = { status: "extracted" | "low_confidence" | "unavailable" | "failed"; fields: Record<string, ExtractionField>; attemptedAt: string; engine: "rentka_local_embedded_text_v1"; error?: string };
 export type PartnerDocument = { id: string; kind: string; storagePath: string; originalName: string; contentType: string; size: number; reviewState: DocumentReviewState; uploadedAt: string; extraction?: ExtractionResult };
+export type ApplicantDriver = { key: string; name: string; mobile: string; mobileNormalized: string; whatsapp: string; whatsappNormalized: string; zoneIds: NormalRentalZoneId[]; cnicNumber: string; cnicNormalized: string; licenceNumber: string; licenceNormalized: string; licenceIssueDate?: string; licenceExpiryDate: string; relationshipIntent: "vendor_managed"; documents: PartnerDocument[] };
 export type ApplicantVehicle = { make: string; model: string; modelYear?: number; registrationNumber: string; registrationNormalized: string; category: string; ownershipRelationship?: string; documents: PartnerDocument[] };
 export type PartnerApplication = {
   id: string; applicationId: string; applicationType: ApplicationType; status: ApplicationStatus;
   name: string; businessName?: string; contactName?: string; mobile: string; mobileNormalized: string; whatsapp: string; whatsappNormalized: string;
   zoneIds: NormalRentalZoneId[]; address?: string; cnicNumber?: string; cnicNormalized?: string; licenceNumber?: string; licenceNormalized?: string;
   licenceIssueDate?: string; licenceExpiryDate?: string; numberOfVehicles?: number; approximateDrivers?: number; businessInfo?: string; notes?: string;
-  vehicles: ApplicantVehicle[]; documents: PartnerDocument[];
+  drivers: ApplicantDriver[]; vehicles: ApplicantVehicle[]; documents: PartnerDocument[];
   consent: { accepted: true; textVersion: "2026-08-26"; acceptedAt: string };
   createdAt: string; updatedAt: string; createdBy: { type: "public_applicant" }; updatedBy: { type: "public_applicant" } | AuditActor;
-  duplicateCandidates?: { vendors: string[]; drivers: string[]; vehicles: string[] };
+  confirmedSupplyClassification?: "vendor_managed" | "independent_owner_driver" | "unknown_needs_review";
+  duplicateCandidates?: { vendors: string[]; drivers: string[]; vehicles: string[]; driverMatches?: Record<string,string[]>; vehicleMatches?: Record<string,string[]> };
   onboarding?: { vendorId?: string; driverIds: string[]; vehicleIds: string[]; onboardedAt: string; onboardedBy: AuditActor };
 };
 

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import type { ApprovedBroadcastInput,DispatchBroadcast,DispatchBroadcastStatus } from "./broadcast-types";
+import type { ApprovedBroadcastInput,ApprovedSupplyBroadcastInput,BroadcastRecipientSnapshot,DispatchBroadcast,DispatchBroadcastStatus } from "./broadcast-types";
 import type { DispatchOfferNotificationStatus,DispatchOfferRecord } from "./offer-types";
 import type { WhatsAppOutboundJobInput,WhatsAppOutboundMessageJob,WhatsAppOutboundStatus } from "../messaging/whatsapp-outbox-types";
 
@@ -24,11 +24,21 @@ export function buildApprovedBroadcast(input:ApprovedBroadcastInput):DispatchBro
   const idempotencyKey=dispatchBroadcastIdentity({...input,candidateIds,offerIds,driverIds});
   return{id:idempotencyKey,broadcastId:idempotencyKey,...input,candidateIds,offerIds,driverIds,status:"approved",idempotencyKey,createdAt:input.approvedAt,updatedAt:input.approvedAt};
 }
+const normalizedRecipients=(recipients:BroadcastRecipientSnapshot[])=>[...recipients].map(item=>({...item,recipientId:item.recipientId.trim(),supplyAccountId:item.supplyAccountId.trim(),offerId:item.offerId.trim()})).sort((a,b)=>`${a.recipientType}:${a.recipientId}`.localeCompare(`${b.recipientType}:${b.recipientId}`));
+export function dispatchSupplyBroadcastIdentity(input:Pick<ApprovedSupplyBroadcastInput,"bookingOperationalId"|"revision"|"offerRevision"|"candidateIds"|"offerIds"|"recipients"|"approvedPayoutMinor"|"offerExpiresAt">){const recipients=normalizedRecipients(input.recipients);return hash([input.bookingOperationalId,input.revision,input.offerRevision,uniqueSorted(input.candidateIds).join(","),uniqueSorted(input.offerIds).join(","),recipients.map(item=>`${item.recipientType}:${item.recipientId}:${item.supplyAccountId}:${item.offerId}`).join(","),input.approvedPayoutMinor,input.offerExpiresAt].join(":"))}
+export function buildApprovedSupplyBroadcast(input:ApprovedSupplyBroadcastInput):DispatchBroadcast{
+ const candidateIds=uniqueSorted(input.candidateIds),offerIds=uniqueSorted(input.offerIds),recipients=normalizedRecipients(input.recipients),recipientIds=uniqueSorted(recipients.map(item=>item.recipientId));
+ if(!input.bookingOperationalId||!input.bookingId||!candidateIds.length||candidateIds.length!==offerIds.length||candidateIds.length!==recipients.length||recipientIds.length!==recipients.length||recipients.some(item=>!item.recipientId||!item.supplyAccountId||!item.displayName.trim()||!item.offerId||!offerIds.includes(item.offerId)))throw new Error("Select matching supplier recipients and offers.");
+ if(!Number.isSafeInteger(input.revision)||input.revision<1||!Number.isSafeInteger(input.offerRevision)||input.offerRevision<1)throw new Error("Broadcast revisions must be positive integers.");
+ if(!Number.isSafeInteger(input.approvedPayoutMinor)||input.approvedPayoutMinor<0)throw new Error("Approved payout snapshot is invalid.");
+ if(isOfferExpired(input.offerExpiresAt,new Date(input.approvedAt)))throw new Error("Offer expiry must be after broadcast approval.");
+ const idempotencyKey=dispatchSupplyBroadcastIdentity({...input,candidateIds,offerIds,recipients});return{id:idempotencyKey,broadcastId:idempotencyKey,...input,candidateIds,offerIds,driverIds:[],recipientIds,recipients,status:"approved",idempotencyKey,createdAt:input.approvedAt,updatedAt:input.approvedAt};
+}
 export function reuseOrCreateBroadcast(existing:DispatchBroadcast|undefined,proposed:DispatchBroadcast){return existing?{broadcast:existing,duplicate:true}:{broadcast:proposed,duplicate:false}}
 
 export function outboundMessageIdentity(input:WhatsAppOutboundJobInput){
-  if(input.purpose==="driver_offer"&&(!input.broadcastId||!input.offerId))throw new Error("Driver offer jobs require broadcast and offer identity.");
-  if(input.purpose!=="driver_offer"&&!input.assignmentId)throw new Error("Assignment notification jobs require assignment identity.");
+  if((input.purpose==="driver_offer"||input.purpose==="booking_offer")&&(!input.broadcastId||!input.offerId))throw new Error("Booking offer jobs require broadcast and offer identity.");
+  if(input.purpose!=="driver_offer"&&input.purpose!=="booking_offer"&&!input.assignmentId)throw new Error("Assignment notification jobs require assignment identity.");
   return hash([input.purpose,input.bookingOperationalId,input.broadcastId??"",input.offerId??"",input.assignmentId??"",input.recipientType,input.recipientReferenceId].join(":"));
 }
 export function buildOutboundMessageJob(input:WhatsAppOutboundJobInput):WhatsAppOutboundMessageJob{if(!input.recipientReferenceId.trim())throw new Error("Outbound recipient reference is required.");const idempotencyKey=outboundMessageIdentity(input);return{id:idempotencyKey,...input,status:"not_queued",attemptCount:0,idempotencyKey}}

@@ -1,7 +1,7 @@
-import type { MatchCandidate, MatchProjection } from "@/lib/dispatch/matching-types";
+import type { MatchCandidate, MatchProjection, SupplyRecipientProjection } from "@/lib/dispatch/matching-types";
 import type { DispatchOfferRecord, DriverOfferProjection } from "@/lib/dispatch/offer-types";
 import type { OperationalBooking } from "@/lib/dispatch/booking-types";
-import { broadcastRecipients, createBroadcastSafePreview } from "@/lib/dispatch/broadcast-approval-core";
+import { createBroadcastSafePreview,supplyBroadcastRecipients } from "@/lib/dispatch/broadcast-approval-core";
 import { setMatchOverrideAction } from "./actions";
 import OfferControls from "./OfferControls";
 import BroadcastApproval from "./BroadcastApproval";
@@ -31,6 +31,8 @@ const CandidateCard = ({ bookingDocumentId, candidate, rank, offerProjection, of
     ? <OfferControls projection={offerProjection} offer={offer}/>
     : <p className="mt-3 rounded bg-red-50 p-2 text-xs font-bold text-red-700">Driver WhatsApp number is invalid or missing. Offer actions are unavailable.</p>}
 </article>;
+
+const SupplyRecipientPanel=({projection}:{projection:SupplyRecipientProjection})=><section className="mt-4 rounded-xl border-2 border-blue-200 bg-blue-50 p-4"><div><h4 className="font-black text-[#0F2B46]">Recommended Supply</h4><p className="text-xs text-slate-600">Grouped vendor-first recipient projection. D4 pair-level controls remain available below.</p></div><div className="mt-3 grid gap-3">{projection.top.map((candidate,index)=><article key={candidate.id} className="rounded-lg bg-white p-3"><div className="flex flex-wrap justify-between gap-2"><div><p className="font-black">{index+1}. {candidate.displayName}</p><p className="text-sm">Type: {candidate.classification==="vendor_managed"?"Vendor Managed":"Independent Owner-Driver"}</p></div><span className={`h-fit rounded-full px-2 py-1 text-xs font-bold ${candidate.sendReady?"bg-green-100 text-green-800":"bg-amber-100 text-amber-900"}`}>{candidate.sendReady?"Operational WhatsApp ready":"Operational WhatsApp unavailable"}</span></div><dl className="mt-2 grid gap-2 text-sm sm:grid-cols-3"><div><dt className="text-slate-500">Compatible vehicles</dt><dd className="font-bold">{candidate.eligibleVehicleCount}</dd></div><div><dt className="text-slate-500">Eligible drivers</dt><dd className="font-bold">{candidate.eligibleDriverCount}</dd></div><div><dt className="text-slate-500">Best pair score</dt><dd className="font-bold">{candidate.bestPairScore}</dd></div></dl><p className="mt-2 text-sm"><b>Best matching vehicle:</b> {candidate.bestVehicleLabel}</p><p className="mt-1 text-xs text-slate-500">{candidate.eligiblePairCount} eligible internal combination(s), grouped as one recipient.</p></article>)}{!projection.top.length&&<p className="rounded-lg bg-white p-3 text-sm">No supply account is eligible for automated recipient selection.</p>}</div>{projection.excluded.length>0&&<details className="mt-3 rounded-lg border border-blue-200 bg-white p-3"><summary className="cursor-pointer text-sm font-bold">Review-required / internal supply ({projection.excluded.length})</summary><div className="mt-2 grid gap-2 text-sm">{projection.excluded.map(item=><p key={item.supplyAccountId}><b>{item.displayName}</b> — {item.reason}</p>)}</div></details>}</section>;
 
 export default function MatchPanel({
   bookingDocumentId,
@@ -63,11 +65,12 @@ export default function MatchPanel({
       <a href={`/admin/dispatch?open=${bookingDocumentId}&matches=${bookingDocumentId}`} className="rounded-lg bg-[#0F2B46] px-4 py-2 text-sm font-bold text-white">Refresh matches</a>
     </div>
     <p className="mt-2 text-xs text-slate-500">Conflict window: {projection.window.start} → {projection.window.end}. {projection.window.basis}.</p>
+    {projection.supplyRecipients&&<SupplyRecipientPanel projection={projection.supplyRecipients}/>}
 
     {offers.length > 0 && <div className="mt-4 rounded-xl bg-slate-100 p-3">
       <h4 className="font-black">Driver Responses</h4>
       <div className="mt-2 grid gap-2 text-sm">{offers.map(offer => <div key={offer.id} className="rounded bg-white p-2">
-        <b>{offer.driverName}</b> — {offer.vendorName} — {offer.vehicleRegistration} · <b>{offer.responseStatus === "available" ? "🟢 AVAILABLE" : offer.responseStatus === "declined" ? "🔴 DECLINED" : offer.responseStatus === "no_response" ? "⚪ NO RESPONSE" : offer.offerStage.replaceAll("_", " ")}</b>{offer.responseAt && ` · ${new Date(offer.responseAt).toLocaleString("en-PK")}`}
+        <b>{offer.recipientDisplayName??offer.driverName??offer.vendorName??"Historical recipient"}</b>{offer.vehicleRegistration?` — ${offer.vehicleRegistration}`:""} · <b>{offer.responseStatus === "available" ? "🟢 AVAILABLE" : offer.responseStatus === "declined" ? "🔴 DECLINED" : offer.responseStatus === "no_response" ? "⚪ NO RESPONSE" : offer.offerStage.replaceAll("_", " ")}</b>{offer.responseAt && ` · ${new Date(offer.responseAt).toLocaleString("en-PK")}`}
       </div>)}</div>
       <p className="mt-2 text-xs font-bold">Availability only — no driver or vehicle is assigned.</p>
     </div>}
@@ -77,7 +80,7 @@ export default function MatchPanel({
       : <>
         <BroadcastApproval
           bookingDocumentId={bookingDocumentId}
-          recipients={broadcastRecipients(projection.eligible, projection.top)}
+          recipients={supplyBroadcastRecipients(projection.supplyRecipients?.eligible??[],projection.supplyRecipients?.top??[])}
           preview={createBroadcastSafePreview(booking)}
           currentRevision={currentBroadcastRevision}
           activeBroadcastId={activeBroadcastId}

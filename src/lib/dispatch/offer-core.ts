@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import type { OperationalBooking } from "./booking-types";
-import type { MatchCandidate } from "./matching-types";
-import type { DispatchResponseStatus, DriverOfferProjection } from "./offer-types";
-import type { DispatchDriver } from "./types";
+import type { MatchCandidate,SupplyRecipientCandidate } from "./matching-types";
+import type { DispatchResponseStatus, DriverOfferProjection,SupplyOfferProjection } from "./offer-types";
+import type { DispatchDriver,DispatchVendor } from "./types";
 import { normalizeDispatchPhone } from "./validation.ts";
 
 export const dispatchOfferId=(bookingOperationalId:string,candidateId:string)=>createHash("sha256").update(`${bookingOperationalId}:${candidateId}`).digest("hex");
@@ -17,3 +17,19 @@ const extraHour=(responsibilities:Record<string,unknown>)=>{const value=responsi
 export function createDriverOfferProjection(input:{booking:OperationalBooking;candidate:MatchCandidate;driver:DispatchDriver}):DriverOfferProjection{
  const{booking,candidate,driver}=input;if(booking.lifecycle!=="active"||booking.readinessStatus!=="ready_for_dispatch"||booking.internalFinancials.payoutStatus!=="reviewed"||booking.internalFinancials.vendorPayoutMinor===undefined)throw new Error("Booking must be Ready for Dispatch with an approved vendor payout.");const phone=normalizeDispatchPhone(driver.whatsappNumberNormalized||driver.whatsappNumber);if(!phone)throw new Error("Driver WhatsApp number is invalid or missing.");const r=(booking.responsibilities??{}) as Record<string,unknown>,duration=typeof booking.sourceSnapshot.durationHours==="number"?`${booking.sourceSnapshot.durationHours} hours`:booking.serviceType.toLowerCase().includes("monthly")?"Monthly — confirm schedule":booking.serviceType.toLowerCase().includes("outstation")?"Outstation — confirm duration":"12 hours / confirm with RentKA",foodLabel=booking.serviceType.toLowerCase().includes("outstation")?"Driver TA/DA":"Driver Food/Accommodation";
  const lines=["🚗 *RENTKA — TRIP AVAILABLE*",`Booking: *${booking.bookingId}*`,`📅 Date: ${dateLabel(booking.itinerary.travelDate)}`,`⏰ Pickup: ${timeLabel(booking.itinerary.pickupTime)}`,`🚘 Vehicle Requirement: ${booking.requestedVehicle.categoryOrModel}`,`📍 Pickup Area: ${generalArea(booking.itinerary.pickup)}`,`📍 Destination / Usage: ${generalArea(booking.itinerary.destinationOrUsage)}`,`⏱ Package: ${duration}`,`💰 Your Amount: *${money(booking.internalFinancials.vendorPayoutMinor)}*`,`⛽ Fuel: ${responsibility(r.fuel)}`,`🛣 Toll: ${responsibility(r.toll)}`,`🅿 Parking: ${responsibility(r.parking)}`,`🍽 ${foodLabel}: ${allowance(r.driverFoodAccommodation)}`,`⏳ Extra hour: ${extraHour(r)}`,"","Please confirm:","AVAILABLE","or","NOT AVAILABLE","","Availability only — booking is not assigned yet."];const message=lines.join("\n"),offerId=dispatchOfferId(booking.id,candidate.id);return{offerId,candidateId:candidate.id,bookingOperationalId:booking.id,bookingId:booking.bookingId,vendorId:candidate.vendor.id,driverId:candidate.driver.id,vehicleId:candidate.vehicle.id,vehicleRegistration:candidate.vehicle.registrationNumber,driverName:candidate.driver.name,vendorName:candidate.vendor.name,driverWhatsappNumber:phone,approvedPayoutMinor:booking.internalFinancials.vendorPayoutMinor,message,whatsappUrl:`https://wa.me/${phone}?text=${encodeURIComponent(message)}`}}
+
+export function createSupplyOfferProjection(input:{booking:OperationalBooking;candidate:SupplyRecipientCandidate;vendor:DispatchVendor;designatedDriver?:DispatchDriver}):SupplyOfferProjection{
+ const{booking,candidate,vendor,designatedDriver}=input;
+ if(booking.lifecycle!=="active"||booking.readinessStatus!=="ready_for_dispatch"||booking.internalFinancials.payoutStatus!=="reviewed"||booking.internalFinancials.vendorPayoutMinor===undefined)throw new Error("Booking must be Ready for Dispatch with an approved vendor payout.");
+ if(candidate.supplyAccountId!==vendor.id||!candidate.sendReady)throw new Error("Selected supplier is not ready for automated delivery.");
+ let phone:string|undefined;
+ if(candidate.recipientTypeIntent==="vendor"){
+  if(vendor.supplyClassification!=="vendor_managed"||candidate.classification!=="vendor_managed"||candidate.recipientReferenceId!==vendor.id)throw new Error("Vendor recipient identity no longer matches the supply account.");
+  phone=normalizeDispatchPhone(vendor.whatsappNumberNormalized||vendor.whatsappNumber);
+ }else{
+  if(vendor.supplyClassification!=="independent_owner_driver"||candidate.classification!=="independent_owner_driver"||!designatedDriver||vendor.independentOwnerDriverId!==designatedDriver.id||candidate.recipientReferenceId!==designatedDriver.id||designatedDriver.vendorId!==vendor.id||designatedDriver.supplyRelationship!=="independent_owner_driver")throw new Error("Independent recipient identity no longer matches the designated owner-driver.");
+  phone=normalizeDispatchPhone(designatedDriver.whatsappNumberNormalized||designatedDriver.whatsappNumber);
+ }
+ if(!phone)throw new Error("Selected supplier operational WhatsApp is invalid or missing.");
+ return{offerId:dispatchOfferId(booking.id,candidate.id),candidateId:candidate.id,bookingOperationalId:booking.id,bookingId:booking.bookingId,recipientType:candidate.recipientTypeIntent,recipientId:candidate.recipientReferenceId,supplyAccountId:vendor.id,recipientDisplayName:candidate.displayName,recipientWhatsappNumber:phone,approvedPayoutMinor:booking.internalFinancials.vendorPayoutMinor};
+}

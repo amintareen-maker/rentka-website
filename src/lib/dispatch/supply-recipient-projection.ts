@@ -1,0 +1,27 @@
+import { createHash } from "node:crypto";
+import { normalizeDispatchPhone } from "./validation.ts";
+import type { MatchCandidate, SupplyRecipientCandidate, SupplyRecipientExclusion, SupplyRecipientProjection } from "./matching-types.ts";
+import type { DispatchDriver, DispatchVehicle, DispatchVendor } from "./types.ts";
+
+export type SupplyRecipientProjectionInput={pairCandidates:MatchCandidate[];vendors:DispatchVendor[];drivers:DispatchDriver[];vehicles:DispatchVehicle[];zoneId:string};
+const stableRecipientId=(classification:string,vendorId:string,driverId="")=>createHash("sha256").update(`supply-recipient:${classification}:${vendorId}:${driverId}`).digest("hex").slice(0,24);
+const usableWhatsapp=(raw:string,normalized:string)=>{const computed=normalizeDispatchPhone(raw);return Boolean(computed&&computed===normalized)};
+const orderedUnique=(values:string[])=>[...new Set(values)].sort((a,b)=>a.localeCompare(b));
+const compatibleDriver=(classification:DispatchVendor["supplyClassification"],driver:DispatchDriver|undefined)=>driver?.supplyRelationship===classification;
+const compatibleVehicle=(classification:DispatchVendor["supplyClassification"],vehicle:DispatchVehicle|undefined)=>classification==="vendor_managed"?(vehicle?.controlRelationship==="vendor_owned"||vehicle?.controlRelationship==="vendor_managed"):classification==="independent_owner_driver"?vehicle?.controlRelationship==="independent_controlled":classification==="rentka_internal"?vehicle?.controlRelationship==="rentka_internal":false;
+
+export function projectSupplyRecipients(input:SupplyRecipientProjectionInput):SupplyRecipientProjection{
+ const vendorMap=new Map(input.vendors.map(vendor=>[vendor.id,vendor])),driverMap=new Map(input.drivers.map(driver=>[driver.id,driver])),vehicleMap=new Map(input.vehicles.map(vehicle=>[vehicle.id,vehicle])),pairsByVendor=new Map<string,MatchCandidate[]>();
+ for(const pair of input.pairCandidates){const list=pairsByVendor.get(pair.vendor.id)??[];list.push(pair);pairsByVendor.set(pair.vendor.id,list)}
+ const eligible:SupplyRecipientCandidate[]=[],excluded:SupplyRecipientExclusion[]=[];
+ for(const vendorId of [...pairsByVendor.keys()].sort()){const vendor=vendorMap.get(vendorId),pairs=pairsByVendor.get(vendorId)!;if(!vendor)continue;const classification=vendor.supplyClassification;
+  if(classification==="unknown_needs_review"){excluded.push({supplyAccountId:vendor.id,displayName:vendor.name,classification,reason:"Supply classification needs review; automated recipient projection is blocked."});continue}
+  if(classification==="rentka_internal"){excluded.push({supplyAccountId:vendor.id,displayName:vendor.name,classification,reason:"RentKA internal supply remains on its existing internal-resource workflow."});continue}
+  const intendedDriverId=classification==="independent_owner_driver"?vendor.independentOwnerDriverId:undefined;if(classification==="independent_owner_driver"&&!intendedDriverId){excluded.push({supplyAccountId:vendor.id,displayName:vendor.name,classification,reason:"Independent owner-driver designation is missing."});continue}
+  const compatiblePairs=pairs.filter(pair=>(classification==="vendor_managed"||pair.driver.id===intendedDriverId)&&compatibleDriver(classification,driverMap.get(pair.driver.id))&&compatibleVehicle(classification,vehicleMap.get(pair.vehicle.id)));
+  if(!compatiblePairs.length){excluded.push({supplyAccountId:vendor.id,displayName:vendor.name,classification,reason:"No pair has relationships compatible with the authoritative supply classification."});continue}
+  compatiblePairs.sort((a,b)=>b.score-a.score||a.id.localeCompare(b.id));const best=compatiblePairs[0],designatedDriver=classification==="independent_owner_driver"?driverMap.get(intendedDriverId!):undefined,whatsappReady=classification==="vendor_managed"?usableWhatsapp(vendor.whatsappNumber,vendor.whatsappNumberNormalized):Boolean(designatedDriver&&usableWhatsapp(designatedDriver.whatsappNumber,designatedDriver.whatsappNumberNormalized)),drivers=orderedUnique(compatiblePairs.map(pair=>pair.driver.id)),vehicles=orderedUnique(compatiblePairs.map(pair=>pair.vehicle.id)),labels=orderedUnique(compatiblePairs.map(pair=>pair.vehicle.label));
+  eligible.push({id:stableRecipientId(classification,vendor.id,intendedDriverId),supplyAccountId:vendor.id,recipientReferenceId:classification==="vendor_managed"?vendor.id:intendedDriverId!,recipientTypeIntent:classification==="vendor_managed"?"vendor":"independent_driver",classification,displayName:classification==="vendor_managed"?vendor.name:designatedDriver!.name,zoneId:input.zoneId,operationalWhatsappAvailable:whatsappReady,sendReady:whatsappReady,eligiblePairCount:compatiblePairs.length,eligibleDriverCount:drivers.length,eligibleVehicleCount:vehicles.length,compatibleVehicleLabels:labels,bestVehicleLabel:best.vehicle.label,bestPairScore:best.score,rankingReasons:[`Best eligible pair score ${best.score}`,`Best compatibility: ${best.compatibility.replaceAll("_"," ")}`,classification==="vendor_managed"?`Grouped ${drivers.length} eligible driver(s) and ${vehicles.length} compatible vehicle(s) without multiplicity scoring`:"Designated independent owner-driver is eligible"],evidence:{bestPairCandidateId:best.id,eligiblePairCandidateIds:compatiblePairs.map(pair=>pair.id).sort()}})
+ }
+ eligible.sort((a,b)=>b.bestPairScore-a.bestPairScore||a.supplyAccountId.localeCompare(b.supplyAccountId)||a.id.localeCompare(b.id));excluded.sort((a,b)=>a.supplyAccountId.localeCompare(b.supplyAccountId));return{top:eligible.slice(0,3),eligible,excluded};
+}

@@ -14,7 +14,7 @@ import {
   validateRevisedOfferExpiry,
 } from "./driver-offer-portal-core";
 import type { DriverOfferPortalMutation, DriverOfferResponse, DriverOfferTokenRecord } from "./driver-offer-portal-types";
-import type { DispatchOfferRecord } from "./offer-types";
+import { directDriverOfferIdentity,type DispatchOfferRecord } from "./offer-types";
 import { assertOfferOpen, isOfferExpired } from "./dispatch-orchestration-core.ts";
 
 const BOOKINGS = "operationalBookings";
@@ -61,6 +61,7 @@ export async function issueSecureDriverOfferLink(bookingOperationalId: string, o
     if (!bookingSnap.exists || !offerSnap.exists) throw new Error("Offer is not available.");
     const booking = { ...bookingSnap.data(), id: bookingSnap.id } as OperationalBooking;
     const offer = { ...offerSnap.data(), id: offerSnap.id } as DispatchOfferRecord;
+    const identity = directDriverOfferIdentity(offer);
     assertBookingAndOfferCurrent(booking, offer, String(controlSnap.data()?.activeBroadcastId ?? ""));
 
     const now = FieldValue.serverTimestamp();
@@ -69,8 +70,8 @@ export async function issueSecureDriverOfferLink(bookingOperationalId: string, o
       bookingOperationalId,
       offerId,
       candidateId: offer.candidateId,
-      driverId: offer.driverId,
-      vendorId: offer.vendorId,
+      driverId: identity.driverId,
+      vendorId: identity.vendorId,
       offeredPayoutMinor: offer.currentOfferedPayoutMinor ?? offer.approvedPayoutMinor,
       offerRevision: offerRevision(offer),
       ...(offer.broadcastId ? { broadcastId: offer.broadcastId } : {}),
@@ -86,7 +87,7 @@ export async function issueSecureDriverOfferLink(bookingOperationalId: string, o
     }, { merge: true });
     tx.create(bookingRef.collection("events").doc(), auditEvent("driver_offer_secure_link_issued", now, {
       offerId,
-      driverId: offer.driverId,
+      driverId: identity.driverId,
       offerRevision: offerRevision(offer),
       tokenHashPrefix: tokenHash.slice(0, 8),
       reissued: oldTokens.docs.some(doc => doc.data().active === true),
@@ -119,7 +120,8 @@ export async function getSecureDriverOfferPage(token: string) {
   if (!bookingSnap.exists || !offerSnap.exists) throw new Error("Offer is no longer available.");
   const booking = { ...bookingSnap.data(), id: bookingSnap.id } as OperationalBooking;
   const offer = { ...offerSnap.data(), id: offerSnap.id } as DispatchOfferRecord;
-  if (offer.driverId !== data.driverId || offer.vendorId !== data.vendorId || offer.candidateId !== data.candidateId) throw new Error("Offer authorization does not match.");
+  const identity=directDriverOfferIdentity(offer);
+  if (identity.driverId !== data.driverId || identity.vendorId !== data.vendorId || offer.candidateId !== data.candidateId) throw new Error("Offer authorization does not match.");
   assertCurrentOfferRevision(data.offerRevision, offer.offerRevision);
   assertCurrentBroadcast(offer, String(controlSnap.data()?.activeBroadcastId ?? ""));
 
@@ -127,14 +129,14 @@ export async function getSecureDriverOfferPage(token: string) {
     const now = FieldValue.serverTimestamp();
     const batch = db.batch();
     batch.set(offerRef, { responseStatus: "expired", portalStatus: "closed", closeReason: "offer_expired", updatedAt: now }, { merge: true });
-    batch.set(bookingRef.collection("events").doc(`offer-expired-${offer.id}-${offerRevision(offer)}`), auditEvent("driver_offer_response_changed", now, { offerId: offer.id, driverId: offer.driverId, offerRevision: offerRevision(offer), responseStatus: "expired" }));
+    batch.set(bookingRef.collection("events").doc(`offer-expired-${offer.id}-${offerRevision(offer)}`), auditEvent("driver_offer_response_changed", now, { offerId: offer.id, driverId: identity.driverId, offerRevision: offerRevision(offer), responseStatus: "expired" }));
     await batch.commit();
     offer.responseStatus = "expired";
     offer.portalStatus = "closed";
   } else if (!offer.secureViewedAt && booking.lifecycle === "active" && booking.assignment?.status !== "assigned" && offer.portalStatus !== "closed") {
     const now = FieldValue.serverTimestamp();
     await offerRef.set({ secureViewedAt: now, updatedAt: now }, { merge: true });
-    await bookingRef.collection("events").add(auditEvent("driver_offer_secure_viewed", now, { offerId: offer.id, driverId: offer.driverId, offerRevision: offerRevision(offer) }, { type: "driver_offer", driverId: offer.driverId, offerId: offer.id } as never));
+    await bookingRef.collection("events").add(auditEvent("driver_offer_secure_viewed", now, { offerId: offer.id, driverId: identity.driverId, offerRevision: offerRevision(offer) }, { type: "driver_offer", driverId: identity.driverId, offerId: offer.id } as never));
   }
   return createSecureDriverOfferProjection(booking, { ...offer, secureViewedAt: offer.secureViewedAt ?? new Date().toISOString() }, responsesSnap.docs.map(response));
 }
@@ -155,7 +157,8 @@ export async function submitSecureDriverOfferResponse(token: string, mutation: D
     const booking = { ...bookingSnap.data(), id: bookingSnap.id } as OperationalBooking;
     const offer = { ...offerSnap.data(), id: offerSnap.id } as DispatchOfferRecord;
     assertBookingAndOfferCurrent(booking, offer, String(controlSnap.data()?.activeBroadcastId ?? ""));
-    if (offer.driverId !== data.driverId || offer.vendorId !== data.vendorId || offer.candidateId !== data.candidateId) throw new Error("Offer authorization does not match.");
+    const identity=directDriverOfferIdentity(offer);
+    if (identity.driverId !== data.driverId || identity.vendorId !== data.vendorId || offer.candidateId !== data.candidateId) throw new Error("Offer authorization does not match.");
     assertCurrentOfferRevision(data.offerRevision, offer.offerRevision);
     const offered = offer.currentOfferedPayoutMinor ?? offer.approvedPayoutMinor;
     if (offered !== data.offeredPayoutMinor) throw new Error("This offer is no longer available.");
@@ -172,7 +175,7 @@ export async function submitSecureDriverOfferResponse(token: string, mutation: D
     if (mutation.kind === "countered") validateCounterPayout(mutation.requestedPayoutMinor, offered);
 
     const now = FieldValue.serverTimestamp();
-    const actor = { type: "driver_offer", driverId: offer.driverId, offerId: offer.id } as const;
+    const actor = { type: "driver_offer", driverId: identity.driverId, offerId: offer.id } as const;
     const responseRef = offerRef.collection(RESPONSES).doc();
     const responseData = { ...mutation, offeredPayoutMinor: offered, offerRevision: offerRevision(offer), timestamp: now, actor, source: "driver_secure_page" };
     tx.create(responseRef, responseData);
@@ -191,7 +194,7 @@ export async function submitSecureDriverOfferResponse(token: string, mutation: D
     });
     tx.create(bookingRef.collection("events").doc(), auditEvent(`driver_offer_${mutation.kind}`, now, {
       offerId: offer.id,
-      driverId: offer.driverId,
+      driverId: identity.driverId,
       offerRevision: offerRevision(offer),
       offeredPayoutMinor: offered,
       ...(mutation.kind === "countered" ? { requestedPayoutMinor: mutation.requestedPayoutMinor } : {}),
@@ -226,6 +229,7 @@ export async function reviewDriverCounter(bookingOperationalId: string, offerId:
     if (!bookingSnap.exists || !offerSnap.exists) throw new Error("Offer not found.");
     const booking = { ...bookingSnap.data(), id: bookingSnap.id } as OperationalBooking;
     const offer = { ...offerSnap.data(), id: offerSnap.id } as DispatchOfferRecord;
+    const identity = directDriverOfferIdentity(offer);
 
     const decisionName = request.action === "accept" ? "accept_counter" : request.action === "reject" ? "reject_counter" : "revised_offer";
     if (offer.lastAdminDecision === decisionName && offer.lastAdminDecisionRevision === request.expectedRevision) {
@@ -293,8 +297,8 @@ export async function reviewDriverCounter(bookingOperationalId: string, offerId:
         bookingOperationalId,
         offerId,
         candidateId: offer.candidateId,
-        driverId: offer.driverId,
-        vendorId: offer.vendorId,
+        driverId: identity.driverId,
+        vendorId: identity.vendorId,
         offeredPayoutMinor: request.revisedPayoutMinor,
         offerRevision: nextRevision,
         ...(offer.broadcastId ? { broadcastId: offer.broadcastId } : {}),
@@ -320,7 +324,7 @@ export async function reviewDriverCounter(bookingOperationalId: string, offerId:
       now,
       {
         offerId,
-        driverId: offer.driverId,
+        driverId: identity.driverId,
         offerRevision: request.expectedRevision,
         originalOfferedPayoutMinor: offer.approvedPayoutMinor,
         driverCounterPayoutMinor: counterMinor,

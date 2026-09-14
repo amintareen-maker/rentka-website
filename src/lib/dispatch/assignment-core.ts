@@ -2,15 +2,29 @@ import type { OperationalBooking } from "./booking-types";
 import type { DispatchOfferRecord } from "./offer-types";
 import type { MatchProjection } from "./matching-types";
 import type { DispatchDriver, DispatchVehicle, DispatchVendor } from "./types";
+import type { VendorFulfillmentProposal } from "./vendor-offer-portal-types";
 
-export type AssignmentSelection={driverId:string;vehicleId:string;offerId:string};
+export type VendorProposalSelection={proposalId:string;vendorId:string;offerRevision:number;responseRevision:number};
+export type AssignmentSelection={driverId:string;vehicleId:string;offerId:string;vendorProposal?:VendorProposalSelection};
 
 export function requireAvailableOffer(offers:DispatchOfferRecord[],selection:AssignmentSelection){
- const offer=offers.find(item=>item.id===selection.offerId&&item.driverId===selection.driverId);
+ const offer=offers.find(item=>item.id===selection.offerId&&(selection.vendorProposal?item.recipientType==="vendor":item.driverId===selection.driverId));
  if(!offer)throw new Error("Select an AVAILABLE response for this Driver.");
  if(offer.responseStatus!=="available"&&offer.responseStatus!=="accepted")throw new Error(offer.responseStatus==="declined"?"This Driver declined the booking.":"This Driver does not have an AVAILABLE or ACCEPTED response.");
  if(offer.responseStatus==="accepted"&&offer.offerRevision!==undefined&&offer.agreedPayoutMinor===undefined)throw new Error("The accepted Driver payout is incomplete. Refresh the offer before assignment.");
  return offer;
+}
+
+export function validateVendorAssignmentProposal(input:{offer:DispatchOfferRecord;proposal:VendorFulfillmentProposal;selection:AssignmentSelection}){
+ const{offer,proposal,selection}=input,expected=selection.vendorProposal;
+ if(!expected||offer.recipientType!=="vendor")throw new Error("A current Vendor fulfillment proposal is required.");
+ if(offer.responseStatus!=="accepted"||offer.agreedPayoutMinor===undefined)throw new Error("The Vendor offer is not currently accepted with an agreed payout.");
+ if(offer.vendorId!==expected.vendorId||offer.supplyAccountId!==expected.vendorId||proposal.vendorId!==expected.vendorId)throw new Error("The Vendor proposal does not belong to this accepted supply account.");
+ if(proposal.id!==expected.proposalId||proposal.status!=="provided")throw new Error("The Vendor proposal has been superseded. Refresh assignment review.");
+ if((offer.offerRevision??0)!==expected.offerRevision||proposal.offerRevision!==expected.offerRevision||proposal.responseRevision!==expected.responseRevision)throw new Error("The Vendor offer or proposal revision is stale. Refresh assignment review.");
+ if(proposal.driverId!==selection.driverId||proposal.vehicleId!==selection.vehicleId)throw new Error("The selected resources no longer match the current Vendor proposal.");
+ if(offer.fulfillmentProposal?.proposalId&&offer.fulfillmentProposal.proposalId!==proposal.id)throw new Error("The Vendor proposal has been superseded. Refresh assignment review.");
+ return{agreedPayoutMinor:offer.agreedPayoutMinor,vendorId:expected.vendorId,proposalId:proposal.id,offerRevision:expected.offerRevision,responseRevision:expected.responseRevision};
 }
 
 export function validateAssignmentSelection(input:{booking:OperationalBooking;matches:MatchProjection;offers:DispatchOfferRecord[];vendors:DispatchVendor[];drivers:DispatchDriver[];vehicles:DispatchVehicle[];selection:AssignmentSelection;activeBroadcastId?:string}){

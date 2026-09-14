@@ -1,5 +1,6 @@
 import type { OperationalBooking } from "./booking-types";
 import type { DispatchDriver, DispatchVehicle, DispatchVendor } from "./types";
+import type { SupplyClassification } from "./supply-classification";
 
 export type MatchResourceKind = "vendor" | "vehicle" | "driver" | "candidate";
 export type MatchExclusion = { kind: MatchResourceKind; id: string; label: string; reason: string; critical: boolean };
@@ -21,7 +22,30 @@ export type MatchProjection = {
   top: MatchCandidate[];
   eligible: MatchCandidate[];
   excluded: MatchExclusion[];
+  supplyRecipients?: SupplyRecipientProjection;
 };
+export type SupplyRecipientTypeIntent = "vendor" | "independent_driver";
+export type SupplyRecipientCandidate = {
+  id: string;
+  supplyAccountId: string;
+  recipientReferenceId: string;
+  recipientTypeIntent: SupplyRecipientTypeIntent;
+  classification: Extract<SupplyClassification,"vendor_managed"|"independent_owner_driver">;
+  displayName: string;
+  zoneId: string;
+  operationalWhatsappAvailable: boolean;
+  sendReady: boolean;
+  eligiblePairCount: number;
+  eligibleDriverCount: number;
+  eligibleVehicleCount: number;
+  compatibleVehicleLabels: string[];
+  bestVehicleLabel: string;
+  bestPairScore: number;
+  rankingReasons: string[];
+  evidence: { bestPairCandidateId: string; eligiblePairCandidateIds: string[] };
+};
+export type SupplyRecipientExclusion = { supplyAccountId: string; displayName: string; classification: SupplyClassification; reason: string };
+export type SupplyRecipientProjection = { top: SupplyRecipientCandidate[]; eligible: SupplyRecipientCandidate[]; excluded: SupplyRecipientExclusion[] };
 export type ResourceReservation = { id: string; bookingId: string; vehicleId?: string; driverId?: string; startsAt: string; endsAt: string; active: boolean };
 export type MatchOverride = { candidateId: string; mode: "include" | "exclude" };
 export type MatchInput = { booking: OperationalBooking; vendors: DispatchVendor[]; vehicles: DispatchVehicle[]; drivers: DispatchDriver[]; reservations?: ResourceReservation[]; overrides?: MatchOverride[]; now?: Date };

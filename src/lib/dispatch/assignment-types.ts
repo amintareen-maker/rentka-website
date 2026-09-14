@@ -7,5 +7,6 @@ export type DispatchAssignment={
   id:string;status:AssignmentStatus;bookingOperationalId:string;bookingId:string;dispatchVendorId:string;vendorName:string;
   assignedDriverId:string;driverSnapshot:DriverAssignmentSnapshot;assignedVehicleId:string;vehicleSnapshot:VehicleAssignmentSnapshot;
   approvedVendorPayoutMinor:number;offerId:string;offerCandidateId:string;assignedAt:string;assignedBy:AuditActor;
+  vendorProposalId?:string;vendorOfferRevision?:number;vendorResponseRevision?:number;supplyAccountId?:string;
   window:{start:string;end:string;basis:string};previousAssignmentId?:string;reason?:string;
 };

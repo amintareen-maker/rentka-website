@@ -1,4 +1,4 @@
-export const WHATSAPP_OUTBOUND_PURPOSES=["driver_offer","driver_final_instructions","customer_driver_details"] as const;
+export const WHATSAPP_OUTBOUND_PURPOSES=["driver_offer","booking_offer","driver_final_instructions","customer_driver_details"] as const;
 export const WHATSAPP_OUTBOUND_STATUSES=["not_queued","queued","sending","provider_accepted","sent","delivered","read","failed","cancelled","outcome_unknown"] as const;
 export type WhatsAppOutboundPurpose=typeof WHATSAPP_OUTBOUND_PURPOSES[number];
 export type WhatsAppOutboundStatus=typeof WHATSAPP_OUTBOUND_STATUSES[number];
@@ -10,7 +10,7 @@ export type WhatsAppOutboundMessageJob={
   broadcastId?:string;
   offerId?:string;
   assignmentId?:string;
-  recipientType:"driver"|"customer";
+  recipientType:"driver"|"customer"|"vendor"|"independent_driver";
   recipientReferenceId:string;
   provider:"dualhook";
   messageKind:"text"|"template";

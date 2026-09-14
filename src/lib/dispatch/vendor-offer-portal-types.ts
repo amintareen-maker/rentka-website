@@ -1,0 +1,11 @@
+export const VENDOR_DECLINE_REASONS=["busy","vehicle_unavailable","driver_unavailable","route_not_suitable","price_too_low","other"] as const;
+export type VendorDeclineReason=typeof VENDOR_DECLINE_REASONS[number];
+export type VendorOfferResponseKind="accepted"|"declined"|"countered";
+export type VendorOfferActor={type:"vendor_offer";vendorId:string;offerId:string};
+export type VendorOfferResponse={id:string;kind:VendorOfferResponseKind;offeredPayoutMinor:number;requestedPayoutMinor?:number;declineReason?:VendorDeclineReason;note?:string;offerRevision:number;timestamp:string;actor:VendorOfferActor;source:"vendor_secure_page"};
+export type VendorOfferTokenRecord={bookingOperationalId:string;offerId:string;candidateId:string;recipientType:"vendor";recipientId:string;supplyAccountId:string;vendorId:string;offeredPayoutMinor:number;offerRevision:number;broadcastId:string;active:boolean;createdAt:unknown;expiresAt:unknown;revokedAt?:unknown;revokeReason?:string};
+export type VendorProposalOption={id:string;label:string};
+export type VendorFulfillmentProposal={id:string;status:"provided";vendorId:string;driverId:string;driverName:string;vehicleId:string;vehicleLabel:string;offerRevision:number;responseRevision:number;timestamp:string;actor:VendorOfferActor;source:"vendor_secure_page"};
+export type SecureVendorOfferProjection={bookingOperationalId:string;bookingId:string;offerId:string;vendorId:string;vendorName:string;offeredPayoutMinor:number;responseStatus:string;generalPickupArea:string;generalDestination:string;travelDate:string;pickupTime:string;vehicleRequirement:string;packageInformation:string;offerExpiresAt:string;supportPhone:string;closed:boolean;latestResponse?:VendorOfferResponse;proposalStatus:"not_provided"|"provided"|"superseded"|"rejected"|"assigned";currentProposal?:VendorFulfillmentProposal;eligibleDrivers:VendorProposalOption[];eligibleVehicles:VendorProposalOption[];eligiblePairs:{driverId:string;vehicleId:string}[]};
+export type VendorOfferPortalMutation={kind:"accepted"}|{kind:"declined";declineReason:VendorDeclineReason;note?:string}|{kind:"countered";requestedPayoutMinor:number;note?:string};
+export type VendorProposalMutation={driverId:string;vehicleId:string};
