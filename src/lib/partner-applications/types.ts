@@ -2,10 +2,12 @@ import type { NormalRentalZoneId } from "../normal-rental/zones";
 import type { AuditActor } from "../dispatch/types";
 
 export const APPLICATION_TYPES = ["driver", "ownerDriver", "vendor"] as const;
+export const DRIVING_SETUPS = ["self", "vendor_driver"] as const;
 export const APPLICATION_STATUSES = ["new", "under_review", "need_more_information", "approved", "rejected"] as const;
 export const DOCUMENT_REVIEW_STATES = ["pending", "verified", "rejected", "needs_replacement"] as const;
 export const PARTNER_VEHICLE_CATEGORIES = ["Sedan", "Hatchback", "SUV", "Mid SUV", "Luxury", "Van", "Coaster", "Other"] as const;
 export type ApplicationType = typeof APPLICATION_TYPES[number];
+export type DrivingSetup = typeof DRIVING_SETUPS[number];
 export type ApplicationStatus = typeof APPLICATION_STATUSES[number];
 export type DocumentReviewState = typeof DOCUMENT_REVIEW_STATES[number];
 export type ExtractionField = { value: string; confidence: number; source: "embedded_text"; accepted?: boolean };
@@ -15,9 +17,10 @@ export type ApplicantDriver = { key: string; name: string; mobile: string; mobil
 export type ApplicantVehicle = { make: string; model: string; modelYear?: number; registrationNumber: string; registrationNormalized: string; category: string; ownershipRelationship?: string; documents: PartnerDocument[] };
 export type PartnerApplication = {
   id: string; applicationId: string; applicationType: ApplicationType; status: ApplicationStatus;
+  drivingSetup?: DrivingSetup;
   name: string; businessName?: string; contactName?: string; mobile: string; mobileNormalized: string; whatsapp: string; whatsappNormalized: string;
   zoneIds: NormalRentalZoneId[]; address?: string; cnicNumber?: string; cnicNormalized?: string; licenceNumber?: string; licenceNormalized?: string;
-  licenceIssueDate?: string; licenceExpiryDate?: string; numberOfVehicles?: number; approximateDrivers?: number; businessInfo?: string; notes?: string;
+  licenceIssueDate?: string; licenceExpiryDate?: string; availability?: "available_after_approval"; numberOfVehicles?: number; approximateDrivers?: number; businessInfo?: string; notes?: string;
   drivers: ApplicantDriver[]; vehicles: ApplicantVehicle[]; documents: PartnerDocument[];
   consent: { accepted: true; textVersion: "2026-08-26"; acceptedAt: string };
   createdAt: string; updatedAt: string; createdBy: { type: "public_applicant" }; updatedBy: { type: "public_applicant" } | AuditActor;
