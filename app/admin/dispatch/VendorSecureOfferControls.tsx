@@ -16,15 +16,20 @@ const money = (minor: number) =>
 export default function VendorSecureOfferControls({
   bookingOperationalId,
   offer,
+  manualMessage,
 }: {
   bookingOperationalId: string;
   offer: DispatchOfferRecord;
+  manualMessage: string;
 }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [link, setLink] = useState("");
   const router = useRouter();
   const response = supplierResponsePresentation(offer);
+  const manualText = link
+    ? `${manualMessage}\nSecure Review Offer: ${link}`
+    : manualMessage;
 
   const issue = async () => {
     setBusy(true);
@@ -55,6 +60,17 @@ export default function VendorSecureOfferControls({
     setBusy(false);
     if (!result.ok) setError(result.message);
     router.refresh();
+  };
+  const copyVendorOffer = async () => {
+    if (link) await navigator.clipboard.writeText(manualText);
+  };
+  const openVendorWhatsApp = () => {
+    if (link && offer.recipientWhatsappNumber)
+      window.open(
+        `https://wa.me/${offer.recipientWhatsappNumber}?text=${encodeURIComponent(manualText)}`,
+        "_blank",
+        "noopener,noreferrer",
+      );
   };
 
   const review = async (form: FormData) => {
@@ -92,13 +108,22 @@ export default function VendorSecureOfferControls({
           {link ? "Reissue Vendor Link" : "Issue Vendor Response Link"}
         </button>
         {link && (
-          <button
-            type="button"
-            onClick={() => navigator.clipboard.writeText(link)}
-            className="rounded border bg-white px-3 py-2 font-bold"
-          >
-            Copy Link
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={copyVendorOffer}
+              className="rounded border bg-white px-3 py-2 font-bold"
+            >
+              Copy Vendor Offer
+            </button>
+            <button
+              type="button"
+              onClick={openVendorWhatsApp}
+              className="rounded bg-green-700 px-3 py-2 font-bold text-white"
+            >
+              Open WhatsApp
+            </button>
+          </>
         )}
         {offer.notificationStatus === "failed" &&
           offer.failureRetryable &&
@@ -113,6 +138,12 @@ export default function VendorSecureOfferControls({
             </button>
           )}
       </div>
+      <details className="mt-3 rounded border bg-white p-3">
+        <summary className="cursor-pointer font-bold">
+          Preview Vendor Offer
+        </summary>
+        <pre className="mt-2 whitespace-pre-wrap text-xs">{manualText}</pre>
+      </details>
       <p className="mt-2">
         <b>Vendor:</b> {response.recipientName}
       </p>
@@ -208,7 +239,8 @@ export default function VendorSecureOfferControls({
       )}
       <p className="mt-2 text-slate-600">
         Vendor acceptance and fulfillment proposals do not assign or reserve
-        resources. No WhatsApp is sent here.
+        resources. Copy and Open WhatsApp are manual fallback actions and do not
+        alter the automated outbox.
       </p>
     </div>
   );

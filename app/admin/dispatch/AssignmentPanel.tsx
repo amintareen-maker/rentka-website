@@ -294,7 +294,8 @@ export default function AssignmentPanel({
             </dl>
             <p className="mt-4 rounded bg-amber-50 p-3 text-sm">
               This persists a final operational assignment and conflict
-              reservation. It sends no Driver or Customer message.
+              reservation. After success, separate outbox jobs queue the Driver
+              and Customer notifications; messaging cannot roll back the assignment.
             </p>
             <div className="mt-4 flex justify-end gap-2">
               <button
@@ -330,7 +331,7 @@ export default function AssignmentPanel({
               <dt>Vehicle:</dt><dd className="font-bold">{vendorProposal.vehicleLabel} — {vendorProposal.registrationNumber}</dd>
               <dt>Agreed payout:</dt><dd className="font-bold">{vendorProposal.agreedPayoutMinor === undefined ? "Unavailable" : money(vendorProposal.agreedPayoutMinor)}</dd>
             </dl>
-            <p className="mt-4 rounded bg-amber-50 p-3 text-sm">This explicit Admin action revalidates the current Vendor offer, latest proposal, D7 eligibility, and conflicts before creating the assignment reservation. It sends no Driver or Customer message.</p>
+            <p className="mt-4 rounded bg-amber-50 p-3 text-sm">This explicit Admin action revalidates the current Vendor offer, latest proposal, D7 eligibility, and conflicts before creating the assignment reservation. After success, separate outbox jobs queue the Driver and Customer notifications; messaging cannot roll back the assignment.</p>
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => setVendorConfirmingId("")} disabled={pending} className="rounded-lg border px-4 py-2 font-bold">Cancel</button>
               <button onClick={submitVendorProposal} disabled={pending || !vendorProposal.current} className="rounded-lg bg-green-700 px-4 py-2 font-bold text-white">{pending ? "Assigning…" : "Confirm Assignment"}</button>

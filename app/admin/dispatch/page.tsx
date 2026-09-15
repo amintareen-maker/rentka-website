@@ -43,6 +43,7 @@ import SecureOfferControls from "./SecureOfferControls";
 import TripSettlement from "./TripSettlement";
 import { getDispatchBroadcastPanel } from "@/lib/dispatch/broadcast-approval-repository";
 import VendorSecureOfferControls from "./VendorSecureOfferControls";
+import { createManualVendorOfferMessage } from "@/lib/dispatch/post-assignment-messaging-core";
 
 // D7 source-contract anchors retained across formatting:
 // q.open?getOperationalBooking(q.open) opened&&!filtered.some [opened,...filtered] no contact or assignment
@@ -522,6 +523,7 @@ export default async function Page({
                   <DriverInstructions
                     projection={instructionsPanel.projection}
                     record={instructionsPanel.record}
+                    notification={instructionsPanel.notification}
                   />
                 </div>
               )}
@@ -530,6 +532,7 @@ export default async function Page({
                   <CustomerDriverDetails
                     projection={customerDetailsPanel.projection}
                     record={customerDetailsPanel.record}
+                    notification={customerDetailsPanel.notification}
                   />
                 </div>
               )}
@@ -555,6 +558,7 @@ export default async function Page({
                             key={offer.id}
                             bookingOperationalId={b.id}
                             offer={offer}
+                            manualMessage={createManualVendorOfferMessage(b, offer)}
                           />
                         ) : offer.recipientType === "independent_driver" ? (
                           <p

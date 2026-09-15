@@ -5,6 +5,7 @@ import { auditEvent, sharedActor } from "./booking-core";
 import type { OperationalBooking } from "./booking-types";
 import { createDriverInstructionsProjection } from "./driver-instructions-core";
 import type { DriverInstructionAction, DriverInstructionRecord } from "./driver-instructions-types";
+import { getPostAssignmentNotificationJob } from "../messaging/post-assignment-delivery-repository";
 
 const BOOKINGS="operationalBookings",INSTRUCTIONS="driverInstructions";
 const iso=(value:unknown)=>value&&typeof value==="object"&&"toDate" in value?(value as{toDate():Date}).toDate().toISOString():String(value??"");
@@ -13,8 +14,8 @@ const record=(doc:FirebaseFirestore.DocumentSnapshot)=>{const data=doc.data()!;r
 export async function getDriverInstructionsPanel(bookingOperationalId:string){
  const db=getAdminDb(),bookingSnap=await db.collection(BOOKINGS).doc(bookingOperationalId).get();if(!bookingSnap.exists)return null;
  const booking={...bookingSnap.data(),id:bookingSnap.id} as OperationalBooking,projection=createDriverInstructionsProjection(booking);if(!projection)return null;
- const instructionSnap=await bookingSnap.ref.collection(INSTRUCTIONS).doc(projection.assignmentId).get();
- return{projection,record:instructionSnap.exists?record(instructionSnap):null};
+ const[instructionSnap,notification]=await Promise.all([bookingSnap.ref.collection(INSTRUCTIONS).doc(projection.assignmentId).get(),getPostAssignmentNotificationJob(booking,"driver_final_instructions")]);
+ return{projection,record:instructionSnap.exists?record(instructionSnap):null,notification};
 }
 
 export async function mutateDriverInstructions(bookingOperationalId:string,assignmentId:string,action:DriverInstructionAction){

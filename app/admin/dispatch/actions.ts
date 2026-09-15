@@ -47,6 +47,11 @@ import {
 import { approveDispatchBroadcast } from "@/lib/dispatch/broadcast-approval-repository";
 import { deliverApprovedBookingOfferJobs,deliverDriverOfferJob } from "@/lib/messaging/driver-offer-delivery-repository";
 import {
+  deliverPostAssignmentNotificationJob,
+  deliverPostAssignmentNotificationJobs,
+  ensurePostAssignmentNotificationJobs,
+} from "@/lib/messaging/post-assignment-delivery-repository";
+import {
   issueSecureVendorOfferLink,
   reviewVendorCounter,
 } from "@/lib/dispatch/vendor-offer-portal-repository";
@@ -400,18 +405,74 @@ export async function assignBookingAction(
       },
       { ...(value(form, "reason") ? { reason: value(form, "reason") } : {}) },
     );
+    let notificationMessage =
+      " Post-assignment notifications could not be queued; assignment remains valid.";
+    if (result.assignment.previousAssignmentId) {
+      notificationMessage =
+        " Reassignment notifications require separate lifecycle review; no automatic message was sent.";
+    } else try {
+      const jobs = await ensurePostAssignmentNotificationJobs(
+          value(form, "bookingDocumentId"),
+          result.assignment.id,
+        ),
+        delivery = await deliverPostAssignmentNotificationJobs(
+          jobs.map((job) => job.jobId),
+        ),
+        accepted = delivery.filter(
+          (item) => item.status === "provider_accepted",
+        ).length,
+        progressed = delivery.filter(
+          (item) =>
+            !item.invoked &&
+            ["sending", "provider_accepted", "sent", "delivered", "read"].includes(
+              item.status,
+            ),
+        ).length,
+        pending = delivery.length - accepted - progressed;
+      notificationMessage = ` Post-assignment notifications: provider accepted ${accepted}; already progressed ${progressed}; pending configuration or retry ${pending}.`;
+    } catch {
+      // Assignment is authoritative and must never roll back for messaging failure.
+    }
     revalidatePath("/admin/dispatch");
     return {
       ok: true,
       message: result.duplicate
-        ? "Booking already has this assignment. No duplicate was created."
-        : "Booking assigned successfully.",
+        ? `Booking already has this assignment. No duplicate was created.${notificationMessage}`
+        : `Booking assigned successfully.${notificationMessage}`,
     };
   } catch (error) {
     return {
       ok: false,
       message:
         error instanceof Error ? error.message : "Unable to assign booking.",
+    };
+  }
+}
+export async function deliverPostAssignmentNotificationAction(
+  jobId: string,
+): Promise<{ ok: boolean; message: string }> {
+  try {
+    await auth();
+    if (!jobId) throw new Error("Post-assignment notification job is required.");
+    const result = await deliverPostAssignmentNotificationJob(jobId);
+    revalidatePath("/admin/dispatch");
+    return {
+      ok: true,
+      message: result.invoked
+        ? result.status === "provider_accepted"
+          ? "Provider accepted the post-assignment message. Delivery is tracked separately."
+          : result.status === "outcome_unknown"
+            ? "Delivery outcome is unknown. Do not retry until reconciled."
+            : "Post-assignment delivery attempt completed."
+        : `No message sent; job status is ${result.status}.`,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : "Unable to deliver post-assignment notification.",
     };
   }
 }
