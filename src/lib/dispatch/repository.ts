@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "../firebaseAdmin";
 import { DISPATCH_COLLECTIONS } from "./collections";
 import { firestoreSafePayload } from "./firestore-payload";
+import { driverSetupClassification, requireVendorDriverChoice, type DriverSetupChoice } from "./driver-setup";
 import type { AuditActor, DispatchDriver, DispatchVehicle, DispatchVendor } from "./types";
 import { assertDriverSupplyRelationship, assertIndependentOwnerDriverDesignation, assertVehicleControlRelationship, LEGACY_DRIVER_RELATIONSHIP, LEGACY_SUPPLY_CLASSIFICATION, LEGACY_VEHICLE_CONTROL, type DriverSupplyRelationship, type SupplyClassification, type VehicleControlRelationship } from "./supply-classification";
 
@@ -59,3 +60,77 @@ export async function saveDispatchDriver(id: string | undefined, input: DriverIn
 }
 
 export async function vendorRelationshipCounts(vendorId: string) { const db = getAdminDb(); const [vehicles, drivers] = await Promise.all([db.collection(DISPATCH_COLLECTIONS.vehicles).where("vendorId", "==", vendorId).get(), db.collection(DISPATCH_COLLECTIONS.drivers).where("vendorId", "==", vendorId).get()]); return { vehicles: vehicles.size, drivers: drivers.size }; }
+
+export async function completeDispatchVendorDriverSetup(vendorId: string, choice: DriverSetupChoice, selectedDriverId?: string) {
+  if (!vendorId) throw new Error("Supply account is required.");
+  const db = getAdminDb(), vendorRef = db.collection(DISPATCH_COLLECTIONS.vendors).doc(vendorId);
+  return db.runTransaction(async (tx) => {
+    const [vendorSnap, driversSnap, vehiclesSnap] = await Promise.all([
+      tx.get(vendorRef),
+      tx.get(db.collection(DISPATCH_COLLECTIONS.drivers).where("vendorId", "==", vendorId)),
+      tx.get(db.collection(DISPATCH_COLLECTIONS.vehicles).where("vendorId", "==", vendorId)),
+    ]);
+    if (!vendorSnap.exists) throw new Error("Supply account was not found.");
+    const vendor = { id: vendorSnap.id, ...vendorSnap.data() } as DispatchVendor,
+      drivers = driversSnap.docs.map((doc) => ({ id: doc.id, ...doc.data(), supplyRelationship: doc.data().supplyRelationship ?? LEGACY_DRIVER_RELATIONSHIP } as DispatchDriver)),
+      vehicles = vehiclesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data(), controlRelationship: doc.data().controlRelationship ?? LEGACY_VEHICLE_CONTROL } as DispatchVehicle)),
+      classification = driverSetupClassification(choice),
+      now = FieldValue.serverTimestamp();
+
+    requireVendorDriverChoice(choice, vendorId, selectedDriverId, drivers);
+    const conflictingDrivers = drivers.filter((driver) => driver.supplyRelationship !== "unknown_needs_review" && driver.supplyRelationship !== classification);
+    const targetVehicleControl = choice === "self" ? "independent_controlled" : "vendor_managed";
+    const conflictingVehicles = vehicles.filter((vehicle) => vehicle.controlRelationship !== "unknown_needs_review" && (choice === "self" ? vehicle.controlRelationship !== targetVehicleControl : vehicle.controlRelationship !== "vendor_owned" && vehicle.controlRelationship !== "vendor_managed"));
+    if (conflictingDrivers.length || conflictingVehicles.length)
+      throw new Error("Existing driver or vehicle relationships conflict with this choice. Review those records before changing driver setup.");
+
+    let effectiveDriverId = selectedDriverId;
+    if (choice === "self") {
+      const designated = drivers.find((driver) => driver.id === vendor.independentOwnerDriverId),
+        matching = drivers.filter((driver) => driver.mobileNumberNormalized === vendor.primaryPhoneNormalized || driver.whatsappNumberNormalized === vendor.whatsappNumberNormalized);
+      if (!designated && matching.length > 1) throw new Error("More than one driver matches the owner profile. Review the driver records first.");
+      const existingOwner = designated ?? matching[0];
+      const ownerRef = existingOwner ? db.collection(DISPATCH_COLLECTIONS.drivers).doc(existingOwner.id) : db.collection(DISPATCH_COLLECTIONS.drivers).doc();
+      effectiveDriverId = ownerRef.id;
+      if (existingOwner) {
+        tx.set(ownerRef, { supplyRelationship: "independent_owner_driver", updatedAt: now, updatedBy: SHARED_ADMIN_ACTOR }, { merge: true });
+      } else {
+        tx.create(ownerRef, firestoreSafePayload({
+          name: vendor.contactName?.trim() || vendor.name,
+          mobileNumber: vendor.primaryPhone,
+          mobileNumberNormalized: vendor.primaryPhoneNormalized,
+          whatsappNumber: vendor.whatsappNumber,
+          whatsappNumberNormalized: vendor.whatsappNumberNormalized,
+          vendorId,
+          supplyRelationship: "independent_owner_driver",
+          zoneIds: vendor.zoneIds,
+          priority: vendor.priority,
+          status: "available",
+          active: true,
+          documentation: { cnicVerificationState: "unknown", licenceState: "unknown" },
+          createdAt: now,
+          createdBy: SHARED_ADMIN_ACTOR,
+          updatedAt: now,
+          updatedBy: SHARED_ADMIN_ACTOR,
+        }));
+      }
+    } else {
+      tx.set(db.collection(DISPATCH_COLLECTIONS.drivers).doc(effectiveDriverId!), { supplyRelationship: "vendor_managed", updatedAt: now, updatedBy: SHARED_ADMIN_ACTOR }, { merge: true });
+    }
+    for (const vehicle of vehicles.filter((item) => item.controlRelationship === "unknown_needs_review"))
+      tx.set(db.collection(DISPATCH_COLLECTIONS.vehicles).doc(vehicle.id), { controlRelationship: targetVehicleControl, updatedAt: now, updatedBy: SHARED_ADMIN_ACTOR }, { merge: true });
+    tx.set(vendorRef, {
+      supplyClassification: classification,
+      independentOwnerDriverId: choice === "self" ? effectiveDriverId : FieldValue.delete(),
+      updatedAt: now,
+      updatedBy: SHARED_ADMIN_ACTOR,
+    }, { merge: true });
+    tx.create(vendorRef.collection("events").doc(), {
+      type: "driver_setup_completed",
+      timestamp: now,
+      actor: SHARED_ADMIN_ACTOR,
+      metadata: { choice, classification, driverId: effectiveDriverId ?? null },
+    });
+    return { choice, classification, driverId: effectiveDriverId! };
+  });
+}

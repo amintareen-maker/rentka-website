@@ -42,7 +42,7 @@ export function supplierResponsePresentation(offer: DispatchOfferRecord) {
       offer.recipientType === "vendor"
         ? "Vendor Managed"
         : offer.recipientType === "independent_driver"
-          ? "Independent Owner-Driver"
+          ? "Owner drives"
           : "Driver",
     deliveryLabel: sentenceCase(offer.notificationStatus ?? "not queued"),
     responseLabel,

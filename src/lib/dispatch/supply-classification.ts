@@ -21,20 +21,25 @@ export type VehicleControlRelationship = typeof VEHICLE_CONTROL_RELATIONSHIPS[nu
 export type OfferRecipientType = "vendor" | "independent_driver" | "rentka_internal" | "blocked_needs_review";
 
 export const SUPPLY_CLASSIFICATION_LABELS: Readonly<Record<SupplyClassification, string>> = {
-  vendor_managed: "Vendor Managed",
-  independent_owner_driver: "Independent Owner-Driver",
-  rentka_internal: "RentKA Internal",
-  unknown_needs_review: "Needs Review",
+  vendor_managed: "One of my drivers will drive",
+  independent_owner_driver: "I will drive myself",
+  rentka_internal: "RentKA team will drive",
+  unknown_needs_review: "Driver setup incomplete",
 };
 
-export const DRIVER_SUPPLY_RELATIONSHIP_LABELS: Readonly<Record<DriverSupplyRelationship, string>> = SUPPLY_CLASSIFICATION_LABELS;
+export const DRIVER_SUPPLY_RELATIONSHIP_LABELS: Readonly<Record<DriverSupplyRelationship, string>> = {
+  vendor_managed: "Vendor driver",
+  independent_owner_driver: "Owner drives",
+  rentka_internal: "RentKA driver",
+  unknown_needs_review: "Driver setup incomplete",
+};
 
 export const VEHICLE_CONTROL_RELATIONSHIP_LABELS: Readonly<Record<VehicleControlRelationship, string>> = {
-  vendor_owned: "Vendor-Owned",
-  vendor_managed: "Vendor-Managed",
-  independent_controlled: "Independently Controlled",
-  rentka_internal: "RentKA Internal",
-  unknown_needs_review: "Needs Review",
+  vendor_owned: "Vendor vehicle",
+  vendor_managed: "Managed vendor vehicle",
+  independent_controlled: "Owner's vehicle",
+  rentka_internal: "RentKA vehicle",
+  unknown_needs_review: "Setup incomplete",
 };
 
 export const supplyClassificationLabel = (value: SupplyClassification) => SUPPLY_CLASSIFICATION_LABELS[value];
@@ -81,9 +86,9 @@ export function assertIndependentOwnerDriverDesignation(
   driver: { id: string; vendorId: string; supplyRelationship: DriverSupplyRelationship } | null,
 ) {
   if (!independentOwnerDriverId) return;
-  if (classification !== "independent_owner_driver") throw new Error("Only an independent owner-driver supply account can designate an independent offer recipient.");
+  if (classification !== "independent_owner_driver") throw new Error("Choose 'I will drive myself' before selecting the owner profile.");
   if (!driver || driver.id !== independentOwnerDriverId || driver.vendorId !== supplyAccountId || driver.supplyRelationship !== "independent_owner_driver") {
-    throw new Error("Select an independent owner-driver belonging to this supply account.");
+    throw new Error("Choose the owner profile that belongs to this supply account.");
   }
 }
 
@@ -106,10 +111,10 @@ export function supplyRelationshipReview(
 }
 
 export function supplyClassificationPresentation(classification: SupplyClassification) {
-  if (classification === "vendor_managed") return "Booking offers go to Vendor";
-  if (classification === "independent_owner_driver") return "Booking offers go to Independent Owner-Driver";
-  if (classification === "rentka_internal") return "RentKA internal supply — automated offers not enabled";
-  return "Automated offers blocked until reviewed";
+  if (classification === "vendor_managed") return "One of this vendor's drivers will drive. Booking offers go to the vendor first.";
+  if (classification === "independent_owner_driver") return "The owner will drive. Booking offers go directly to the owner.";
+  if (classification === "rentka_internal") return "A RentKA team driver will handle this vehicle; automated supplier offers stay off.";
+  return "Driver setup incomplete — automated booking offers remain blocked.";
 }
 
 export function supplyRosterCounts(vendorId: string, drivers: readonly { vendorId: string }[], vehicles: readonly { vendorId: string }[]) {

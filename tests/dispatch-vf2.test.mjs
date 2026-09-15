@@ -21,9 +21,9 @@ const vehicleActions = source("app/admin/vehicles/actions.ts");
 const repository = source("src/lib/dispatch/repository.ts");
 
 test("supply account labels are clear and retain authoritative enum values", () => {
-  assert.deepEqual(Object.values(SUPPLY_CLASSIFICATION_LABELS), ["Vendor Managed", "Independent Owner-Driver", "RentKA Internal", "Needs Review"]);
-  assert.equal(DRIVER_SUPPLY_RELATIONSHIP_LABELS.vendor_managed, "Vendor Managed");
-  assert.equal(VEHICLE_CONTROL_RELATIONSHIP_LABELS.independent_controlled, "Independently Controlled");
+  assert.deepEqual(Object.values(SUPPLY_CLASSIFICATION_LABELS), ["One of my drivers will drive", "I will drive myself", "RentKA team will drive", "Driver setup incomplete"]);
+  assert.equal(DRIVER_SUPPLY_RELATIONSHIP_LABELS.vendor_managed, "Vendor driver");
+  assert.equal(VEHICLE_CONTROL_RELATIONSHIP_LABELS.independent_controlled, "Owner's vehicle");
 });
 
 test("vendor-managed account supports one driver and one vehicle", () => {
@@ -90,13 +90,13 @@ test("independent-owner-driver account accepts compatible driver and vehicle", (
 });
 
 test("independent designation rejects a foreign or incompatible driver", () => {
-  assert.throws(() => assertIndependentOwnerDriverDesignation("independent_owner_driver", "account-a", "driver-a", { id: "driver-a", vendorId: "account-b", supplyRelationship: "independent_owner_driver" }), /belonging to this supply account/);
-  assert.throws(() => assertIndependentOwnerDriverDesignation("vendor_managed", "account-a", "driver-a", { id: "driver-a", vendorId: "account-a", supplyRelationship: "vendor_managed" }), /Only an independent/);
+  assert.throws(() => assertIndependentOwnerDriverDesignation("independent_owner_driver", "account-a", "driver-a", { id: "driver-a", vendorId: "account-b", supplyRelationship: "independent_owner_driver" }), /belongs to this supply account/);
+  assert.throws(() => assertIndependentOwnerDriverDesignation("vendor_managed", "account-a", "driver-a", { id: "driver-a", vendorId: "account-a", supplyRelationship: "vendor_managed" }), /I will drive myself/);
 });
 
 test("independent designation accepts only the account's compatible driver", () => {
   assert.doesNotThrow(() => assertIndependentOwnerDriverDesignation("independent_owner_driver", "account-a", "driver-a", { id: "driver-a", vendorId: "account-a", supplyRelationship: "independent_owner_driver" }));
-  assert.match(vendorPage, /Independent offer recipient/);
+  assert.match(vendorPage, /Owner profile used for driving/);
 });
 
 test("RentKA internal account validates compatible internal resources", () => {

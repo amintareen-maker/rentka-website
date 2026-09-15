@@ -72,13 +72,13 @@ test("forms parse authoritative classification fields", () => {
   assert.equal(parseVehicleForm(vehicle).controlRelationship, "vendor_owned");
 });
 
-test("admin forms expose classification, relationships, review filter, and scoped add actions", () => {
+test("admin forms expose plain driver setup, safe review filter, and scoped add actions", () => {
   const vendors = readFileSync(new URL("../app/admin/vendors/page.tsx", import.meta.url), "utf8");
   const drivers = readFileSync(new URL("../app/admin/drivers/page.tsx", import.meta.url), "utf8");
   const vehicles = readFileSync(new URL("../app/admin/vehicles/page.tsx", import.meta.url), "utf8");
-  for (const marker of ["Supply classification", "Supply Classification Review Required", "Add Driver", "Add Vehicle", "View Drivers", "View Vehicles", "classification=unknown_needs_review"]) assert.ok(vendors.includes(marker), marker);
-  assert.match(drivers, /Supply relationship/);
-  assert.match(vehicles, /Supply\/control relationship/);
+  for (const marker of ["Who will drive this vehicle?", "Driver Setup Needs Attention", "Complete Driver Setup", "Add Driver", "Add Vehicle", "View Drivers", "View Vehicles", "classification=unknown_needs_review"]) assert.ok(vendors.includes(marker), marker);
+  assert.match(drivers, /Driver setup/);
+  assert.match(vehicles, /Vehicle control/);
   assert.match(vendors, /supplyClassificationPresentation/);
 });
 

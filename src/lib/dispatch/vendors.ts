@@ -1,1 +1,1 @@
-export { getDispatchVendor, listDispatchVendors, saveDispatchVendor, vendorRelationshipCounts } from "./repository";
+export { completeDispatchVendorDriverSetup, getDispatchVendor, listDispatchVendors, saveDispatchVendor, vendorRelationshipCounts } from "./repository";
