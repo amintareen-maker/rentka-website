@@ -29,3 +29,8 @@ export async function claimStagedDocuments(transaction:FirebaseFirestore.Transac
 }
 export async function cleanupExpiredStagedUploads(limit=50){const snap=await getAdminDb().collection(STAGING_COLLECTION).where("expiresAtTimestamp","<=",Timestamp.now()).limit(limit).get();let removed=0;for(const doc of snap.docs){const data=doc.data() as StagedUpload;if(data.attachedApplicationId)continue;await getAdminBucket().file(data.storagePath).delete({ignoreNotFound:true});await doc.ref.delete();removed++}return removed}
 export async function readProtectedDocument(path:string){if(!path.startsWith("partner-applications/staged/"))throw new Error("Invalid protected document path.");const file=getAdminBucket().file(path);const[metadata]=await file.getMetadata();const[buffer]=await file.download();return{buffer,contentType:String(metadata.contentType||"application/octet-stream"),name:path.split("/").at(-1)||"document"}}
+export async function writeAdminReplacementDocument(file:File,kind:string){
+ const id=randomUUID(),now=new Date(),prepared=await prepareDocumentUpload(file,kind,{stagedUploadId:id,objectId:randomUUID()}),extraction=extractDocumentFields(printableDocumentText(prepared.buffer),kind,now);
+ await getAdminBucket().file(prepared.storagePath).save(prepared.buffer,{resumable:false,contentType:file.type,metadata:{cacheControl:"private, no-store",metadata:{adminReplacement:"true"}}});
+ return{id,document:{id,kind,storagePath:prepared.storagePath,originalName:prepared.originalName,contentType:file.type,size:file.size,reviewState:"pending" as const,uploadedAt:now.toISOString(),extraction}};
+}

@@ -13,7 +13,9 @@ export type ApplicationStatus = typeof APPLICATION_STATUSES[number];
 export type DocumentReviewState = typeof DOCUMENT_REVIEW_STATES[number];
 export type ExtractionField = { value: string; confidence: number; source: "embedded_text"; accepted?: boolean };
 export type ExtractionResult = { status: "extracted" | "low_confidence" | "unavailable" | "failed"; fields: Record<string, ExtractionField>; attemptedAt: string; engine: "rentka_local_embedded_text_v1"; error?: string };
-export type PartnerDocument = { id: string; kind: string; storagePath: string; originalName: string; contentType: string; size: number; reviewState: DocumentReviewState; uploadedAt: string; extraction?: ExtractionResult };
+export type PartnerDocument = { id: string; kind: string; storagePath: string; originalName: string; contentType: string; size: number; reviewState: DocumentReviewState; uploadedAt: string; reviewedAt?: string; reviewNote?: string; extraction?: ExtractionResult };
+export type PartnerDocumentOwnerType = "application" | "driver" | "vehicle";
+export type PartnerDocumentHistoryEntry = PartnerDocument & { ownerType: PartnerDocumentOwnerType; ownerIndex?: number; replacedAt: string; replacedBy: AuditActor; replacedByDocumentId: string; replacementReason?: string };
 export type ApplicantDriver = { key: string; name: string; mobile: string; mobileNormalized: string; whatsapp: string; whatsappNormalized: string; zoneIds: NormalRentalZoneId[]; cnicNumber: string; cnicNormalized: string; licenceNumber: string; licenceNormalized: string; licenceIssueDate?: string; licenceExpiryDate: string; relationshipIntent: "vendor_managed"; documents: PartnerDocument[] };
 export type ApplicantVehicle = { make: string; model: string; modelYear?: number; registrationNumber: string; registrationNormalized: string; category: string; ownershipRelationship?: string; documents: PartnerDocument[] };
 export type PartnerApplication = {
@@ -22,7 +24,7 @@ export type PartnerApplication = {
   name: string; businessName?: string; contactName?: string; mobile: string; mobileNormalized: string; whatsapp: string; whatsappNormalized: string;
   zoneIds: NormalRentalZoneId[]; otherOperationalArea?: string; address?: string; cnicNumber?: string; cnicNormalized?: string; licenceNumber?: string; licenceNormalized?: string;
   licenceIssueDate?: string; licenceExpiryDate?: string; availability?: "available_after_approval"; numberOfVehicles?: number; approximateDrivers?: number; businessInfo?: string; notes?: string;
-  drivers: ApplicantDriver[]; vehicles: ApplicantVehicle[]; documents: PartnerDocument[];
+  drivers: ApplicantDriver[]; vehicles: ApplicantVehicle[]; documents: PartnerDocument[]; documentHistory?: PartnerDocumentHistoryEntry[];
   consent: { accepted: true; textVersion: "2026-08-26"; acceptedAt: string };
   createdAt: string; updatedAt: string; createdBy: { type: "public_applicant" }; updatedBy: { type: "public_applicant" } | AuditActor;
   confirmedSupplyClassification?: "vendor_managed" | "independent_owner_driver" | "unknown_needs_review";
