@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { readFileSync } from "node:fs";
+import { validateSubmission } from "../src/lib/partner-applications/validation.ts";
+import { formatPartnerOperationalAreas } from "../src/lib/partner-applications/types.ts";
+import { collectPartnerFormErrors } from "../app/join-rentka/validation-navigation.ts";
+
+const validOwner=(patch={})=>({applicationType:"ownerDriver",name:"Ali Driver",mobile:"03020589999",whatsapp:"03020589999",zoneIds:["twin_cities"],cnicNumber:"61101-1234567-1",licenceNumber:"ISL-12345",licenceExpiryDate:"26/08/2028",consent:true,vehicles:[{make:"Toyota",model:"Corolla",modelYear:2022,registrationNumber:"ICT-123",category:"Sedan",uploadTokens:[]}],...patch});
+
+test("Other selected with a valid area is trimmed and persisted",()=>{const result=validateSubmission(validOwner({zoneIds:[],otherZoneSelected:true,otherOperationalArea:"  Peshawar  "}));assert.deepEqual(result.zoneIds,[]);assert.equal(result.otherOperationalArea,"Peshawar")});
+test("Other selected with an empty area is rejected on client and server",()=>{assert.throws(()=>validateSubmission(validOwner({zoneIds:[],otherZoneSelected:true,otherOperationalArea:"   "})),error=>error.field==="otherOperationalArea");const errors=collectPartnerFormErrors({applicationType:"ownerDriver",values:{otherZoneSelected:true,otherOperationalArea:"   "},zoneIds:[],uploadedKinds:[],includeVehicle:true});assert.equal(errors.find(error=>error.field==="otherOperationalArea")?.message,"Other city / operational area is required")});
+test("multiple standard zones and Other remain distinct",()=>{const result=validateSubmission(validOwner({zoneIds:["twin_cities","lahore"],otherZoneSelected:true,otherOperationalArea:"Faisalabad"}));assert.deepEqual(result.zoneIds,["twin_cities","lahore"]);assert.equal(result.otherOperationalArea,"Faisalabad")});
+test("existing Islamabad and Lahore submissions are unchanged",()=>{for(const zoneIds of [["twin_cities"],["lahore"],["twin_cities","lahore"]]){const result=validateSubmission(validOwner({zoneIds}));assert.deepEqual(result.zoneIds,zoneIds);assert.equal("otherOperationalArea" in result,false)}});
+test("public form and Admin review expose the simple Other-area workflow",()=>{const form=readFileSync(new URL("../app/join-rentka/PartnerApplicationForm.tsx",import.meta.url),"utf8"),admin=readFileSync(new URL("../app/admin/partner-applications/page.tsx",import.meta.url),"utf8");assert.match(form,/> Other<\/label>/);assert.match(form,/Other city \/ operational area/);assert.match(form,/e\.g\. Peshawar, Faisalabad, Murree, Abbottabad/);assert.match(form,/required placeholder=/);assert.equal(formatPartnerOperationalAreas(["twin_cities","lahore"],"Peshawar"),"Islamabad / Rawalpindi, Lahore, Other: Peshawar");assert.match(admin,/formatPartnerOperationalAreas/);assert.match(admin,/Operational areas/)});
