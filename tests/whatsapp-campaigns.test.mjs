@@ -85,7 +85,8 @@ function database() {
       const writes = [];
       const result = await work({ get: async r => r.isQuery ? querySnapshot(r) : snapshot(r), getAll,
         create: (r, data) => { if (records.has(r.path)) throw Error("already exists"); writes.push(() => records.set(r.path, data)); },
-        update: (r, data) => writes.push(() => records.set(r.path, { ...records.get(r.path), ...data })) });
+        update: (r, data) => writes.push(() => records.set(r.path, { ...records.get(r.path), ...data })),
+        delete: r => writes.push(() => records.delete(r.path)) });
       assert.ok(writes.length <= 401, "transaction stays within bounded write count");
       metrics.writes.push(writes.length); writes.forEach(write => write()); return result;
     }).finally(() => { metrics.active--; });
@@ -278,6 +279,42 @@ test("File A/B/C retain independent memberships and correct history counts", asy
   const size = db.records.size;
   await importFile(files, csvA, fileDetails("File A", 1)); assert.equal(db.records.size, size);
   await importFile(files, csvA, fileDetails("File A again", 4)); assert.equal(contactRecords(db).length, 151);
+});
+test("contact removal preserves independent audiences and historical sends", async () => {
+  const db = database(), repo = repository(db), files = fileRepository(db, repo);
+  const csv = 'First Name,Phone 1 - Value\nAsad,03020589999\nAsad duplicate,+923020589999';
+  const a = await importFile(files, csv, fileDetails("Corporate Clients", 41));
+  const b = await importFile(files, csv, fileDetails("Islamabad Leads", 42));
+  const id = repo.contactIdForPhone("+923020589999");
+  const before = await files.listFileAudiences();
+  assert.equal(before.find(x => x.audienceId === a.audienceId).members.length, 1, "same-file duplicate is prevented");
+  assert.equal(before.find(x => x.audienceId === b.audienceId).members.length, 1, "same number across files is allowed");
+  assert.equal(core.fileAudience(contactRecords(db), before.find(x => x.audienceId === a.audienceId).members, "campaign-a").finalEligible, 1);
+  assert.equal(core.fileAudience(contactRecords(db), before.find(x => x.audienceId === b.audienceId).members, "campaign-b").finalEligible, 1);
+
+  db.records.set("whatsappCampaignSends/history-a", { campaignId: "campaign-a", contactId: id, phoneE164: "+923020589999", status: "delivered" });
+  const afterCampaignA = core.fileAudience(contactRecords(db), before.find(x => x.audienceId === b.audienceId).members, "campaign-b", new Set());
+  assert.equal(afterCampaignA.finalEligible, 1, "Campaign A send does not block Campaign B");
+
+  await files.removeContactFromAudience(a.audienceId, id);
+  assert.equal(db.records.has(`whatsappCampaignAudiences/${a.audienceId}/members/${id}`), false);
+  assert.equal(db.records.has(`whatsappCampaignAudiences/${b.audienceId}/members/${id}`), true);
+  assert.equal(db.records.has(`whatsappCampaignContacts/${id}`), true);
+  assert.equal(db.records.has("whatsappCampaignSends/history-a"), true);
+
+  assert.equal(await files.contactMembershipCount(id), 1);
+  const deleteDb = database(), deleteRepo = repository(deleteDb), deleteFiles = fileRepository(deleteDb, deleteRepo);
+  const deleteA = await importFile(deleteFiles, 'First Name,Phone 1 - Value\nAsad,03020589999', fileDetails("Corporate Clients", 43));
+  const deleteB = await importFile(deleteFiles, 'First Name,Phone 1 - Value\nAsad,03020589999', fileDetails("Islamabad Leads", 44));
+  const deleteId = deleteRepo.contactIdForPhone("+923020589999");
+  deleteDb.records.set("whatsappCampaignSends/history-a", { campaignId: "campaign-a", contactId: deleteId, phoneE164: "+923020589999", status: "delivered" });
+  assert.equal(await deleteFiles.contactMembershipCount(deleteId), 2);
+  const result = await deleteFiles.deleteContactAndMemberships(deleteId);
+  assert.equal(result.membershipsRemoved, 2);
+  assert.equal(deleteDb.records.has(`whatsappCampaignContacts/${deleteId}`), false);
+  assert.equal(deleteDb.records.has(`whatsappCampaignAudiences/${deleteA.audienceId}/members/${deleteId}`), false);
+  assert.equal(deleteDb.records.has(`whatsappCampaignAudiences/${deleteB.audienceId}/members/${deleteId}`), false);
+  assert.equal(deleteDb.records.has("whatsappCampaignSends/history-a"), true, "historical send remains intact");
 });
 test("file approval is separate from legacy status and never reverses excluded or opted-out contacts", async () => {
   const db = database(), repo = repository(db), files = fileRepository(db, repo), csv = namedCsv(1000000, 3);

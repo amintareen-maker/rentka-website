@@ -7,7 +7,7 @@ import { createDraft, existingPhones, importContacts, reviewContact } from "@/li
 import { issueReview, verifyReview } from "@/lib/whatsapp-campaigns/import-review";
 import type { ContactInput, Source, ImportDetails } from "@/lib/whatsapp-campaigns/types";
 
-import { confirmFileImport, importReviewContext, previewEligibility, previewFileAudience, createDraftFromFile } from "@/lib/whatsapp-campaigns/file-audiences";
+import { confirmFileImport, importReviewContext, previewEligibility, previewFileAudience, createDraftFromFile, contactMembershipCount, removeContactFromAudience, deleteContactAndMemberships } from "@/lib/whatsapp-campaigns/file-audiences";
 
 async function authorize() { if (!(await hasAdminSession())) throw new Error("Unauthorized"); }
 function refresh() { revalidatePath("/admin/whatsapp-campaigns"); revalidatePath("/admin/whatsapp-campaigns/contacts"); }
@@ -43,4 +43,13 @@ export async function checkFileAudience(audienceId: string, campaignId: string) 
 }
 export async function saveFileAudience(audienceId: string, campaignId: string, fingerprint: string) {
   await authorize(); const id = await createDraftFromFile(audienceId, campaignId, fingerprint); refresh(); return id;
+}
+export async function getContactMembershipCount(contactId: string) {
+  await authorize(); return contactMembershipCount(contactId);
+}
+export async function removeFromAudience(audienceId: string, contactId: string) {
+  await authorize(); await removeContactFromAudience(audienceId, contactId); refresh();
+}
+export async function deleteContactCompletely(contactId: string) {
+  await authorize(); const result = await deleteContactAndMemberships(contactId); refresh(); return result;
 }

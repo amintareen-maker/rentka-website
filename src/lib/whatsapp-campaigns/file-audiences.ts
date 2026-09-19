@@ -81,6 +81,42 @@ export async function listFileAudiences(): Promise<FileAudienceView[]> {
   return audiences;
 }
 
+function validateContactId(contactId: string) {
+  if (!/^[a-f0-9]{64}$/.test(contactId)) throw new Error("Invalid contact.");
+}
+export async function contactMembershipCount(contactId: string) {
+  validateContactId(contactId);
+  const audiences = await getAdminDb().collection(COLLECTIONS.audiences).get();
+  const memberships = await Promise.all(audiences.docs.map(audience => audience.ref.collection("members").doc(contactId).get()));
+  return memberships.filter(member => member.exists).length;
+}
+export async function removeContactFromAudience(audienceId: string, contactId: string) {
+  if (!/^[a-f0-9]{64}$/.test(audienceId)) throw new Error("Invalid audience.");
+  validateContactId(contactId);
+  const db = getAdminDb(), audienceRef = db.collection(COLLECTIONS.audiences).doc(audienceId);
+  await db.runTransaction(async tx => {
+    const audience = await tx.get(audienceRef);
+    if (!audience.exists) throw new Error("Audience not found.");
+    const memberRef = audienceRef.collection("members").doc(contactId), member = await tx.get(memberRef);
+    if (!member.exists) throw new Error("Contact is not in this audience.");
+    tx.delete(memberRef);
+  });
+}
+export async function deleteContactAndMemberships(contactId: string) {
+  validateContactId(contactId);
+  const db = getAdminDb(), contactRef = db.collection(COLLECTIONS.contacts).doc(contactId);
+  const audiences = await db.collection(COLLECTIONS.audiences).get();
+  let membershipsRemoved = 0;
+  await db.runTransaction(async tx => {
+    const contact = await tx.get(contactRef);
+    if (!contact.exists) throw new Error("Contact not found.");
+    const refs = audiences.docs.map(audience => audience.ref.collection("members").doc(contactId));
+    const memberships = await tx.getAll(...refs);
+    memberships.filter(member => member.exists).forEach(member => { membershipsRemoved++; tx.delete(member.ref); });
+    tx.delete(contactRef);
+  });
+  return { membershipsRemoved };
+}
 function validateAudienceRequest(audienceId: string, campaignId: string) {
   if (!/^[a-f0-9]{64}$/.test(audienceId) || !/^[0-9a-f-]{36}$/.test(campaignId)) throw new Error("Invalid audience request.");
 }
