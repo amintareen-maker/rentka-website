@@ -11,6 +11,7 @@ import { groupNormalRentalInventoryCards, normalRentalModelHref, normalRentalPub
 import { parseTestLeadResponse } from "@/lib/normal-rental/test-lead-response";
 import { formatLahoreWhatsAppVehicleLines } from "@/lib/normal-rental/lead-output";
 import type { NormalRentalBookingContext } from "@/lib/normal-rental/zones";
+import { trackDataLayer } from "@/lib/tracking";
 import styles from "../../../app/admin/pricing/preview/PreviewClient.module.css";
 
 type Props = { inventory: LahoreBookingInventory[]; context: Pick<NormalRentalBookingContext, "cityLabel">; variant?: "private-test" | "prelaunch" };
@@ -74,6 +75,7 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
   const timeTrigger = useRef<HTMLButtonElement>(null);
   const timeContainer = useRef<HTMLDivElement>(null);
   const errorRef = useRef<HTMLParagraphElement>(null);
+  const submissionInProgress = useRef(false);
 
   useEffect(() => {
     if (!error) return;
@@ -132,13 +134,13 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
   if (inventory.length === 0) return <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center font-semibold text-slate-600">No active Lahore inventory available.</div>;
 
   async function submit(formData: FormData) {
-    if (!selected || !currentRate) return;
+    if (!selected || !currentRate || submissionInProgress.current) return;
     const focusField = (selector: string) => requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true }));
     if (!pickupPlace) { setError("Please select a pickup location from the Google suggestions."); focusField("#lahore-preview-pickup"); return; }
     if (packageType === "outsideCity" && !destinationPlace) { setError("Please select a destination from the Google suggestions."); focusField("#lahore-preview-destination"); return; }
     if (!String(formData.get("customerName") || "").trim()) { setError("Please enter your name."); focusField("input[name='customerName']"); return; }
     if (!String(formData.get("phone") || "").trim()) { setError("Please enter your phone number."); focusField("input[name='phone']"); return; }
-    setLoading(true); setError("");
+    submissionInProgress.current = true; setLoading(true); setError("");
     const whatsappWindow = window.open("", "_blank");
     let committedLead: CreatedLead | undefined;
     try {
@@ -157,8 +159,28 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
       const response = await fetch(prelaunch ? "/api/normal-rental-lead" : "/api/admin/normal-rental-test-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const responseBody = await response.text();
       const lead = parseTestLeadResponse(responseBody, response.ok, response.status) as CreatedLead;
+      if (!lead.leadId) throw new Error("The booking request did not return a lead ID.");
       committedLead = lead;
       setCreated(lead);
+      if (prelaunch) {
+        trackDataLayer("generate_lead", {
+          lead_id: lead.leadId,
+          booking_id: lead.leadId,
+          city: context.cityLabel,
+          service: "withDriver",
+          vehicle: selected.modelName,
+          car: selected.modelName,
+          vehicle_id: selected.inventoryId,
+          car_id: selected.inventoryId,
+          value: lead.estimatedRentalAmount,
+          estimated_rental_amount: lead.estimatedRentalAmount,
+          currency: "PKR",
+          source: "rent_a_car_lahore",
+          flow: "lahore_normal",
+          pricing_type: packageType,
+          duration,
+        });
+      }
       const destination = packageType === "outsideCity" ? `\nTravelling To: ${payload.destinationAddress}` : "";
       const vehicleLines = formatLahoreWhatsAppVehicleLines({ carName: selected.modelName, modelYear: selected.modelYearLabel ?? selected.modelYear, publicVehicleLabel: selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : selected.publicLabel, pricingType: packageType, duration, rate: currentRate });
       const message = `Hi RentKA\n\nI submitted a ${prelaunch ? "Lahore car rental request" : "private Lahore test request"}.\n\nBooking reference: *${lead.leadId}*\nCity: ${context.cityLabel}\n${vehicleLines.join("\n")}\nRental Duration: ${duration}\nPickup: ${payload.pickupAddress}${destination}\nDate: ${payload.pickupDate}\nTime: ${payload.preferredTime}\nDays: ${payload.numberOfDays}\nEstimated Rental: PKR ${lead.estimatedRentalAmount.toLocaleString("en-PK")}\n\nCustomer: ${payload.customerName}\nPhone: ${payload.phone}\nEmail: ${payload.email || "Not provided"}\n\nPlease confirm availability.`;
@@ -211,7 +233,7 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
       } else {
         setError(message);
       }
-    } finally { setLoading(false); }
+    } finally { submissionInProgress.current = false; setLoading(false); }
   }
 
   return <GooglePlacesProvider><>

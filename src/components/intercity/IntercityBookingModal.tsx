@@ -348,6 +348,7 @@ Thank you.
 
       const trackingPayload = {
         lead_id: leadId,
+        booking_id: leadId,
         car: vehicle,
         car_name: vehicle,
         car_id: null,
@@ -363,6 +364,7 @@ Thank you.
         value,
         currency: "PKR",
         source: "one_way_drop",
+        flow: "one_way_drop",
       };
 
       trackDataLayer("lead_submit", trackingPayload);

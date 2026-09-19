@@ -338,6 +338,7 @@ Please confirm availability.
       const reviewLink = `https://www.rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
       const trackingPayload = {
         lead_id: leadId,
+        booking_id: leadId,
         car: context.carName ?? null,
         car_name: context.carName ?? null,
         car_id: context.carId ?? null,
@@ -351,6 +352,7 @@ Please confirm availability.
         value: estimatedRentalAmount,
         currency: "PKR",
         source: "website",
+        flow: "twin_cities_normal",
         number_of_days: numberOfDays,
         daily_rate: dailyRentalRate,
         estimated_rental_amount: estimatedRentalAmount,
