@@ -2,6 +2,7 @@ import type { OperationalBooking } from "./booking-types";
 import type { DispatchOfferRecord } from "./offer-types";
 import { createBroadcastSafePreview } from "./broadcast-approval-core.ts";
 import { normalizeDispatchPhone } from "./validation.ts";
+import { formatVehicleDisplayLabel } from "./vehicle-display.ts";
 
 export const DRIVER_FINAL_TEMPLATE_BODY = `🚗 RentKA — Trip Confirmed
 
@@ -137,7 +138,7 @@ export function createDriverFinalMessage(
       "customer contact",
       missingFields,
     ),
-    vehicle = `${vehicleMakeModel(booking)} — ${assignment.vehicleSnapshot.registrationNumber}`,
+    vehicle = formatVehicleDisplayLabel(assignment.vehicleSnapshot),
     parameters = [
       booking.bookingId,
       pickup,

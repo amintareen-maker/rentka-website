@@ -14,6 +14,7 @@ import { computeMatches } from "./matching-core";
 import type { ResourceReservation } from "./matching-types";
 import type { DispatchOfferRecord } from "./offer-types";
 import type { DispatchDriver, DispatchVehicle, DispatchVendor } from "./types";
+import { formatVehicleDisplayLabel } from "./vehicle-display.ts";
 import {
   assertVendorOfferCurrent,
   assertVendorOfferIdentity,
@@ -749,7 +750,7 @@ export async function submitVendorFulfillmentProposal(
         driverId: driver.id,
         driverName: driver.name,
         vehicleId: vehicle.id,
-        vehicleLabel: `${vehicle.make} ${vehicle.model}${vehicle.modelYear ? ` ${vehicle.modelYear}` : ""}`,
+        vehicleLabel: formatVehicleDisplayLabel(vehicle),
         offerRevision: revision(offer),
         responseRevision: revision(offer),
         timestamp: now,

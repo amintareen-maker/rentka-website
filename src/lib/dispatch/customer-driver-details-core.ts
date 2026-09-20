@@ -1,5 +1,6 @@
 import type { OperationalBooking } from "./booking-types";
 import { createCustomerDriverDetailsMessage } from "./post-assignment-messaging-core.ts";
+import { formatVehicleDisplayLabel } from "./vehicle-display.ts";
 import type {
   CustomerDriverDetailsProjection,
   CustomerDriverDetailsRecord,
@@ -98,7 +99,7 @@ export function createCustomerDriverDetailsProjection(
       ? { customerWhatsappNumber: canonical.recipientNumber }
       : {}),
     driverName: assignment.driverSnapshot.name,
-    vehicleLabel: `${vehicle.make} ${vehicle.model}${vehicle.modelYear ? ` ${vehicle.modelYear}` : ""} - ${vehicle.registrationNumber}`,
+    vehicleLabel: formatVehicleDisplayLabel(vehicle),
     message: canonical.message,
     ...(canonical.whatsappUrl ? { whatsappUrl: canonical.whatsappUrl } : {}),
     missingFields: canonical.missingFields,

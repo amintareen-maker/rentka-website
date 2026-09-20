@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import type { DispatchAssignment } from "@/lib/dispatch/assignment-types";
+import { formatVehicleDisplayLabel } from "@/lib/dispatch/vehicle-display";
 import { assignBookingAction } from "./actions";
 
 type VehicleOption = {
@@ -119,11 +120,7 @@ export default function AssignmentPanel({
           </div>
           <div>
             <p className="text-slate-500">Vehicle</p>
-            <b>
-              {current.vehicleSnapshot.make} {current.vehicleSnapshot.model}{" "}
-              {current.vehicleSnapshot.modelYear ?? ""}
-            </b>
-            <p>{current.vehicleSnapshot.registrationNumber}</p>
+            <b>{formatVehicleDisplayLabel(current.vehicleSnapshot)}</b>
           </div>
           <div>
             <p className="text-slate-500">Vendor</p>
@@ -160,7 +157,7 @@ export default function AssignmentPanel({
                   <div><p className="text-slate-500">Agreed vendor payout</p><b>{proposal.agreedPayoutMinor === undefined ? "Unavailable" : money(proposal.agreedPayoutMinor)}</b></div>
                   <div><p className="text-slate-500">Proposal status</p><b>{proposal.current ? "Awaiting RentKA Assignment" : "Superseded — refresh required"}</b></div>
                   <div><p className="text-slate-500">Proposed Driver</p><b>{proposal.driverName}</b><p>{proposal.driverPhone}</p></div>
-                  <div><p className="text-slate-500">Proposed Vehicle</p><b>{proposal.vehicleLabel}</b><p>{proposal.registrationNumber}</p></div>
+                  <div><p className="text-slate-500">Proposed Vehicle</p><b>{proposal.vehicleLabel}</b></div>
                 </div>
                 <button disabled={!proposal.current || proposal.agreedPayoutMinor === undefined} onClick={() => setVendorConfirmingId(proposal.proposalId)} className="mt-3 rounded-lg bg-emerald-800 px-4 py-2 font-bold text-white disabled:opacity-40">Review Vendor Assignment</button>
               </div>
@@ -218,7 +215,7 @@ export default function AssignmentPanel({
               <option value="">Choose Vehicle</option>
               {vehicles.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.label} — {item.registrationNumber} — docs{" "}
+                  {item.label} — docs{" "}
                   {item.documentationState}
                 </option>
               ))}
@@ -285,7 +282,7 @@ export default function AssignmentPanel({
               <dd className="font-bold">{driver.name}</dd>
               <dt>Vehicle:</dt>
               <dd className="font-bold">
-                {vehicle.label} — {vehicle.registrationNumber}
+                {vehicle.label}
               </dd>
               <dt>Vendor:</dt>
               <dd className="font-bold">{driver.vendorName}</dd>
@@ -328,7 +325,7 @@ export default function AssignmentPanel({
               <dt>Booking:</dt><dd className="font-bold">{bookingId}</dd>
               <dt>Vendor:</dt><dd className="font-bold">{vendorProposal.vendorName}</dd>
               <dt>Driver:</dt><dd className="font-bold">{vendorProposal.driverName}</dd>
-              <dt>Vehicle:</dt><dd className="font-bold">{vendorProposal.vehicleLabel} — {vendorProposal.registrationNumber}</dd>
+              <dt>Vehicle:</dt><dd className="font-bold">{vendorProposal.vehicleLabel}</dd>
               <dt>Agreed payout:</dt><dd className="font-bold">{vendorProposal.agreedPayoutMinor === undefined ? "Unavailable" : money(vendorProposal.agreedPayoutMinor)}</dd>
             </dl>
             <p className="mt-4 rounded bg-amber-50 p-3 text-sm">This explicit Admin action revalidates the current Vendor offer, latest proposal, D7 eligibility, and conflicts before creating the assignment reservation. After success, separate outbox jobs queue the Driver and Customer notifications; messaging cannot roll back the assignment.</p>

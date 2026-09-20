@@ -15,6 +15,7 @@ import { computeMatches, matchingWindow } from "./matching-core";
 import type { ResourceReservation } from "./matching-types";
 import type { DispatchOfferRecord } from "./offer-types";
 import type { DispatchDriver, DispatchVehicle, DispatchVendor } from "./types";
+import { formatVehicleDisplayLabel } from "./vehicle-display.ts";
 import {
   assertVendorOfferCurrent,
   validateVendorProposal,
@@ -144,7 +145,7 @@ export async function getAssignmentPanel(bookingOperationalId: string) {
       driverName: driver.name,
       driverPhone: driver.mobileNumber,
       vehicleId: vehicle.id,
-      vehicleLabel: `${vehicle.make} ${vehicle.model}${vehicle.modelYear ? ` ${vehicle.modelYear}` : ""}`,
+      vehicleLabel: formatVehicleDisplayLabel(vehicle),
       registrationNumber: vehicle.registrationNumber,
       current:
         proposal.status === "provided" &&
