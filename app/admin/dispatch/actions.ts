@@ -128,6 +128,28 @@ export async function createManualBookingAction(
   }
 }
 
+export type DispatchInlineActionResult = {
+  ok: boolean;
+  message: string;
+};
+
+async function mutateInline(
+  work: () => Promise<string>,
+): Promise<DispatchInlineActionResult> {
+  try {
+    await auth();
+    const message = await work();
+    revalidatePath("/admin/dispatch");
+    return { ok: true, message };
+  } catch (error) {
+    return {
+      ok: false,
+      message:
+        error instanceof Error ? error.message : "Unable to complete action.",
+    };
+  }
+}
+
 export async function importBookingAction(form:FormData):Promise<never>{return mutateThenRedirect(async () => {
     const input = parseImport(form);
     const result = await normalizeExistingSource(
@@ -218,6 +240,114 @@ export async function updateResponsibilitiesAction(
   form: FormData,
 ): Promise<never> {
   return mutateThenRedirect(async () => {
+    const id = value(form, "bookingDocumentId"),
+      booking = await getOperationalBooking(id);
+    if (!booking) throw new Error("Operational booking not found.");
+    const parsed = parseResponsibilityUpdate(form, booking.serviceType);
+    await updateOperationalResponsibilities(id, parsed.responsibilities);
+    return "Operational responsibilities updated";
+  });
+}
+
+export async function recordPaymentInlineAction(
+  form: FormData,
+): Promise<DispatchInlineActionResult> {
+  return mutateInline(async () => {
+    const amountMinor = majorToMinor(value(form, "amount"), "Payment amount");
+    assertMinor(amountMinor, "Payment amount");
+    await recordOperationalPayment(value(form, "bookingDocumentId"), {
+      amountMinor,
+      ...(value(form, "method") ? { method: value(form, "method") } : {}),
+      ...(value(form, "reference")
+        ? { reference: value(form, "reference") }
+        : {}),
+      ...(value(form, "note") ? { note: value(form, "note") } : {}),
+    });
+    return "Payment recorded";
+  });
+}
+
+export async function applyCustomerDiscountInlineAction(
+  form: FormData,
+): Promise<DispatchInlineActionResult> {
+  return mutateInline(async () => {
+    const input = parseCustomerDiscount(form);
+    await applyOperationalCustomerDiscount(input.bookingDocumentId, {
+      amountMinor: input.amountMinor,
+      reason: input.reason,
+    });
+    return "Customer discount applied";
+  });
+}
+
+export async function reviewPayoutInlineAction(
+  form: FormData,
+): Promise<DispatchInlineActionResult> {
+  return mutateInline(async () => {
+    const vendorPayoutMinor = majorToMinor(
+      value(form, "vendorPayout"),
+      "Vendor payout",
+      true,
+    );
+    await reviewVendorPayout(value(form, "bookingDocumentId"), {
+      vendorPayoutMinor,
+      ...(value(form, "payoutNotes")
+        ? { notes: value(form, "payoutNotes") }
+        : {}),
+    });
+    return "Vendor payout reviewed";
+  });
+}
+
+export async function overridePaymentInlineAction(
+  form: FormData,
+): Promise<DispatchInlineActionResult> {
+  return mutateInline(async () => {
+    const reason = value(form, "overrideReason");
+    if (reason.length < 8)
+      throw new Error("Override reason is required and must be specific.");
+    await approvePaymentOverride(value(form, "bookingDocumentId"), reason);
+    return "Dispatch-before-payment override approved";
+  });
+}
+
+export async function cancelBookingInlineAction(
+  form: FormData,
+): Promise<DispatchInlineActionResult> {
+  return mutateInline(async () => {
+    const reason = value(form, "cancellationReason"),
+      bookingDocumentId = value(form, "bookingDocumentId");
+    if (reason.length < 3) throw new Error("Cancellation reason is required.");
+    await cancelOperationalBooking(
+      bookingDocumentId,
+      reason,
+      value(form, "cancellationType") === "not_proceeding",
+    );
+    await closeSecureOffersAfterCancellation(bookingDocumentId);
+    return "Booking marked as not proceeding";
+  });
+}
+
+export async function setMatchOverrideInlineAction(
+  form: FormData,
+): Promise<DispatchInlineActionResult> {
+  return mutateInline(async () => {
+    const bookingDocumentId = value(form, "bookingDocumentId"),
+      candidateId = value(form, "candidateId"),
+      mode = value(form, "mode");
+    if (mode !== "include" && mode !== "exclude")
+      throw new Error("Select a valid matching action.");
+    await setOperationalMatchOverride(bookingDocumentId, candidateId, mode);
+    return mode === "include"
+      ? "Candidate included for this booking"
+      : "Candidate excluded for this booking";
+  });
+}
+
+export async function updateResponsibilitiesInlineAction(
+  form: FormData,
+): Promise<DispatchInlineActionResult> {
+  return mutateInline(async () => {
     const id = value(form, "bookingDocumentId"),
       booking = await getOperationalBooking(id);
     if (!booking) throw new Error("Operational booking not found.");

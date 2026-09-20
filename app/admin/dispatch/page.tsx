@@ -15,14 +15,14 @@ import {
 } from "@/lib/dispatch/booking-types";
 import { NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
 import {
-  applyCustomerDiscountAction,
-  cancelBookingAction,
+  applyCustomerDiscountInlineAction,
+  cancelBookingInlineAction,
   createManualBookingAction,
   importBookingAction,
-  overridePaymentAction,
-  recordPaymentAction,
-  reviewPayoutAction,
-  updateResponsibilitiesAction,
+  overridePaymentInlineAction,
+  recordPaymentInlineAction,
+  reviewPayoutInlineAction,
+  updateResponsibilitiesInlineAction,
 } from "./actions";
 import { formatDispatchAdminDate } from "@/lib/dispatch/validation";
 import ManualBookingForm from "./ManualBookingForm";
@@ -44,6 +44,10 @@ import TripSettlement from "./TripSettlement";
 import { getDispatchBroadcastPanel } from "@/lib/dispatch/broadcast-approval-repository";
 import VendorSecureOfferControls from "./VendorSecureOfferControls";
 import { createManualVendorOfferMessage } from "@/lib/dispatch/post-assignment-messaging-core";
+import { supplierResponsePresentation } from "@/lib/dispatch/admin-presentation";
+import { deriveAdminDispatchWorkflow } from "@/lib/dispatch/admin-workflow-core";
+import BookingWorkflow from "./BookingWorkflow";
+import InlineActionForm from "./InlineActionForm";
 
 // D7 source-contract anchors retained across formatting:
 // q.open?getOperationalBooking(q.open) opened&&!filtered.some [opened,...filtered] no contact or assignment
@@ -52,6 +56,7 @@ export const metadata: Metadata = {
   title: "Dispatch Queue | RentKA Admin",
   robots: { index: false, follow: false, noarchive: true, nosnippet: true },
 };
+
 const money = (n: number) =>
   `Rs ${(n / 100).toLocaleString("en-PK", { maximumFractionDigits: 2 })}`;
 const tabs = [
@@ -92,7 +97,7 @@ function Financials({ b }: { b: OperationalBooking }) {
   ] as const;
   return (
     <>
-      <div className="mt-4 grid gap-3 rounded-xl bg-blue-50 p-4 text-sm sm:grid-cols-4 lg:grid-cols-7">
+      <div className="grid gap-3 rounded-xl bg-blue-50 p-4 text-sm sm:grid-cols-4 lg:grid-cols-7">
         {values.map(([title, value]) => (
           <div key={title}>
             <p className="text-slate-500">{title}</p>
@@ -112,8 +117,14 @@ function Financials({ b }: { b: OperationalBooking }) {
 
 function D2Forms({ b }: { b: OperationalBooking }) {
   return (
-    <>
-      <form action={recordPaymentAction} className="rounded-xl border p-4">
+    <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <InlineActionForm
+        action={recordPaymentInlineAction}
+        className="rounded-xl border p-4"
+        label="Record payment"
+        pendingLabel="Recording payment…"
+        buttonClassName="mt-3 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white"
+      >
         <input type="hidden" name="bookingDocumentId" value={b.id} />
         <h3 className="font-black">Record Payment</h3>
         <label className={`${label} mt-3 block`}>
@@ -139,13 +150,14 @@ function D2Forms({ b }: { b: OperationalBooking }) {
           Note
           <input className={input} name="note" />
         </label>
-        <button className="mt-3 rounded-lg bg-blue-700 px-4 py-2 font-bold text-white">
-          Record payment
-        </button>
-      </form>
-      <form
-        action={applyCustomerDiscountAction}
+      </InlineActionForm>
+
+      <InlineActionForm
+        action={applyCustomerDiscountInlineAction}
         className="rounded-xl border border-amber-200 bg-amber-50 p-4"
+        label="Apply discount"
+        pendingLabel="Applying discount…"
+        buttonClassName="mt-3 rounded-lg bg-amber-700 px-4 py-2 font-bold text-white"
       >
         <input type="hidden" name="bookingDocumentId" value={b.id} />
         <h3 className="font-black">Apply Customer Discount / Adjustment</h3>
@@ -154,27 +166,21 @@ function D2Forms({ b }: { b: OperationalBooking }) {
         </p>
         <label className={`${label} mt-3 block`}>
           Discount amount (Rs)
-          <input
-            className={input}
-            required
-            name="discountAmount"
-            inputMode="decimal"
-          />
+          <input className={input} required name="discountAmount" inputMode="decimal" />
         </label>
         <label className={`${label} mt-2 block`}>
           Mandatory reason
-          <input
-            className={input}
-            required
-            minLength={3}
-            name="discountReason"
-          />
+          <input className={input} required minLength={3} name="discountReason" />
         </label>
-        <button className="mt-3 rounded-lg bg-amber-700 px-4 py-2 font-bold text-white">
-          Apply discount
-        </button>
-      </form>
-      <form action={reviewPayoutAction} className="rounded-xl border p-4">
+      </InlineActionForm>
+
+      <InlineActionForm
+        action={reviewPayoutInlineAction}
+        className="rounded-xl border p-4"
+        label="Approve payout review"
+        pendingLabel="Saving payout…"
+        buttonClassName="mt-3 rounded-lg bg-green-700 px-4 py-2 font-bold text-white"
+      >
         <input type="hidden" name="bookingDocumentId" value={b.id} />
         <h3 className="font-black">Review Vendor Payout</h3>
         <label className={`${label} mt-3 block`}>
@@ -193,71 +199,71 @@ function D2Forms({ b }: { b: OperationalBooking }) {
         </label>
         <label className={`${label} mt-2 block`}>
           Internal payout notes
-          <input
-            className={input}
-            name="payoutNotes"
-            defaultValue={b.internalFinancials.payoutNotes}
-          />
+          <input className={input} name="payoutNotes" defaultValue={b.internalFinancials.payoutNotes} />
         </label>
-        <button className="mt-3 rounded-lg bg-green-700 px-4 py-2 font-bold text-white">
-          Approve payout review
-        </button>
-      </form>
-      <form
-        action={overridePaymentAction}
-        className="rounded-xl border border-purple-200 bg-purple-50 p-4"
-      >
-        <input type="hidden" name="bookingDocumentId" value={b.id} />
-        <h3 className="font-black text-purple-900">Dispatch Before Payment</h3>
-        <p className="mt-1 text-xs">Does not bypass vendor payout review.</p>
-        <label className={`${label} mt-3 block`}>
-          Mandatory exception reason
-          <input
-            className={input}
-            required
-            minLength={8}
-            name="overrideReason"
-          />
-        </label>
-        <button className="mt-3 rounded-lg bg-purple-800 px-4 py-2 font-bold text-white">
-          Approve override
-        </button>
-      </form>
-      <form
-        action={cancelBookingAction}
-        className="rounded-xl border border-red-200 p-4"
-      >
-        <input type="hidden" name="bookingDocumentId" value={b.id} />
-        <h3 className="font-black text-red-800">Stop Processing</h3>
-        <select className={input} name="cancellationType">
-          <option value="not_proceeding">Not proceeding</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <label className={`${label} mt-2 block`}>
-          Reason
-          <input className={input} required name="cancellationReason" />
-        </label>
-        <button className="mt-3 rounded-lg bg-red-700 px-4 py-2 font-bold text-white">
-          Confirm stop
-        </button>
-      </form>
-      <form
-        action={updateResponsibilitiesAction}
-        className="lg:col-span-2 rounded-xl border p-4"
-      >
-        <input type="hidden" name="bookingDocumentId" value={b.id} />
-        <OperationalResponsibilities
-          service={b.serviceType}
-          initial={b.responsibilities as never}
-        />
-        <button className="mt-3 rounded-lg bg-[#0F2B46] px-4 py-2 font-bold text-white">
-          Save Operational Responsibilities
-        </button>
-        <p className="mt-2 text-xs text-slate-500">
-          Does not change customer sale, payments, readiness or vendor payout.
-        </p>
-      </form>
-    </>
+      </InlineActionForm>
+
+      <details className="lg:col-span-3 rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <summary className="cursor-pointer font-black text-slate-800">
+          Advanced / Exceptions
+        </summary>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <InlineActionForm
+            action={overridePaymentInlineAction}
+            className="rounded-xl border border-purple-200 bg-purple-50 p-4"
+            label="Approve override"
+            pendingLabel="Approving override…"
+            buttonClassName="mt-3 rounded-lg bg-purple-800 px-4 py-2 font-bold text-white"
+            confirmMessage="Approve dispatch before payment for this booking?"
+          >
+            <input type="hidden" name="bookingDocumentId" value={b.id} />
+            <h3 className="font-black text-purple-900">Dispatch Before Payment</h3>
+            <p className="mt-1 text-xs">Does not bypass vendor payout review.</p>
+            <label className={`${label} mt-3 block`}>
+              Mandatory exception reason
+              <input className={input} required minLength={8} name="overrideReason" />
+            </label>
+          </InlineActionForm>
+
+          <InlineActionForm
+            action={cancelBookingInlineAction}
+            className="rounded-xl border border-red-200 bg-white p-4"
+            label="Confirm stop"
+            pendingLabel="Stopping…"
+            buttonClassName="mt-3 rounded-lg bg-red-700 px-4 py-2 font-bold text-white"
+            confirmMessage="Stop processing this booking?"
+          >
+            <input type="hidden" name="bookingDocumentId" value={b.id} />
+            <h3 className="font-black text-red-800">Stop Processing</h3>
+            <select className={input} name="cancellationType">
+              <option value="not_proceeding">Not proceeding</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <label className={`${label} mt-2 block`}>
+              Reason
+              <input className={input} required name="cancellationReason" />
+            </label>
+          </InlineActionForm>
+
+          <InlineActionForm
+            action={updateResponsibilitiesInlineAction}
+            className="lg:col-span-2 rounded-xl border bg-white p-4"
+            label="Save Operational Responsibilities"
+            pendingLabel="Saving responsibilities…"
+            buttonClassName="mt-3 rounded-lg bg-[#0F2B46] px-4 py-2 font-bold text-white"
+          >
+            <input type="hidden" name="bookingDocumentId" value={b.id} />
+            <OperationalResponsibilities
+              service={b.serviceType}
+              initial={b.responsibilities as never}
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              Does not change customer sale, payments, readiness or vendor payout.
+            </p>
+          </InlineActionForm>
+        </div>
+      </details>
+    </div>
   );
 }
 
@@ -304,27 +310,23 @@ export default async function Page({
   ] = await Promise.all([
     q.open ? listOperationalEvents(q.open) : Promise.resolve([]),
     q.open ? getDispatchOfferPanel(q.open) : Promise.resolve(null),
-    q.matches ? getAssignmentPanel(q.matches) : Promise.resolve(null),
+    q.open ? getAssignmentPanel(q.open) : Promise.resolve(null),
     q.open ? getDriverInstructionsPanel(q.open) : Promise.resolve(null),
     q.open ? getCustomerDriverDetailsPanel(q.open) : Promise.resolve(null),
     q.open ? getTripOperationsPanel(q.open) : Promise.resolve(null),
     q.open ? getTripSettlementPanel(q.open) : Promise.resolve(null),
-    q.matches ? getDispatchBroadcastPanel(q.matches) : Promise.resolve(null),
+    q.open ? getDispatchBroadcastPanel(q.open) : Promise.resolve(null),
   ]);
   const matches = offerPanel?.matches ?? null;
   const assignmentDrivers =
     assignmentPanel?.availableOffers
       .filter(
-        (offer, index, all) =>
-          all.findIndex((item) => item.driverId === offer.driverId) === index,
+        (offer, index, offers) =>
+          offers.findIndex((item) => item.driverId === offer.driverId) === index,
       )
       .map((offer) => {
-        const driver = assignmentPanel.drivers.find(
-            (item) => item.id === offer.driverId,
-          ),
-          vendor = assignmentPanel.vendors.find(
-            (item) => item.id === offer.vendorId,
-          );
+        const driver = assignmentPanel.drivers.find((item) => item.id === offer.driverId);
+        const vendor = assignmentPanel.vendors.find((item) => item.id === offer.vendorId);
         return driver && vendor
           ? {
               id: driver.id,
@@ -354,72 +356,54 @@ export default async function Page({
           : null;
       })
       .filter((item): item is NonNullable<typeof item> => !!item) ?? [];
+
+  const bookingHref = (id: string, showMatches = false) => {
+    const params = new URLSearchParams();
+    for (const key of ["tab", "source", "zone", "date", "search"] as const) {
+      if (q[key]) params.set(key, q[key]!);
+    }
+    params.set("open", id);
+    if (showMatches) params.set("matches", id);
+    return `/admin/dispatch?${params.toString()}#booking-${id}`;
+  };
+
   return (
     <main className="min-h-screen bg-slate-100 p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         <DispatchAdminNav current="dispatch" />
         <header className="mb-6">
-          <p className="text-sm font-bold uppercase tracking-widest text-[#5BAE4A]">
-            RentKA operations
-          </p>
-          <h1 className="text-3xl font-black text-[#0F2B46]">
-            Dispatch intake queue
-          </h1>
-          <p className="text-slate-600">
-            D3 finds and ranks operational resources. RentKA decides; no contact
-            or assignment occurs.
-          </p>
+          <p className="text-sm font-bold uppercase tracking-widest text-[#5BAE4A]">RentKA operations</p>
+          <h1 className="text-3xl font-black text-[#0F2B46]">Dispatch workspace</h1>
+          <p className="text-slate-600">Move each booking through one clear next action. RentKA remains in control of every offer and assignment.</p>
         </header>
-        {q.error && (
-          <p
-            role="alert"
-            className="mb-4 rounded-lg bg-red-50 p-3 text-red-800"
-          >
-            {q.error}
-          </p>
-        )}
-        {q.message && (
-          <p className="mb-4 rounded-lg bg-green-50 p-3 text-green-800">
-            {q.message}
-          </p>
-        )}
+        {q.error && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-red-800">{q.error}</p>}
+        {q.message && <p className="mb-4 rounded-lg bg-green-50 p-3 text-green-800">{q.message}</p>}
+
         <div className="mb-6 grid gap-5 lg:grid-cols-2">
           <details className="rounded-2xl bg-white p-5">
-            <summary className="cursor-pointer text-xl font-black">
-              + Create Manual Booking
-            </summary>
-            <ManualBookingForm
-              action={createManualBookingAction}
-              vehicles={vehicles}
-            />
+            <summary className="cursor-pointer text-xl font-black">+ Create Manual Booking</summary>
+            <ManualBookingForm action={createManualBookingAction} vehicles={vehicles} />
           </details>
           <details className="rounded-2xl bg-white p-5">
-            <summary className="cursor-pointer text-xl font-black">
-              Import Existing Booking
-            </summary>
+            <summary className="cursor-pointer text-xl font-black">Import Existing Booking</summary>
             <form action={importBookingAction} className="mt-4 grid gap-3">
               <label className={label}>
                 Source
                 <select className={input} name="sourceType">
-                  {OPERATIONAL_SOURCE_TYPES.filter((x) => x !== "manual").map(
-                    (x) => (
-                      <option key={x} value={x}>
-                        {x.replaceAll("_", " ")}
-                      </option>
-                    ),
-                  )}
+                  {OPERATIONAL_SOURCE_TYPES.filter((x) => x !== "manual").map((x) => (
+                    <option key={x} value={x}>{x.replaceAll("_", " ")}</option>
+                  ))}
                 </select>
               </label>
               <label className={label}>
                 Source document ID
                 <input className={input} required name="sourceDocumentId" />
               </label>
-              <button className="rounded-lg bg-[#0F2B46] px-5 py-3 font-bold text-white">
-                Import into queue
-              </button>
+              <button className="rounded-lg bg-[#0F2B46] px-5 py-3 font-bold text-white">Import into queue</button>
             </form>
           </details>
         </div>
+
         <nav className="mb-3 flex flex-wrap gap-2">
           {tabs.map((t) => (
             <Link
@@ -432,235 +416,194 @@ export default async function Page({
           ))}
         </nav>
         <form className="mb-5 grid gap-2 rounded-xl bg-white p-3 sm:grid-cols-5">
-          <input
-            className={input}
-            name="search"
-            placeholder="ID, customer or phone"
-            defaultValue={q.search}
-          />
+          <input className={input} name="search" placeholder="ID, customer or phone" defaultValue={q.search} />
           <select className={input} name="source" defaultValue={q.source ?? ""}>
             <option value="">All sources</option>
-            {OPERATIONAL_SOURCE_TYPES.map((x) => (
-              <option key={x}>{x}</option>
-            ))}
+            {OPERATIONAL_SOURCE_TYPES.map((x) => <option key={x}>{x}</option>)}
           </select>
           <select className={input} name="zone" defaultValue={q.zone ?? ""}>
             <option value="">All zones</option>
-            {Object.entries(NORMAL_RENTAL_ZONES).map(([id, z]) => (
-              <option key={id} value={id}>
-                {z.label}
-              </option>
-            ))}
+            {Object.entries(NORMAL_RENTAL_ZONES).map(([id, zone]) => <option key={id} value={id}>{zone.label}</option>)}
           </select>
-          <input
-            className={input}
-            name="date"
-            placeholder="YYYY-MM-DD"
-            defaultValue={q.date}
-          />
-          <button className="rounded-lg bg-slate-800 px-4 py-2 text-white">
-            Filter
-          </button>
+          <input className={input} name="date" placeholder="YYYY-MM-DD" defaultValue={q.date} />
+          <button className="rounded-lg bg-slate-800 px-4 py-2 text-white">Filter</button>
         </form>
+
         <section className="grid gap-4">
-          {rows.map((b) => (
-            <article key={b.id} className="rounded-2xl bg-white p-5">
-              <div className="flex flex-wrap justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-black">{b.bookingId}</h2>
-                    <span
-                      className={`rounded-full px-2 py-1 text-xs font-bold ${badge(b.readinessStatus)}`}
-                    >
-                      {b.readinessStatus.replaceAll("_", " ")}
-                    </span>
-                    {b.paymentOverride?.approved && (
-                      <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-bold text-purple-800">
-                        Payment override
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm">
-                    {b.source.type.replaceAll("_", " ")} ·{" "}
-                    {NORMAL_RENTAL_ZONES[b.zoneId].label} · {b.serviceType}
-                  </p>
-                </div>
-                <Link
-                  href={`/admin/dispatch?open=${b.id}`}
-                  className="h-fit rounded-lg border px-4 py-2 text-sm font-bold"
-                >
-                  Open / Review
-                </Link>
-              </div>
-              <div className="mt-4 grid gap-3 text-sm md:grid-cols-3">
-                <div>
-                  <p className="text-slate-500">Customer</p>
-                  <b>{b.customer.name}</b>
-                  <p>{b.customer.phone}</p>
-                </div>
-                <div>
-                  <p className="text-slate-500">Trip</p>
-                  <b>
-                    {formatDispatchAdminDate(b.itinerary.travelDate)} ·{" "}
-                    {b.itinerary.pickupTime}
-                  </b>
-                  <p>
-                    {b.itinerary.pickup} →{" "}
-                    {b.itinerary.destinationOrUsage || "Usage to confirm"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-slate-500">Requested vehicle</p>
-                  <b>{b.requestedVehicle.categoryOrModel}</b>
-                  {b.requestedVehicle.passengers && (
-                    <p>{b.requestedVehicle.passengers} passengers</p>
-                  )}
-                </div>
-              </div>
-              <Financials b={b} />
-              {q.open === b.id && instructionsPanel && (
-                <div className="mt-5">
-                  <DriverInstructions
-                    projection={instructionsPanel.projection}
-                    record={instructionsPanel.record}
-                    notification={instructionsPanel.notification}
-                  />
-                </div>
-              )}
-              {q.open === b.id && customerDetailsPanel && (
-                <div className="mt-5">
-                  <CustomerDriverDetails
-                    projection={customerDetailsPanel.projection}
-                    record={customerDetailsPanel.record}
-                    notification={customerDetailsPanel.notification}
-                  />
-                </div>
-              )}
-              {q.open === b.id && tripOperationsPanel && (
-                <div className="mt-5">
-                  <TripOperations projection={tripOperationsPanel.projection} />
-                </div>
-              )}
-              {q.open === b.id && settlementPanel && (
-                <div className="mt-5">
-                  <TripSettlement projection={settlementPanel.projection} />
-                </div>
-              )}
-              {q.open === b.id &&
-                offerPanel &&
-                offerPanel.offers.length > 0 && (
-                  <section className="mt-5 rounded-xl border-2 border-indigo-700 bg-indigo-50 p-4">
-                    <h3 className="font-black">Supplier Responses</h3>
-                    <div className="mt-3 space-y-3">
-                      {offerPanel.offers.map((offer) =>
-                        offer.recipientType === "vendor" ? (
-                          <VendorSecureOfferControls
-                            key={offer.id}
-                            bookingOperationalId={b.id}
-                            offer={offer}
-                            manualMessage={createManualVendorOfferMessage(b, offer)}
-                          />
-                        ) : offer.recipientType === "independent_driver" ? (
-                          <p
-                            key={offer.id}
-                            className="rounded bg-white p-3 text-sm"
-                          >
-                            Independent supplier secure response is not changed
-                            by VF6. No message sent.
-                          </p>
-                        ) : (
-                          <SecureOfferControls
-                            key={offer.id}
-                            bookingOperationalId={b.id}
-                            offer={offer}
-                          />
-                        ),
-                      )}
-                    </div>
-                  </section>
-                )}
-              {q.open === b.id && (
-                <div className="mt-5 grid gap-4 border-t pt-5 lg:grid-cols-2">
-                  <div className="lg:col-span-2 rounded-xl border p-4">
-                    <h3 className="font-black">Smart Matching</h3>
-                    {b.readinessStatus === "ready_for_dispatch" &&
-                    b.lifecycle === "active" ? (
-                      <Link
-                        href={`/admin/dispatch?open=${b.id}&matches=${b.id}`}
-                        className="mt-2 inline-block rounded-lg bg-[#0F2B46] px-4 py-2 font-bold text-white"
-                      >
-                        Find Matches
-                      </Link>
+          {rows.map((b) => {
+            const isOpen = q.open === b.id;
+            const offers = isOpen ? offerPanel?.offers ?? [] : [];
+            const assignmentReady =
+              assignmentDrivers.length > 0 ||
+              Boolean(
+                assignmentPanel?.vendorFulfillmentReviews.some(
+                  (proposal) => proposal.current && proposal.agreedPayoutMinor !== undefined,
+                ),
+              );
+            const workflow = deriveAdminDispatchWorkflow({
+              lifecycle: b.lifecycle,
+              readinessStatus: b.readinessStatus,
+              assigned: b.assignment?.status === "assigned",
+              matchesOpen: q.matches === b.id,
+              offers,
+              activeBroadcastId: broadcastPanel?.activeBroadcastId,
+              assignmentReady,
+            });
+            const currentAccepted = workflow.currentOffers.find(
+              (offer) => offer.responseStatus === "accepted",
+            );
+
+            const responseContent = (
+              <section className="rounded-xl border-2 border-indigo-200 bg-indigo-50 p-4">
+                <h3 className="font-black text-indigo-950">Current Supplier Responses</h3>
+                <p className="mt-1 text-sm text-slate-600">Only suppliers in the current offer round are actionable.</p>
+                <div className="mt-3 space-y-3">
+                  {workflow.currentOffers.map((offer) =>
+                    offer.recipientType === "vendor" ? (
+                      <VendorSecureOfferControls
+                        key={offer.id}
+                        bookingOperationalId={b.id}
+                        offer={offer}
+                        manualMessage={createManualVendorOfferMessage(b, offer)}
+                      />
+                    ) : offer.recipientType === "independent_driver" ? (
+                      <div key={offer.id} className="rounded-lg bg-white p-3 text-sm">
+                        {(() => {
+                          const response = supplierResponsePresentation(offer);
+                          return <><b>{response.recipientName}</b><p>{response.supplierType} · {response.responseLabel}</p><p className="mt-1 text-xs text-slate-500">Current offer: {money(response.currentPayoutMinor)}</p></>;
+                        })()}
+                      </div>
                     ) : (
-                      <>
-                        <button
-                          disabled
-                          className="mt-2 rounded-lg bg-slate-300 px-4 py-2 font-bold text-slate-600"
-                        >
-                          Find Matches
-                        </button>
-                        <p className="mt-2 text-sm text-amber-800">
-                          Unavailable:{" "}
-                          {b.lifecycle !== "active"
-                            ? "Cancelled / Not Proceeding"
-                            : b.readinessStatus.replaceAll("_", " ")}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                  {matches && q.matches === b.id && (
-                    <MatchPanel
-                      bookingDocumentId={b.id}
-                      booking={b}
-                      projection={matches}
-                      offerProjections={offerPanel?.projections}
-                      offers={offerPanel?.offers}
-                      currentBroadcastRevision={broadcastPanel?.currentRevision}
-                      activeBroadcastId={broadcastPanel?.activeBroadcastId}
-                      defaultOfferExpiresAt={
-                        broadcastPanel?.defaultOfferExpiresAt
-                      }
-                    />
-                  )}{" "}
-                  {assignmentPanel && q.matches === b.id && (
-                    <AssignmentPanel
-                      bookingDocumentId={b.id}
-                      bookingId={b.bookingId}
-                      payoutMinor={b.internalFinancials.vendorPayoutMinor ?? 0}
-                      current={b.assignment}
-                      drivers={assignmentDrivers}
-                      vendorProposals={assignmentPanel.vendorFulfillmentReviews}
-                    />
+                      <SecureOfferControls key={offer.id} bookingOperationalId={b.id} offer={offer} />
+                    ),
                   )}
-                  <D2Forms b={b} />
-                  <details className="lg:col-span-2 rounded-xl border p-4">
-                    <summary className="cursor-pointer font-black">
-                      Audit history ({events.length})
-                    </summary>
+                  {!workflow.currentOffers.length && <p className="rounded-lg bg-white p-3 text-sm">No offers have been sent in the current round.</p>}
+                </div>
+                {workflow.historicalOffers.length > 0 && (
+                  <details className="mt-4 rounded-lg border bg-white p-3">
+                    <summary className="cursor-pointer font-bold">View offer history ({workflow.historicalOffers.length})</summary>
                     <div className="mt-3 space-y-2">
-                      {events.map((e) => (
-                        <div
-                          key={String(e.id)}
-                          className="rounded-lg bg-slate-50 p-2 text-sm"
-                        >
-                          <b>{String(e.type).replaceAll("_", " ")}</b> ·{" "}
-                          {String(e.timestamp)}
-                          <pre className="text-xs">
-                            {JSON.stringify(e.metadata ?? {}, null, 2)}
-                          </pre>
-                        </div>
-                      ))}
+                      {workflow.historicalOffers.map((offer) => {
+                        const response = supplierResponsePresentation(offer);
+                        return <div key={offer.id} className="rounded bg-slate-50 p-2 text-sm"><b>{response.recipientName}</b> · revision {offer.offerRevision ?? 0} · {response.responseLabel}</div>;
+                      })}
                     </div>
                   </details>
+                )}
+              </section>
+            );
+
+            const assignmentContent = assignmentPanel ? (
+              <AssignmentPanel
+                bookingDocumentId={b.id}
+                bookingId={b.bookingId}
+                payoutMinor={b.internalFinancials.vendorPayoutMinor ?? 0}
+                current={b.assignment}
+                drivers={assignmentDrivers}
+                vendorProposals={assignmentPanel.vendorFulfillmentReviews}
+              />
+            ) : <p className="rounded-lg bg-amber-50 p-3 font-bold text-amber-900">Assignment information is unavailable. Refresh this booking before continuing.</p>;
+
+            return (
+              <article id={`booking-${b.id}`} key={b.id} className="scroll-mt-4 rounded-2xl bg-white p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-xl font-black">{b.bookingId}</h2>
+                      <span className={`rounded-full px-2 py-1 text-xs font-bold ${badge(b.readinessStatus)}`}>{workflow.dispatchState}</span>
+                      {b.paymentOverride?.approved && <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-bold text-purple-800">Payment override</span>}
+                    </div>
+                    <p className="mt-1 text-sm text-slate-600">{NORMAL_RENTAL_ZONES[b.zoneId]?.label ?? b.zoneId} · {b.serviceType.replaceAll("_", " ")} · {b.requestedVehicle.categoryOrModel}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Next action</p>
+                    <p className="font-black text-[#0F2B46]">{workflow.nextAction}</p>
+                    {!isOpen && <Link scroll={false} href={bookingHref(b.id)} className="mt-2 inline-block rounded-lg border px-4 py-2 text-sm font-bold">Open workflow</Link>}
+                  </div>
                 </div>
-              )}
-            </article>
-          ))}
-          {!rows.length && (
-            <p className="rounded-xl border border-dashed bg-white p-8 text-center">
-              No operational bookings match these filters.
-            </p>
-          )}
+
+                <div className="mt-4 grid gap-3 rounded-xl bg-slate-50 p-3 text-sm sm:grid-cols-2 lg:grid-cols-6">
+                  <div><p className="text-slate-500">Trip</p><b>{formatDispatchAdminDate(b.itinerary.travelDate)} · {b.itinerary.pickupTime}</b></div>
+                  <div><p className="text-slate-500">Route</p><b>{b.itinerary.pickup} → {b.itinerary.destinationOrUsage || "To confirm"}</b></div>
+                  <div><p className="text-slate-500">Customer</p><b>{b.customer.name}</b><p>{b.customer.phone}</p></div>
+                  <div><p className="text-slate-500">Payment</p><b>{b.customerFinancials.paymentStatus === "sufficient" ? "Ready" : money(b.customerFinancials.balanceMinor) + " balance"}</b></div>
+                  <div><p className="text-slate-500">Payout</p><b>{b.internalFinancials.payoutStatus === "reviewed" ? money(b.internalFinancials.vendorPayoutMinor ?? 0) : "Needs review"}</b></div>
+                  <div><p className="text-slate-500">Source</p><b>{b.source.type.replaceAll("_", " ")}</b></div>
+                </div>
+
+                {isOpen && (
+                  <>
+                    <BookingWorkflow
+                      key={`${b.id}-${workflow.currentStage}`}
+                      bookingId={b.id}
+                      currentStage={workflow.currentStage}
+                      stages={workflow.stages}
+                      content={{
+                        readiness: <><Financials b={b} /><D2Forms b={b} /></>,
+                        find_supply: (
+                          <div>
+                            <h3 className="font-black">Find eligible supply</h3>
+                            <p className="mt-1 text-sm text-slate-600">Matching checks availability, documents, relationships, vehicle fit and conflicts. No supplier is contacted.</p>
+                            {b.readinessStatus === "ready_for_dispatch" && b.lifecycle === "active" ? (
+                              <Link scroll={false} href={bookingHref(b.id, true)} className="mt-3 inline-block rounded-lg bg-[#0F2B46] px-4 py-2 font-bold text-white">Find Matches</Link>
+                            ) : <p className="mt-3 rounded-lg bg-amber-50 p-3 font-bold text-amber-900">Complete booking readiness before matching.</p>}
+                          </div>
+                        ),
+                        send_offers: matches && q.matches === b.id ? (
+                          <MatchPanel
+                            bookingDocumentId={b.id}
+                            booking={b}
+                            projection={matches}
+                            offerProjections={offerPanel?.projections}
+                            offers={workflow.currentOffers}
+                            currentBroadcastRevision={broadcastPanel?.currentRevision}
+                            activeBroadcastId={broadcastPanel?.activeBroadcastId}
+                            defaultOfferExpiresAt={broadcastPanel?.defaultOfferExpiresAt}
+                          />
+                        ) : <Link scroll={false} href={bookingHref(b.id, true)} className="inline-block rounded-lg bg-[#0F2B46] px-4 py-2 font-bold text-white">Load supplier shortlist</Link>,
+                        responses: responseContent,
+                        fulfillment: (
+                          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                            <h3 className="font-black text-emerald-950">Driver & Vehicle</h3>
+                            {currentAccepted?.recipientType === "vendor" ? (
+                              currentAccepted.fulfillmentProposal?.status === "provided" ? (
+                                <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+                                  <div><dt className="text-slate-500">Driver proposed by vendor</dt><dd className="font-bold">{currentAccepted.fulfillmentProposal.driverName}</dd></div>
+                                  <div><dt className="text-slate-500">Vehicle proposed by vendor</dt><dd className="font-bold">{currentAccepted.fulfillmentProposal.vehicleLabel}</dd></div>
+                                </dl>
+                              ) : <p className="mt-2">The vendor accepted. Waiting for the vendor to propose an eligible driver and vehicle.</p>
+                            ) : <p className="mt-2">Owner-driver flow uses the accepted supplier and eligible vehicle; no child-driver selection is required.</p>}
+                          </div>
+                        ),
+                        assignment: assignmentReady ? assignmentContent : <p className="rounded-lg bg-amber-50 p-3 font-bold text-amber-900">A current accepted supplier and eligible driver/vehicle are required before final assignment.</p>,
+                        notifications: (
+                          <div className="space-y-4">
+                            {assignmentContent}
+                            {instructionsPanel && <DriverInstructions projection={instructionsPanel.projection} record={instructionsPanel.record} notification={instructionsPanel.notification} />}
+                            {customerDetailsPanel && <CustomerDriverDetails projection={customerDetailsPanel.projection} record={customerDetailsPanel.record} notification={customerDetailsPanel.notification} />}
+                            <details className="rounded-xl border p-4">
+                              <summary className="cursor-pointer font-black">Trip Operations & Settlement</summary>
+                              <div className="mt-4 space-y-4">
+                                {tripOperationsPanel && <TripOperations projection={tripOperationsPanel.projection} />}
+                                {settlementPanel && <TripSettlement projection={settlementPanel.projection} />}
+                              </div>
+                            </details>
+                          </div>
+                        ),
+                      }}
+                    />
+                    <details className="mt-4 rounded-xl border p-4">
+                      <summary className="cursor-pointer font-black">Audit history ({events.length})</summary>
+                      <div className="mt-3 space-y-2">
+                        {events.map((e) => <div key={String(e.id)} className="rounded-lg bg-slate-50 p-2 text-sm"><b>{String(e.type).replaceAll("_", " ")}</b> · {String(e.timestamp)}<pre className="overflow-auto text-xs">{JSON.stringify(e.metadata ?? {}, null, 2)}</pre></div>)}
+                      </div>
+                    </details>
+                  </>
+                )}
+              </article>
+            );
+          })}
+          {!rows.length && <p className="rounded-xl border border-dashed bg-white p-8 text-center">No operational bookings match these filters.</p>}
         </section>
       </div>
     </main>

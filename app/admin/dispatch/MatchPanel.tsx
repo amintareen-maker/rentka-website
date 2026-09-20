@@ -1,11 +1,13 @@
 import type { MatchCandidate, MatchProjection, SupplyRecipientProjection } from "@/lib/dispatch/matching-types";
 import type { DispatchOfferRecord, DriverOfferProjection } from "@/lib/dispatch/offer-types";
 import type { OperationalBooking } from "@/lib/dispatch/booking-types";
+import Link from "next/link";
 import { createBroadcastSafePreview,supplyBroadcastRecipients } from "@/lib/dispatch/broadcast-approval-core";
 import { supplierResponsePresentation } from "@/lib/dispatch/admin-presentation";
-import { setMatchOverrideAction } from "./actions";
+import { setMatchOverrideInlineAction } from "./actions";
 import OfferControls from "./OfferControls";
 import BroadcastApproval from "./BroadcastApproval";
+import InlineActionForm from "./InlineActionForm";
 
 const CandidateCard = ({ bookingDocumentId, candidate, rank, offerProjection, offer }: {
   bookingDocumentId: string;
@@ -17,15 +19,19 @@ const CandidateCard = ({ bookingDocumentId, candidate, rank, offerProjection, of
   <div className="flex flex-wrap items-start justify-between gap-2">
     <div>
       <p className="font-black text-[#0F2B46]">{rank ? `${rank}. ` : ""}{candidate.vendor.name}</p>
-      <p className="font-bold">{candidate.driver.name} + {candidate.vehicle.label} — {candidate.vehicle.registrationNumber}</p>
+      <p className="font-bold">{candidate.driver.name} + {candidate.vehicle.label}</p>
       <p className="text-sm">Score: {candidate.score} · {candidate.compatibility.replaceAll("_", " ")}</p>
     </div>
-    <form action={setMatchOverrideAction}>
+    <InlineActionForm
+      action={setMatchOverrideInlineAction}
+      label="Exclude"
+      pendingLabel="Excluding…"
+      buttonClassName="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-bold text-red-700"
+    >
       <input type="hidden" name="bookingDocumentId" value={bookingDocumentId}/>
       <input type="hidden" name="candidateId" value={candidate.id}/>
       <input type="hidden" name="mode" value="exclude"/>
-      <button className="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-xs font-bold text-red-700">Exclude</button>
-    </form>
+    </InlineActionForm>
   </div>
   <ul className="mt-3 grid gap-1 text-sm sm:grid-cols-2">{candidate.reasons.map(reason => <li key={reason}>• {reason}</li>)}</ul>
   {offerProjection
@@ -60,12 +66,11 @@ export default function MatchPanel({
   return <section className="lg:col-span-2 rounded-xl border-2 border-[#0F2B46] bg-white p-4">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h3 className="text-lg font-black text-[#0F2B46]">D3 Smart Matches + D4 Manual Dispatch</h3>
-        <p className="text-sm text-slate-600">Admin-controlled dispatch. Broadcast approval queues records only; no message is sent yet.</p>
+        <h3 className="text-lg font-black text-[#0F2B46]">Select Suppliers and Send Offers</h3>
+        <p className="text-sm text-slate-600">Choose the shortlist, review payout and expiry, then approve once. Vendor-managed supply is contacted vendor-first.</p>
       </div>
-      <a href={`/admin/dispatch?open=${bookingDocumentId}&matches=${bookingDocumentId}`} className="rounded-lg bg-[#0F2B46] px-4 py-2 text-sm font-bold text-white">Refresh matches</a>
+      <Link scroll={false} href={`/admin/dispatch?open=${bookingDocumentId}&matches=${bookingDocumentId}#booking-${bookingDocumentId}`} className="rounded-lg border px-4 py-2 text-sm font-bold">Refresh matches</Link>
     </div>
-    <p className="mt-2 text-xs text-slate-500">Conflict window: {projection.window.start} → {projection.window.end}. {projection.window.basis}.</p>
     {projection.supplyRecipients&&<SupplyRecipientPanel projection={projection.supplyRecipients}/>}
 
     {offers.length > 0 && <div className="mt-4 rounded-xl bg-slate-100 p-3">
@@ -87,31 +92,32 @@ export default function MatchPanel({
           activeBroadcastId={activeBroadcastId}
           defaultOfferExpiresAt={defaultOfferExpiresAt}
         />
-        <h4 className="mt-5 font-black">Recommended Top {projection.top.length}</h4>
-        <div className="mt-2 grid gap-3">{projection.top.map((candidate, index) => <CandidateCard key={candidate.id} bookingDocumentId={bookingDocumentId} candidate={candidate} rank={index + 1} offerProjection={projectionFor(candidate.id)} offer={offerFor(candidate.id)}/>)}</div>
-        {!projection.top.length && <p className="mt-2 rounded-lg bg-amber-50 p-3">No eligible combination was found. Review diagnostics below.</p>}
+        <details className="mt-4 rounded-lg border p-3">
+          <summary className="cursor-pointer font-bold">View matching details · Recommended Top {projection.top.length}</summary>
+          <p className="mt-2 text-xs text-slate-500">Conflict window: {projection.window.start} → {projection.window.end}. {projection.window.basis}.</p>
+          <div className="mt-3 grid gap-3">{projection.top.map((candidate, index) => <CandidateCard key={candidate.id} bookingDocumentId={bookingDocumentId} candidate={candidate} rank={index + 1} offerProjection={projectionFor(candidate.id)} offer={offerFor(candidate.id)}/>)}</div>
+          {!projection.top.length && <p className="mt-2 rounded-lg bg-amber-50 p-3">No eligible combination was found. Review diagnostics below.</p>}
+        </details>
         <details className="mt-4 rounded-lg border p-3">
           <summary className="cursor-pointer font-bold">View all eligible ({projection.eligible.length})</summary>
           <div className="mt-3 grid gap-2">{projection.eligible.map(candidate => <div key={candidate.id}>
             <CandidateCard bookingDocumentId={bookingDocumentId} candidate={candidate} offerProjection={projectionFor(candidate.id)} offer={offerFor(candidate.id)}/>
-            {!candidate.manuallyIncluded && <form action={setMatchOverrideAction} className="mt-1 text-right">
+            {!candidate.manuallyIncluded && <InlineActionForm action={setMatchOverrideInlineAction} className="mt-1 text-right" label="Prioritize" pendingLabel="Prioritizing…" buttonClassName="rounded-lg border bg-white px-3 py-1.5 text-xs font-bold">
               <input type="hidden" name="bookingDocumentId" value={bookingDocumentId}/>
               <input type="hidden" name="candidateId" value={candidate.id}/>
               <input type="hidden" name="mode" value="include"/>
-              <button className="rounded-lg border bg-white px-3 py-1.5 text-xs font-bold">Prioritize</button>
-            </form>}
+            </InlineActionForm>}
           </div>)}</div>
         </details>
         <details className="mt-3 rounded-lg border p-3">
           <summary className="cursor-pointer font-bold">Excluded / Not Eligible ({projection.excluded.length})</summary>
           <div className="mt-3 space-y-2">{projection.excluded.map((item, index) => <div key={`${item.kind}:${item.id}:${index}`} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-50 p-2 text-sm">
             <span><b>{item.kind}:</b> {item.label} — {item.reason}{item.critical && " (critical block)"}</span>
-            {item.kind === "candidate" && !item.critical && <form action={setMatchOverrideAction}>
+            {item.kind === "candidate" && !item.critical && <InlineActionForm action={setMatchOverrideInlineAction} label="Include again" pendingLabel="Including…" buttonClassName="rounded border bg-white px-2 py-1 text-xs font-bold">
               <input type="hidden" name="bookingDocumentId" value={bookingDocumentId}/>
               <input type="hidden" name="candidateId" value={item.id}/>
               <input type="hidden" name="mode" value="include"/>
-              <button className="rounded border bg-white px-2 py-1 text-xs font-bold">Include again</button>
-            </form>}
+            </InlineActionForm>}
           </div>)}</div>
         </details>
       </>}

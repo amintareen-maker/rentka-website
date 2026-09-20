@@ -1,5 +1,6 @@
 "use client";
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { DispatchAssignment } from "@/lib/dispatch/assignment-types";
 import { formatVehicleDisplayLabel } from "@/lib/dispatch/vehicle-display";
 import { assignBookingAction } from "./actions";
@@ -60,6 +61,7 @@ export default function AssignmentPanel({
   drivers: DriverOption[];
   vendorProposals: VendorProposalOption[];
 }) {
+  const router = useRouter();
   const [driverId, setDriverId] = useState(drivers[0]?.id ?? ""),
     [vehicleId, setVehicleId] = useState(""),
     [confirming, setConfirming] = useState(false),
@@ -89,7 +91,10 @@ export default function AssignmentPanel({
       if (changing) form.set("reason", reason);
       const result = await assignBookingAction(form);
       setMessage(result.message);
-      if (result.ok) setConfirming(false);
+      if (result.ok) {
+        setConfirming(false);
+        router.refresh();
+      }
     });
   };
   const submitVendorProposal = () => {
@@ -106,7 +111,10 @@ export default function AssignmentPanel({
       form.set("vendorResponseRevision", String(vendorProposal.responseRevision));
       const result = await assignBookingAction(form);
       setMessage(result.message);
-      if (result.ok) setVendorConfirmingId("");
+      if (result.ok) {
+        setVendorConfirmingId("");
+        router.refresh();
+      }
     });
   };
   if (current?.status === "assigned" && !changing)
