@@ -437,7 +437,7 @@ export default async function Page({
               assignmentDrivers.length > 0 ||
               Boolean(
                 assignmentPanel?.vendorFulfillmentReviews.some(
-                  (proposal) => proposal.current && proposal.agreedPayoutMinor !== undefined,
+                  (proposal) => proposal.current && proposal.assignmentEligible && proposal.agreedPayoutMinor !== undefined,
                 ),
               );
             const workflow = deriveAdminDispatchWorkflow({
@@ -566,12 +566,7 @@ export default async function Page({
                           <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                             <h3 className="font-black text-emerald-950">Driver & Vehicle</h3>
                             {currentAccepted?.recipientType === "vendor" ? (
-                              currentAccepted.fulfillmentProposal?.status === "provided" ? (
-                                <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
-                                  <div><dt className="text-slate-500">Driver proposed by vendor</dt><dd className="font-bold">{currentAccepted.fulfillmentProposal.driverName}</dd></div>
-                                  <div><dt className="text-slate-500">Vehicle proposed by vendor</dt><dd className="font-bold">{currentAccepted.fulfillmentProposal.vehicleLabel}</dd></div>
-                                </dl>
-                              ) : <p className="mt-2">The vendor accepted. Waiting for the vendor to propose an eligible driver and vehicle.</p>
+                              currentAccepted.fulfillmentProposal?.status === "provided" ? assignmentContent : <p className="mt-2">The vendor accepted. Waiting for the vendor to propose an eligible driver and vehicle.</p>
                             ) : <p className="mt-2">Owner-driver flow uses the accepted supplier and eligible vehicle; no child-driver selection is required.</p>}
                           </div>
                         ),

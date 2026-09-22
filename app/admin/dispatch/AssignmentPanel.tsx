@@ -41,6 +41,15 @@ type VendorProposalOption = {
   vehicleId: string;
   vehicleLabel: string;
   registrationNumber: string;
+  driverSubmittedDuringFulfillment: boolean;
+  vehicleSubmittedDuringFulfillment: boolean;
+  driverReviewRequired: boolean;
+  vehicleReviewRequired: boolean;
+  driverDocumentSummary: string;
+  vehicleDocumentSummary: string;
+  driverDocuments: { id: string; label: string }[];
+  vehicleDocuments: { id: string; label: string }[];
+  assignmentEligible: boolean;
   current: boolean;
 };
 const money = (minor: number) =>
@@ -98,7 +107,7 @@ export default function AssignmentPanel({
     });
   };
   const submitVendorProposal = () => {
-    if (!vendorProposal?.current) return;
+    if (!vendorProposal?.current || !vendorProposal.assignmentEligible) return;
     startTransition(async () => {
       const form = new FormData();
       form.set("bookingDocumentId", bookingDocumentId);
@@ -163,11 +172,12 @@ export default function AssignmentPanel({
                 <div className="grid gap-3 md:grid-cols-3">
                   <div><p className="text-slate-500">Vendor / response</p><b>{proposal.vendorName}</b><p>{proposal.responseStatus}</p></div>
                   <div><p className="text-slate-500">Agreed vendor payout</p><b>{proposal.agreedPayoutMinor === undefined ? "Unavailable" : money(proposal.agreedPayoutMinor)}</b></div>
-                  <div><p className="text-slate-500">Proposal status</p><b>{proposal.current ? "Awaiting RentKA Assignment" : "Superseded — refresh required"}</b></div>
-                  <div><p className="text-slate-500">Proposed Driver</p><b>{proposal.driverName}</b><p>{proposal.driverPhone}</p></div>
-                  <div><p className="text-slate-500">Proposed Vehicle</p><b>{proposal.vehicleLabel}</b></div>
+                  <div><p className="text-slate-500">Proposal status</p><b>{!proposal.current ? "Superseded — refresh required" : proposal.assignmentEligible ? "Awaiting RentKA Assignment" : "Needs RentKA review"}</b></div>
+                  <div><p className="text-slate-500">Proposed Driver</p><b>{proposal.driverName}</b><p>{proposal.driverPhone}</p>{proposal.driverSubmittedDuringFulfillment && <><p className="mt-1 font-bold text-amber-800">New driver submitted by vendor</p><p>Verification: {proposal.driverDocumentSummary}</p><a className="font-bold text-blue-800 underline" href={`/admin/drivers?vendor=${proposal.vendorId}&edit=${proposal.driverId}`}>Review driver</a>{proposal.driverDocuments.map((document) => <a key={document.id} target="_blank" rel="noreferrer" className="ml-2 text-blue-800 underline" href={`/api/admin/dispatch/supply-documents?type=driver&resource=${proposal.driverId}&document=${document.id}`}>{document.label}</a>)}</>}</div>
+                  <div><p className="text-slate-500">Proposed Vehicle</p><b>{proposal.vehicleLabel}</b><p>Registration: {proposal.registrationNumber}</p>{proposal.vehicleSubmittedDuringFulfillment && <><p className="mt-1 font-bold text-amber-800">New vehicle submitted by vendor</p><p>Documents: {proposal.vehicleDocumentSummary}</p><a className="font-bold text-blue-800 underline" href={`/admin/vehicles?vendor=${proposal.vendorId}&edit=${proposal.vehicleId}`}>Review vehicle</a>{proposal.vehicleDocuments.map((document) => <a key={document.id} target="_blank" rel="noreferrer" className="ml-2 text-blue-800 underline" href={`/api/admin/dispatch/supply-documents?type=vehicle&resource=${proposal.vehicleId}&document=${document.id}`}>{document.label}</a>)}</>}</div>
                 </div>
-                <button disabled={!proposal.current || proposal.agreedPayoutMinor === undefined} onClick={() => setVendorConfirmingId(proposal.proposalId)} className="mt-3 rounded-lg bg-emerald-800 px-4 py-2 font-bold text-white disabled:opacity-40">Review Vendor Assignment</button>
+                {!proposal.assignmentEligible && <p className="mt-3 rounded bg-amber-100 p-2 font-bold text-amber-950">Final assignment is locked until the new Driver and Vehicle pass RentKA review and become eligible.</p>}
+                <button disabled={!proposal.current || !proposal.assignmentEligible || proposal.agreedPayoutMinor === undefined} onClick={() => setVendorConfirmingId(proposal.proposalId)} className="mt-3 rounded-lg bg-emerald-800 px-4 py-2 font-bold text-white disabled:opacity-40">Review Vendor Assignment</button>
               </div>
             ))}
           </div>
@@ -339,7 +349,7 @@ export default function AssignmentPanel({
             <p className="mt-4 rounded bg-amber-50 p-3 text-sm">This explicit Admin action revalidates the current Vendor offer, latest proposal, D7 eligibility, and conflicts before creating the assignment reservation. After success, separate outbox jobs queue the Driver and Customer notifications; messaging cannot roll back the assignment.</p>
             <div className="mt-4 flex justify-end gap-2">
               <button onClick={() => setVendorConfirmingId("")} disabled={pending} className="rounded-lg border px-4 py-2 font-bold">Cancel</button>
-              <button onClick={submitVendorProposal} disabled={pending || !vendorProposal.current} className="rounded-lg bg-green-700 px-4 py-2 font-bold text-white">{pending ? "Assigning…" : "Confirm Assignment"}</button>
+              <button onClick={submitVendorProposal} disabled={pending || !vendorProposal.current || !vendorProposal.assignmentEligible} className="rounded-lg bg-green-700 px-4 py-2 font-bold text-white">{pending ? "Assigning…" : "Confirm Assignment"}</button>
             </div>
           </div>
         </div>

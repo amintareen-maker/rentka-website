@@ -31,10 +31,22 @@ export type VehicleDocumentation = {
   fitnessExpiry?: string; insuranceExpiry?: string; notes?: string;
 };
 
+export type DispatchProtectedDocument = {
+  id: string; kind: string; storagePath: string; originalName: string; contentType: string;
+  size: number; reviewState: "pending" | "approved" | "rejected"; uploadedAt: string;
+  reviewedAt?: string; reviewNote?: string;
+};
+
+export type FulfillmentQuickAdd = {
+  bookingOperationalId: string; offerId: string; vendorId: string;
+  source: "vendor_secure_page"; createdAt: string;
+};
+
 export type DispatchVehicle = {
   id: string; vendorId: string; controlRelationship: VehicleControlRelationship; zoneIds: NormalRentalZoneId[]; category: string; make: string; model: string;
   modelYear?: number; registrationNumber: string; publicModelSourceCarId?: string; status: VehicleStatus;
   active: boolean; notes?: string; documentation: VehicleDocumentation;
+  registrationNumberNormalized?: string; documents?: DispatchProtectedDocument[]; fulfillmentQuickAdd?: FulfillmentQuickAdd;
   createdAt: string; updatedAt: string; createdBy: AuditActor; updatedBy: AuditActor;
 };
 
@@ -47,6 +59,7 @@ export type DispatchDriver = {
   id: string; name: string; mobileNumber: string; mobileNumberNormalized: string; whatsappNumber: string;
   whatsappNumberNormalized: string; vendorId: string; supplyRelationship: DriverSupplyRelationship; zoneIds: NormalRentalZoneId[]; priority: DispatchPriority;
   status: DriverStatus; active: boolean; notes?: string; documentation: DriverDocumentation;
+  documents?: DispatchProtectedDocument[]; fulfillmentQuickAdd?: FulfillmentQuickAdd;
   vehicleEligibility?: DriverVehicleEligibility;
   createdAt: string; updatedAt: string; createdBy: AuditActor; updatedBy: AuditActor;
 };

@@ -16,6 +16,7 @@ import type { ResourceReservation } from "./matching-types";
 import type { DispatchOfferRecord } from "./offer-types";
 import type { DispatchDriver, DispatchVehicle, DispatchVendor } from "./types";
 import { formatVehicleDisplayLabel } from "./vehicle-display.ts";
+import { quickAddDocumentSummary } from "./vendor-fulfillment-quick-add-core.ts";
 import {
   assertVendorOfferCurrent,
   validateVendorProposal,
@@ -147,6 +148,15 @@ export async function getAssignmentPanel(bookingOperationalId: string) {
       vehicleId: vehicle.id,
       vehicleLabel: formatVehicleDisplayLabel(vehicle),
       registrationNumber: vehicle.registrationNumber,
+      driverSubmittedDuringFulfillment: proposal.driverSubmittedDuringFulfillment === true || Boolean(driver.fulfillmentQuickAdd),
+      vehicleSubmittedDuringFulfillment: proposal.vehicleSubmittedDuringFulfillment === true || Boolean(vehicle.fulfillmentQuickAdd),
+      driverReviewRequired: !driver.active || driver.status !== "available",
+      vehicleReviewRequired: !vehicle.active || vehicle.status !== "available",
+      driverDocumentSummary: quickAddDocumentSummary(driver.documents, "driver"),
+      vehicleDocumentSummary: quickAddDocumentSummary(vehicle.documents, "vehicle"),
+      driverDocuments: (driver.documents ?? []).map((document) => ({ id: document.id, label: document.kind === "cnic_front" ? "CNIC" : document.kind === "licence_front" ? "Driving licence" : document.kind.replaceAll("_", " ") })),
+      vehicleDocuments: (vehicle.documents ?? []).map((document) => ({ id: document.id, label: document.kind === "vehicle_registration" ? "Registration document" : document.kind === "vehicle_photo" ? "Vehicle photo" : document.kind.replaceAll("_", " ") })),
+      assignmentEligible: matches.eligible.some((item) => item.vendor.id === vendor.id && item.driver.id === driver.id && item.vehicle.id === vehicle.id),
       current:
         proposal.status === "provided" &&
         proposal.offerRevision === (offer.offerRevision ?? 0) &&

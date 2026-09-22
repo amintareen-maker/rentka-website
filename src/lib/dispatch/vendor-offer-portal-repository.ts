@@ -2,6 +2,7 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "../firebaseAdmin";
+import { claimStagedDocuments } from "../partner-applications/documents";
 import { auditEvent, sharedActor } from "./booking-core";
 import type { OperationalBooking } from "./booking-types";
 import { DISPATCH_COLLECTIONS } from "./collections";
@@ -14,6 +15,15 @@ import { computeMatches } from "./matching-core";
 import type { ResourceReservation } from "./matching-types";
 import type { DispatchOfferRecord } from "./offer-types";
 import type { DispatchDriver, DispatchVehicle, DispatchVendor } from "./types";
+import {
+  fulfillmentQuickAddBinding,
+  isCurrentFulfillmentQuickAdd,
+  normalizeVehicleRegistration,
+  quickAddDriverId,
+  quickAddVehicleId,
+  validateVendorQuickAddDriver,
+  validateVendorQuickAddVehicle,
+} from "./vendor-fulfillment-quick-add-core";
 import { formatVehicleDisplayLabel } from "./vehicle-display.ts";
 import {
   assertVendorOfferCurrent,
@@ -28,6 +38,7 @@ import type {
   VendorOfferResponse,
   VendorOfferTokenRecord,
   VendorProposalMutation,
+  VendorQuickAddResult,
 } from "./vendor-offer-portal-types";
 
 // VF6 source-contract anchors retained across formatting:
@@ -320,6 +331,84 @@ export async function getSecureVendorOfferPage(token: string) {
     responses: responsesSnap.docs.map(responseFrom),
     proposals: proposalsSnap.docs.map(proposalFrom),
     matches,
+    drivers,
+    vehicles,
+  });
+}
+
+function assertQuickAddOffer(booking: OperationalBooking, offer: DispatchOfferRecord, vendor: DispatchVendor, controlBroadcastId: string, data: VendorOfferTokenRecord) {
+  assertVendorOfferCurrent(booking, offer, controlBroadcastId);
+  assertTokenBinding(data, offer);
+  if (offer.responseStatus !== "accepted" || offer.agreedPayoutMinor === undefined)
+    throw new Error("Accept the current vendor offer before adding fulfillment resources.");
+  if (vendor.supplyClassification !== "vendor_managed")
+    throw new Error("Quick add is available only for vendor-managed supply.");
+}
+
+export async function quickAddVendorDriver(token: string, input: { name?: unknown; phone?: unknown; uploadToken?: string }): Promise<VendorQuickAddResult> {
+  const parsed = validateVendorQuickAddDriver(input), { db, tokenRef, data } = await tokenContext(token),
+    bookingRef = db.collection(BOOKINGS).doc(data.bookingOperationalId), offerRef = bookingRef.collection(OFFERS).doc(data.offerId),
+    vendorRef = db.collection(DISPATCH_COLLECTIONS.vendors).doc(data.vendorId), controlRef = bookingRef.collection(CONTROL).doc("current"),
+    duplicateQuery = db.collection(DISPATCH_COLLECTIONS.drivers).where("vendorId", "==", data.vendorId),
+    driverRef = db.collection(DISPATCH_COLLECTIONS.drivers).doc(quickAddDriverId(data.vendorId, parsed.mobileNumberNormalized));
+  return db.runTransaction(async (tx) => {
+    const [tokenSnap, bookingSnap, offerSnap, vendorSnap, controlSnap, duplicates, existing] = await Promise.all([tx.get(tokenRef), tx.get(bookingRef), tx.get(offerRef), tx.get(vendorRef), tx.get(controlRef), tx.get(duplicateQuery), tx.get(driverRef)]);
+    if (!tokenSnap.exists || tokenSnap.data()?.active !== true || new Date(iso(tokenSnap.data()?.expiresAt)).getTime() <= Date.now()) throw new Error("This vendor offer link is no longer active.");
+    if (!bookingSnap.exists || !offerSnap.exists || !vendorSnap.exists) throw new Error("Vendor offer is no longer available.");
+    const booking = resource<OperationalBooking>(bookingSnap), offer = resource<DispatchOfferRecord>(offerSnap), vendor = resource<DispatchVendor>(vendorSnap);
+    assertQuickAddOffer(booking, offer, vendor, String(controlSnap.data()?.activeBroadcastId ?? ""), data);
+    const duplicate = duplicates.docs.find((item) => item.data().mobileNumberNormalized === parsed.mobileNumberNormalized) ?? (existing.exists ? existing : undefined);
+    if (duplicate) {
+      const driver = resource<DispatchDriver>(duplicate);
+      if (driver.vendorId !== vendor.id || driver.mobileNumberNormalized !== parsed.mobileNumberNormalized) throw new Error("A matching driver record cannot be used for this vendor.");
+      const currentQuickAdd = isCurrentFulfillmentQuickAdd(driver, { bookingOperationalId: booking.id, offerId: offer.id, vendorId: vendor.id });
+      return { id: driver.id, label: driver.name, reviewRequired: currentQuickAdd && (!driver.active || driver.status !== "available"), submittedDuringFulfillment: currentQuickAdd, duplicate: true };
+    }
+    const now = FieldValue.serverTimestamp(), actor = { type: "vendor_offer", vendorId: vendor.id, offerId: offer.id } as const,
+      documents = input.uploadToken ? await claimStagedDocuments(tx, [input.uploadToken], driverRef.id) : [];
+    tx.create(driverRef, {
+      name: parsed.name, mobileNumber: parsed.mobileNumber, mobileNumberNormalized: parsed.mobileNumberNormalized,
+      whatsappNumber: parsed.mobileNumber, whatsappNumberNormalized: parsed.mobileNumberNormalized, vendorId: vendor.id,
+      supplyRelationship: "vendor_managed", zoneIds: vendor.zoneIds, priority: "normal", status: "offline", active: false,
+      documentation: { cnicVerificationState: "unknown", licenceState: "unknown", notes: "Submitted during vendor fulfillment; RentKA review required." },
+      documents, fulfillmentQuickAdd: { ...fulfillmentQuickAddBinding({ bookingOperationalId: booking.id, offerId: offer.id, vendorId: vendor.id }), createdAt: now },
+      createdAt: now, updatedAt: now, createdBy: actor, updatedBy: actor,
+    });
+    tx.create(bookingRef.collection("events").doc(), auditEvent("vendor_fulfillment_driver_added" as never, now, { offerId: offer.id, vendorId: vendor.id, driverId: driverRef.id, documentProvided: documents.length > 0 }, actor));
+    return { id: driverRef.id, label: parsed.name, reviewRequired: true, submittedDuringFulfillment: true, duplicate: false };
+  });
+}
+
+export async function quickAddVendorVehicle(token: string, input: { make?: unknown; model?: unknown; registrationNumber?: unknown; modelYear?: unknown; uploadTokens?: string[] }): Promise<VendorQuickAddResult> {
+  const parsed = validateVendorQuickAddVehicle(input), { db, tokenRef, data } = await tokenContext(token),
+    bookingRef = db.collection(BOOKINGS).doc(data.bookingOperationalId), offerRef = bookingRef.collection(OFFERS).doc(data.offerId),
+    vendorRef = db.collection(DISPATCH_COLLECTIONS.vendors).doc(data.vendorId), controlRef = bookingRef.collection(CONTROL).doc("current"),
+    duplicateQuery = db.collection(DISPATCH_COLLECTIONS.vehicles).where("vendorId", "==", data.vendorId),
+    vehicleRef = db.collection(DISPATCH_COLLECTIONS.vehicles).doc(quickAddVehicleId(data.vendorId, parsed.registrationNumberNormalized));
+  return db.runTransaction(async (tx) => {
+    const [tokenSnap, bookingSnap, offerSnap, vendorSnap, controlSnap, duplicates, existing] = await Promise.all([tx.get(tokenRef), tx.get(bookingRef), tx.get(offerRef), tx.get(vendorRef), tx.get(controlRef), tx.get(duplicateQuery), tx.get(vehicleRef)]);
+    if (!tokenSnap.exists || tokenSnap.data()?.active !== true || new Date(iso(tokenSnap.data()?.expiresAt)).getTime() <= Date.now()) throw new Error("This vendor offer link is no longer active.");
+    if (!bookingSnap.exists || !offerSnap.exists || !vendorSnap.exists) throw new Error("Vendor offer is no longer available.");
+    const booking = resource<OperationalBooking>(bookingSnap), offer = resource<DispatchOfferRecord>(offerSnap), vendor = resource<DispatchVendor>(vendorSnap);
+    assertQuickAddOffer(booking, offer, vendor, String(controlSnap.data()?.activeBroadcastId ?? ""), data);
+    const duplicate = duplicates.docs.find((item) => normalizeVehicleRegistration(item.data().registrationNumberNormalized || item.data().registrationNumber) === parsed.registrationNumberNormalized) ?? (existing.exists ? existing : undefined);
+    if (duplicate) {
+      const vehicle = resource<DispatchVehicle>(duplicate);
+      if (vehicle.vendorId !== vendor.id || normalizeVehicleRegistration(vehicle.registrationNumber) !== parsed.registrationNumberNormalized) throw new Error("A matching vehicle record cannot be used for this vendor.");
+      const currentQuickAdd = isCurrentFulfillmentQuickAdd(vehicle, { bookingOperationalId: booking.id, offerId: offer.id, vendorId: vendor.id });
+      return { id: vehicle.id, label: formatVehicleDisplayLabel(vehicle), reviewRequired: currentQuickAdd && (!vehicle.active || vehicle.status !== "available"), submittedDuringFulfillment: currentQuickAdd, duplicate: true };
+    }
+    const now = FieldValue.serverTimestamp(), actor = { type: "vendor_offer", vendorId: vendor.id, offerId: offer.id } as const,
+      documents = input.uploadTokens?.length ? await claimStagedDocuments(tx, input.uploadTokens, vehicleRef.id) : [];
+    const vehicle = { vendorId: vendor.id, controlRelationship: "vendor_managed", zoneIds: vendor.zoneIds,
+      category: booking.requestedVehicle.categoryOrModel, make: parsed.make, model: parsed.model, ...("modelYear" in parsed ? { modelYear: parsed.modelYear } : {}),
+      registrationNumber: parsed.registrationNumber, registrationNumberNormalized: parsed.registrationNumberNormalized, status: "inactive", active: false,
+      documentation: { overallState: "unknown", registrationState: "unknown", tokenChallanState: "unknown", permitState: "unknown", fitnessState: "unknown", insuranceState: "unknown", notes: "Submitted during vendor fulfillment; RentKA review required." },
+      documents, fulfillmentQuickAdd: { ...fulfillmentQuickAddBinding({ bookingOperationalId: booking.id, offerId: offer.id, vendorId: vendor.id }), createdAt: now },
+      createdAt: now, updatedAt: now, createdBy: actor, updatedBy: actor };
+    tx.create(vehicleRef, vehicle);
+    tx.create(bookingRef.collection("events").doc(), auditEvent("vendor_fulfillment_vehicle_added" as never, now, { offerId: offer.id, vendorId: vendor.id, vehicleId: vehicleRef.id, documentCount: documents.length }, actor));
+    return { id: vehicleRef.id, label: formatVehicleDisplayLabel({ id: vehicleRef.id, ...vehicle } as unknown as DispatchVehicle), reviewRequired: true, submittedDuringFulfillment: true, duplicate: false };
   });
 }
 
@@ -713,14 +802,19 @@ export async function submitVendorFulfillmentProposal(
       String(controlSnap.data()?.activeBroadcastId ?? ""),
     );
     assertTokenBinding(data, offer);
-    const matches = computeMatches({
+    const quickAddContext = { bookingOperationalId: booking.id, offerId: offer.id, vendorId: vendor.id },
+      driverReviewRequired = isCurrentFulfillmentQuickAdd(driver, quickAddContext) && (!driver.active || driver.status !== "available"),
+      vehicleReviewRequired = isCurrentFulfillmentQuickAdd(vehicle, quickAddContext) && (!vehicle.active || vehicle.status !== "available"),
+      proposalDriver = driverReviewRequired ? { ...driver, active: true, status: "available" as const } : driver,
+      proposalVehicle = vehicleReviewRequired ? { ...vehicle, active: true, status: "available" as const } : vehicle,
+      matches = computeMatches({
       booking,
       vendors: [vendor],
-      drivers: [driver],
-      vehicles: [vehicle],
+      drivers: [proposalDriver],
+      vehicles: [proposalVehicle],
       reservations: reservationsSnap.docs.map(reservation),
     });
-    validateVendorProposal({
+    const validation = validateVendorProposal({
       booking,
       offer,
       vendor,
@@ -755,7 +849,11 @@ export async function submitVendorFulfillmentProposal(
         responseRevision: revision(offer),
         timestamp: now,
         actor,
-        source: "vendor_secure_page",
+      source: "vendor_secure_page",
+        driverReviewRequired: validation.driverReviewRequired,
+        vehicleReviewRequired: validation.vehicleReviewRequired,
+        driverSubmittedDuringFulfillment: Boolean(driver.fulfillmentQuickAdd),
+        vehicleSubmittedDuringFulfillment: Boolean(vehicle.fulfillmentQuickAdd),
       };
     tx.create(proposalRef, proposal);
     tx.update(offerRef, {
