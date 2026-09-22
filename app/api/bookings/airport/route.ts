@@ -4,6 +4,8 @@ import { getAdminDb } from "@/lib/firebaseAdmin";
 import { sendAirportBookingNotification, type AirportBookingNotification } from "@/lib/airport/notification";
 import { isValidAirportPhone, normalizeAirportPhone } from "@/lib/airport/phone";
 import { attemptAutomaticOperationalIntake } from "@/lib/dispatch/automatic-intake";
+import { getAirportDefinition, isAirportId } from "@/lib/airport/constants";
+import { airportBookingId, airportCounterDocumentId, nextAirportSequence } from "@/lib/airport/counter";
 
 export const runtime = "nodejs";
 
@@ -23,19 +25,19 @@ export async function POST(request: Request) {
     stage = "firestore_setup";
     const adminDb = getAdminDb();
     const quoteRef = adminDb.collection("airportQuotes").doc(body.quoteId);
-    const counterRef = adminDb.collection("airportCounters").doc("islamabadAirportBookings");
     const internalDocumentId = randomUUID();
     const bookingRef = adminDb.collection("airportBookings").doc(internalDocumentId);
     stage = "firestore_transaction";
     const booking = await adminDb.runTransaction(async (transaction) => {
       stage = "transaction_reads";
-      const [quoteSnapshot, counterSnapshot] = await Promise.all([
-        transaction.get(quoteRef),
-        transaction.get(counterRef),
-      ]);
+      const quoteSnapshot = await transaction.get(quoteRef);
       if (!quoteSnapshot.exists) throw new Error("QUOTE_NOT_FOUND");
       stage = "quote_validation";
       const quote = quoteSnapshot.data()!;
+      const airportId = isAirportId(quote.airportId) ? quote.airportId : "islamabad";
+      const airport = getAirportDefinition(airportId);
+      const counterRef = adminDb.collection("airportCounters").doc(airportCounterDocumentId(airportId));
+      const counterSnapshot = await transaction.get(counterRef);
       if (new Date(String(quote.expiresAt)).getTime() <= Date.now()) throw new Error("QUOTE_EXPIRED");
       const selectedOption = Array.isArray(quote.vehicleOptions)
         ? quote.vehicleOptions.find((option: { vehicle?: { id?: unknown } }) => option?.vehicle?.id === body.vehicleId)
@@ -44,13 +46,18 @@ export async function POST(request: Request) {
           : undefined;
       if (!selectedOption) throw new Error("QUOTE_VEHICLE_MISSING");
       stage = "counter_increment";
-      const sequence = Number(counterSnapshot.data()?.value ?? 1000) + 1;
+      const sequence = nextAirportSequence(counterSnapshot.data()?.value);
       if (!Number.isSafeInteger(sequence) || sequence < 1001) throw new Error("SEQUENCE_UNAVAILABLE");
-      const bookingId = `RK-ISB-ARPT-${String(sequence).padStart(4, "0")}`;
+      const bookingId = airportBookingId(airport, sequence);
       const createdAt = new Date().toISOString();
       const nextBooking: AirportBookingNotification & { operationalKm: number } = {
         bookingId,
         quoteId: body.quoteId as string,
+        airportId,
+        airportName: airport.airportName,
+        airportCode: airport.airportCode,
+        city: airport.city,
+        pricingVersion: Number(quote.pricingVersion),
         service: "airportTransfer",
         tripType: quote.tripType === "airportDropoff" ? "airportDropoff" : "airportPickup",
         customer: { name: customerName, phone, email: typeof body.email === "string" ? body.email.trim() : "" },
@@ -97,6 +104,9 @@ export async function POST(request: Request) {
       bookingId: booking.bookingId,
       quoteId: booking.quoteId,
       status: booking.bookingStatus,
+      airportId: booking.airportId,
+      airportName: booking.airportName,
+      city: booking.city,
       tripType: booking.tripType,
       date: booking.date,
       time: booking.time,

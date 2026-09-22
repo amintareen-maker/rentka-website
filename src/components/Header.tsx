@@ -45,7 +45,7 @@ export default function Header() {
             <nav className="flex items-center gap-8 text-sm font-medium text-slate-700">
               <Link href="/rent-a-car-islamabad" className="transition hover:text-[var(--rentka-blue)]">Islamabad</Link>
               <Link href="/rent-a-car-lahore" className="transition hover:text-[var(--rentka-blue)]">Lahore</Link>
-              <Link href="/airport-car-rental-islamabad" className="transition hover:text-[var(--rentka-blue)]">Airport Transfer</Link>
+              <Link href="/airport-transfer" className="transition hover:text-[var(--rentka-blue)]">Airport Transfer</Link>
               <Link href="/one-way-drop" className="transition hover:text-[var(--rentka-blue)]">One-Way Trips</Link>
               <Link href="/blog" className="transition hover:text-[var(--rentka-blue)]">Travel Guides</Link>
               <Link href="/about" className="transition hover:text-[var(--rentka-blue)]">About Us</Link>
@@ -56,7 +56,7 @@ export default function Header() {
 
         <nav aria-label="Primary mobile navigation" className="flex items-center justify-between gap-1 pb-3 text-sm font-semibold text-slate-700 md:hidden">
           <Link href="/rent-a-car-islamabad" className="inline-flex min-h-10 items-center rounded-md px-2 transition hover:bg-slate-50 hover:text-[var(--rentka-blue)]">Cars</Link>
-          <Link href="/airport-car-rental-islamabad" className="inline-flex min-h-10 items-center rounded-md px-2 transition hover:bg-slate-50 hover:text-[var(--rentka-blue)]">Airport</Link>
+          <Link href="/airport-transfer" className="inline-flex min-h-10 items-center rounded-md px-2 transition hover:bg-slate-50 hover:text-[var(--rentka-blue)]">Airport</Link>
           <Link href="/one-way-drop" className="inline-flex min-h-10 items-center rounded-md px-2 transition hover:bg-slate-50 hover:text-[var(--rentka-blue)]">One-Way</Link>
           <div ref={mobileMenuRef} className="relative">
             <button type="button" aria-expanded={moreOpen} aria-controls="mobile-more-menu" className="inline-flex min-h-10 items-center gap-1 rounded-md px-2 transition hover:bg-slate-50 hover:text-[var(--rentka-blue)]" onClick={() => setMoreOpen((open) => !open)}>

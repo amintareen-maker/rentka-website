@@ -1,9 +1,10 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { getAdminDb } from "@/lib/firebaseAdmin";
-import { ISLAMABAD_AIRPORT } from "./constants";
-import { getAirportPricingConfigWithMeta } from "./config";
-import type { AirportPlace, AirportTripType, LuggageLevel } from "./types";
+import { getAirportDefinition, isAirportId } from "./constants";
+import { getAirportPricingConfigWithMeta, getEligibleAirportVehicleRules } from "./config";
+import { calculateAirportFare } from "./pricing";
+import type { AirportId, AirportPlace, AirportTripType, LuggageLevel } from "./types";
 
 const QUOTE_BUDGET_MS = 6_000;
 const PLACES_TIMEOUT_MS = 1_700;
@@ -30,6 +31,7 @@ const validPlace = (place: unknown): place is AirportPlace => {
 };
 
 type QuoteInput = {
+  airportId?: AirportId;
   tripType: AirportTripType;
   place: AirportPlace;
   date: string;
@@ -78,7 +80,8 @@ function logFailure(attemptId: string, stage: string, startedAt: number, error: 
 export function validateQuoteInput(value: unknown): value is QuoteInput {
   if (!value || typeof value !== "object") return false;
   const input = value as Record<string, unknown>;
-  return ["airportPickup", "airportDropoff"].includes(String(input.tripType))
+  return (input.airportId === undefined || isAirportId(input.airportId))
+    && ["airportPickup", "airportDropoff"].includes(String(input.tripType))
     && validPlace(input.place)
     && /^\d{4}-\d{2}-\d{2}$/.test(String(input.date))
     && /^\d{2}:\d{2}$/.test(String(input.time))
@@ -171,31 +174,31 @@ async function calculateRoute(origin: AirportPlace, destination: AirportPlace, a
 export async function createAirportQuotes(input: QuoteInput, attemptId: string = randomUUID()) {
   const requestStartedAt = Date.now();
   const deadline = requestStartedAt + QUOTE_BUDGET_MS;
-  const pricingPromise = getAirportPricingConfigWithMeta(attemptId).catch((error) => {
+  const airportId: AirportId = input.airportId ?? "islamabad";
+  const airport = getAirportDefinition(airportId);
+  if (!airport.active || !airport.bookingEnabled) throw new AirportQuoteError("PRICING_UNAVAILABLE", "Airport booking is not enabled");
+  const pricingPromise = getAirportPricingConfigWithMeta(airportId, attemptId).catch((error) => {
     if (error instanceof AirportQuoteError) throw error;
     throw new AirportQuoteError("PRICING_UNAVAILABLE", error instanceof Error ? error.message : undefined);
   });
   const [pricingResult, verifiedPlace] = await Promise.all([pricingPromise, verifyGooglePlace(input.place.placeId, attemptId, deadline)]);
-  const pickup = input.tripType === "airportPickup" ? ISLAMABAD_AIRPORT : verifiedPlace;
-  const destination = input.tripType === "airportPickup" ? verifiedPlace : ISLAMABAD_AIRPORT;
+  if (!pricingResult || pricingResult.config.enabled === false) throw new AirportQuoteError("PRICING_UNAVAILABLE", "Airport pricing is not configured");
+  const pickup = input.tripType === "airportPickup" ? airport.place : verifiedPlace;
+  const destination = input.tripType === "airportPickup" ? verifiedPlace : airport.place;
   const { config, source: pricingSource } = pricingResult;
+  const eligibleVehicles = await getEligibleAirportVehicleRules(airportId, config);
   const routeInfo = await calculateRoute(pickup, destination, attemptId, deadline);
   const fareStartedAt = Date.now();
-  const hour = Number(input.time.slice(0, 2));
-  const late = hour >= 22 || hour < 6;
   const now = new Date();
   const expiresAt = new Date(now.getTime() + config.quoteValidityMinutes * 60000);
-  const vehicleOptions = config.vehicles.filter((item) => item.active && item.passengers >= input.passengers).map((vehicle) => {
-    const additionalCustomerKm = Math.max(0, routeInfo.distanceKm - vehicle.includedKm);
-    const operationalKm = Math.max(0, vehicle.operationalKm);
-    const distanceCharge = (additionalCustomerKm + operationalKm) * vehicle.additionalKmRate;
-    const total = Math.ceil((vehicle.minimumFare + distanceCharge + (input.tripType === "airportPickup" ? vehicle.pickupAdjustment : vehicle.dropoffAdjustment) + (late && vehicle.lateNightEnabled ? vehicle.lateNightSurcharge : 0) + vehicle.operationalAllowance) / 50) * 50;
-    return { vehicle: { id: vehicle.id, name: vehicle.name, passengers: vehicle.passengers, luggage: vehicle.luggage }, price: total, operationalKm, additionalCustomerKm, includedItems: [...(vehicle.fuelIncluded ? ["Fuel Included"] : []), "Professional Driver Included"], excludedItems: [...(!vehicle.tollIncluded ? ["Tolls"] : []), ...(!vehicle.parkingIncluded ? ["Parking"] : [])] };
+  const vehicleOptions = eligibleVehicles.filter((item) => item.passengers >= input.passengers).map((vehicle) => {
+    const { price: total, operationalKm, additionalCustomerKm } = calculateAirportFare(vehicle, routeInfo.distanceKm, input.tripType, input.time);
+    return { vehicle: { id: vehicle.id, modelKey: vehicle.modelKey, name: vehicle.name, passengers: vehicle.passengers, luggage: vehicle.luggage }, price: total, operationalKm, additionalCustomerKm, includedItems: [...(vehicle.fuelIncluded ? ["Fuel Included"] : []), "Professional Driver Included"], excludedItems: [...(!vehicle.tollIncluded ? ["Tolls"] : []), ...(!vehicle.parkingIncluded ? ["Parking"] : [])] };
   });
   console.info("Airport quote diagnostic", { attemptId, stage: "fare_calculation", result: "success", durationMs: Date.now() - fareStartedAt, pricingSource, optionCount: vehicleOptions.length });
   if (vehicleOptions.length === 0) throw new AirportQuoteError("PRICING_UNAVAILABLE", "No eligible Airport vehicles configured");
   const quoteId = randomUUID();
-  const quote = { quoteId, ...input, place: verifiedPlace, pickup, destination, ...routeInfo, vehicleOptions, pricingVersion: config.version, advancePercentage: config.advancePercentage, createdAt: now.toISOString(), expiresAt: expiresAt.toISOString() };
+  const quote = { quoteId, ...input, airportId, airportName: airport.airportName, city: airport.city, airportCode: airport.airportCode, place: verifiedPlace, pickup, destination, ...routeInfo, vehicleOptions, pricingVersion: config.version, advancePercentage: config.advancePercentage, createdAt: now.toISOString(), expiresAt: expiresAt.toISOString() };
   const persistenceStartedAt = Date.now();
   try { await withinDeadline(getAdminDb().collection("airportQuotes").doc(quoteId).set(quote), deadline); }
   catch (error) { logFailure(attemptId, "quote_persistence", persistenceStartedAt, error, { pricingSource }); throw new AirportQuoteError("PERSISTENCE_UNAVAILABLE"); }

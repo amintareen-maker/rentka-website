@@ -21,7 +21,7 @@ async function loadPublicStartingFares() {
   let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
     return await Promise.race([
-      getPublicAirportStartingFares(),
+      getPublicAirportStartingFares("islamabad"),
       new Promise<PublicAirportStartingFare[]>((_, reject) => {
         timeout = setTimeout(() => reject(new Error("AIRPORT_STARTING_FARES_TIMEOUT")), 8_000);
       }),
@@ -311,7 +311,7 @@ export default async function IslamabadAirportTransferPage() {
         </div>
       </section>
 
-      <AirportBookingEngine />
+      <AirportBookingEngine airportId="islamabad" />
 
       {startingFares.length > 0 && (
         <section aria-labelledby="airport-starting-prices" className="bg-white px-4 py-16 md:py-20">

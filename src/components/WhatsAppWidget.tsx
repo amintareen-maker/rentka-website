@@ -1,23 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 import { trackMetaPixel } from "@/lib/tracking";
+import { airportWhatsAppContext } from "@/lib/airport/whatsapp";
+
+const subscribeToClientMount = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export default function WhatsAppWidget() {
   const pathname = usePathname();
-  const bookingPage = pathname.startsWith("/one-way-drop") || pathname === "/airport-car-rental-islamabad";
+  const airportContext = airportWhatsAppContext(pathname);
+  const bookingPage = pathname.startsWith("/one-way-drop") || Boolean(airportContext);
+  const chatMessage = airportContext?.message ?? "Hi RentKA, I need help finding a car.";
   const [manualPath, setManualPath] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const mounted = useSyncExternalStore(subscribeToClientMount, getClientSnapshot, getServerSnapshot);
 
   useEffect(() => {
-    if (bookingPage) return;
+    if (!mounted || bookingPage) return;
     const timer = setTimeout(() => {
       setChatOpen(true);
     }, 6000);
 
     return () => clearTimeout(timer);
-  }, [bookingPage]);
+  }, [bookingPage, mounted]);
+
+  if (!mounted) return null;
 
   return (
     <div className="fixed bottom-24 right-6 z-50">
@@ -25,7 +35,7 @@ export default function WhatsAppWidget() {
       {chatOpen && (!bookingPage || manualPath === pathname) && (
         <div className="bg-white w-72 rounded-2xl shadow-xl border border-slate-200 p-4 mb-3 animate-fade-in relative">
           <p className="text-sm font-semibold text-slate-900 mb-1">
-            👋 Need help choosing a car?
+            👋 Need help with {airportContext?.label ?? "choosing a car"}?
           </p>
 
           <p className="text-sm text-slate-600 mb-3">
@@ -33,7 +43,7 @@ export default function WhatsAppWidget() {
           </p>
 
           <a
-            href="https://wa.me/923020589999?text=Hi%20RentKA,%20I%20need%20help%20finding%20a%20car."
+            href={`https://wa.me/923020589999?text=${encodeURIComponent(chatMessage)}`}
             data-whatsapp-source="floating_widget"
             onClick={() => {
               trackMetaPixel("Contact", {

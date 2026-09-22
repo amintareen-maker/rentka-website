@@ -2,6 +2,11 @@ import "server-only";
 import { Resend } from "resend";
 
 export type AirportBookingNotification = {
+  airportId: string;
+  airportName: string;
+  airportCode: string;
+  city: string;
+  pricingVersion: number;
   bookingId: string;
   quoteId: string;
   service: string;
@@ -48,7 +53,7 @@ export async function sendAirportBookingNotification(booking: AirportBookingNoti
   const fields: Array<[string, unknown]> = [
     ["Booking ID", booking.bookingId],
     ["Quote ID", booking.quoteId],
-    ["Service", "Islamabad Airport Transfer"],
+    ["Service", `${booking.airportName} Transfer`],
     ["Trip type", serviceDirection],
     ["Customer name", booking.customer.name],
     ["Customer phone / WhatsApp", booking.customer.phone],

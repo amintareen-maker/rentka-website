@@ -18,6 +18,9 @@ export async function POST(request: Request) {
     if (!quote.vehicleOptions.length) return NextResponse.json({ error: "No suitable vehicle is currently configured. Please contact us on WhatsApp." }, { status: 404 });
     const publicQuotes = quote.vehicleOptions.map((option) => ({
       quoteId: quote.quoteId,
+      airportId: quote.airportId,
+      airportName: quote.airportName,
+      city: quote.city,
       tripType: quote.tripType,
       pickup: quote.pickup,
       destination: quote.destination,

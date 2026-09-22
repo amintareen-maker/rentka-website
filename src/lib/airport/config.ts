@@ -1,147 +1,37 @@
 import "server-only";
 import { getAdminDb } from "@/lib/firebaseAdmin";
-import type { AirportPricingConfig, AirportVehicleRule, LuggageLevel } from "./types";
+import { getAirportFleetModels,airportRuleModelKey } from "./fleet";
+import { getAirportDefinition } from "./constants";
+import { nextAirportPricingVersion } from "./versioning";
+import { getBookableAirportRules,isAirportPricingReady } from "./activation";
+export { airportRuleHasValidPricing } from "./activation";
+import type { AirportId,AirportPricingConfig,AirportVehicleRule,LuggageLevel } from "./types";
 
-export const DEFAULT_AIRPORT_PRICING: AirportPricingConfig = {
-  version: 1, quoteValidityMinutes: 30, advancePercentage: 20,
-  vehicles: [
-    { id:"corolla",name:"Toyota Corolla",active:true,passengers:4,luggage:"standard",minimumFare:5000,includedKm:25,additionalKmRate:110,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:750,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:500,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false },
-    { id:"civic",name:"Honda Civic",active:true,passengers:4,luggage:"standard",minimumFare:7000,includedKm:25,additionalKmRate:140,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:1000,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:600,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false },
-    { id:"brv",name:"Honda BR-V",active:true,passengers:6,luggage:"heavy",minimumFare:8000,includedKm:25,additionalKmRate:160,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:1000,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:700,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false },
-    { id:"prado",name:"Toyota Prado",active:true,passengers:5,luggage:"heavy",minimumFare:15000,includedKm:25,additionalKmRate:260,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:2000,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:1000,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false },
-  ],
-};
+export const DEFAULT_AIRPORT_PRICING:AirportPricingConfig={airportId:"islamabad",enabled:true,version:1,quoteValidityMinutes:30,advancePercentage:20,vehicles:[
+{id:"corolla",modelKey:"toyota-corolla",name:"Toyota Corolla",active:true,pricingConfigured:true,passengers:4,luggage:"standard",minimumFare:5000,includedKm:25,additionalKmRate:110,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:750,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:500,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false},
+{id:"civic",modelKey:"honda-civic",name:"Honda Civic",active:true,pricingConfigured:true,passengers:4,luggage:"standard",minimumFare:7000,includedKm:25,additionalKmRate:140,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:1000,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:600,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false},
+{id:"brv",modelKey:"honda-br-v",name:"Honda BR-V",active:true,pricingConfigured:true,passengers:6,luggage:"heavy",minimumFare:8000,includedKm:25,additionalKmRate:160,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:1000,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:700,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false},
+{id:"prado",modelKey:"toyota-prado",name:"Toyota Prado",active:true,pricingConfigured:true,passengers:5,luggage:"heavy",minimumFare:15000,includedKm:25,additionalKmRate:260,operationalKm:0,pickupAdjustment:0,dropoffAdjustment:0,lateNightSurcharge:2000,lateNightEnabled:true,waitingAllowanceMinutes:45,additionalWaitingRate:1000,operationalAllowance:0,fuelIncluded:true,tollIncluded:false,parkingIncluded:false}]};
 
-const ref = () => getAdminDb().collection("pricingConfigurations").doc("airportTransfer");
-export type PricingSource = "firestore" | "cache_fresh" | "cache_stale" | "default_development";
-type CachedPricing = { config: AirportPricingConfig; loadedAt: number; source: "firestore" | "default_development" };
-const FRESH_CACHE_MS = 45_000;
-const MAX_STALE_MS = 5 * 60_000;
-const TRANSIENT_CODES = new Set(["4", "10", "14", "aborted", "deadline-exceeded", "deadline_exceeded", "unavailable"]);
-const LUGGAGE = new Set<LuggageLevel>(["light", "standard", "heavy"]);
-let cachedPricing: CachedPricing | undefined;
-let pricingLoad: Promise<CachedPricing> | undefined;
+const newRef=(airportId:AirportId)=>getAdminDb().collection("airportPricingConfigurations").doc(airportId);
+const legacyRef=()=>getAdminDb().collection("pricingConfigurations").doc("airportTransfer");
+export type PricingSource="firestore"|"legacy_firestore"|"cache_fresh"|"cache_stale"|"default_development";
+type CachedPricing={config:AirportPricingConfig;loadedAt:number;source:"firestore"|"legacy_firestore"|"default_development"};
+const cache=new Map<AirportId,CachedPricing>(),loads=new Map<AirportId,Promise<CachedPricing|null>>(),FRESH_CACHE_MS=45_000,MAX_STALE_MS=5*60_000,TRANSIENT_CODES=new Set(["4","10","14","aborted","deadline-exceeded","deadline_exceeded","unavailable"]),LUGGAGE=new Set<LuggageLevel>(["light","standard","heavy"]);
+const finite=(value:unknown,minimum=0)=>typeof value==="number"&&Number.isFinite(value)&&value>=minimum;
+const transient=(error:unknown)=>TRANSIENT_CODES.has(String((error as{code?:unknown})?.code??"").toLowerCase());
+const wait=(ms:number)=>new Promise(resolve=>setTimeout(resolve,ms));
 
-const safeError = (error: unknown) => {
-  const value = error as Error & { code?: string | number };
-  return { errorName: value?.name ?? "UnknownError", errorCode: value?.code ?? "UNKNOWN", safeMessage: value?.message ?? "Unknown pricing read error" };
-};
-const transient = (error: unknown) => TRANSIENT_CODES.has(String((error as { code?: unknown })?.code ?? "").toLowerCase());
-const wait = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-const finite = (value: unknown, minimum = 0) => typeof value === "number" && Number.isFinite(value) && value >= minimum;
+function validateVehicle(value:unknown):value is AirportVehicleRule{if(!value||typeof value!=="object")return false;const v=value as Record<string,unknown>;return typeof v.id==="string"&&v.id.length>0&&typeof v.name==="string"&&v.name.length>0&&typeof v.active==="boolean"&&Number.isInteger(v.passengers)&&Number(v.passengers)>0&&LUGGAGE.has(v.luggage as LuggageLevel)&&["minimumFare","includedKm","additionalKmRate","operationalKm","pickupAdjustment","dropoffAdjustment","lateNightSurcharge","waitingAllowanceMinutes","additionalWaitingRate","operationalAllowance"].every(key=>finite(v[key]))&&typeof v.lateNightEnabled==="boolean"&&typeof v.fuelIncluded==="boolean"&&typeof v.tollIncluded==="boolean"&&typeof v.parkingIncluded==="boolean"}
+export function validateAirportPricingConfig(value:unknown,expectedAirportId?:AirportId):AirportPricingConfig{if(!value||typeof value!=="object")throw new Error("INVALID_AIRPORT_PRICING_CONFIGURATION");const c=value as Record<string,unknown>;if(!Number.isInteger(c.version)||Number(c.version)<1||!Number.isInteger(c.quoteValidityMinutes)||Number(c.quoteValidityMinutes)<1||!finite(c.advancePercentage)||Number(c.advancePercentage)>100||!Array.isArray(c.vehicles)||!c.vehicles.every(validateVehicle))throw new Error("INVALID_AIRPORT_PRICING_CONFIGURATION");const vehicles=c.vehicles.map(vehicle=>({...vehicle,modelKey:airportRuleModelKey(vehicle),pricingConfigured:vehicle.pricingConfigured!==false}));if(new Set(vehicles.map(v=>v.id)).size!==vehicles.length)throw new Error("INVALID_AIRPORT_PRICING_CONFIGURATION");if(expectedAirportId&&c.airportId!==undefined&&c.airportId!==expectedAirportId)throw new Error("AIRPORT_PRICING_CONTEXT_MISMATCH");return{airportId:expectedAirportId??c.airportId as AirportId|undefined,enabled:c.enabled===true||(expectedAirportId==="islamabad"&&c.enabled===undefined),version:Number(c.version),quoteValidityMinutes:Number(c.quoteValidityMinutes),advancePercentage:Number(c.advancePercentage),vehicles}}
 
-function validateVehicle(value: unknown): value is AirportVehicleRule {
-  if (!value || typeof value !== "object") return false;
-  const v = value as Record<string, unknown>;
-  return typeof v.id === "string" && v.id.length > 0
-    && typeof v.name === "string" && v.name.length > 0
-    && typeof v.active === "boolean"
-    && Number.isInteger(v.passengers) && Number(v.passengers) > 0
-    && LUGGAGE.has(v.luggage as LuggageLevel)
-    && ["minimumFare","includedKm","additionalKmRate","operationalKm","pickupAdjustment","dropoffAdjustment","lateNightSurcharge","waitingAllowanceMinutes","additionalWaitingRate","operationalAllowance"].every((key) => finite(v[key]))
-    && typeof v.lateNightEnabled === "boolean"
-    && typeof v.fuelIncluded === "boolean"
-    && typeof v.tollIncluded === "boolean"
-    && typeof v.parkingIncluded === "boolean";
-}
+async function read(airportId:AirportId,attemptId:string):Promise<CachedPricing|null>{const startedAt=Date.now(),specific=await newRef(airportId).get();if(specific.exists)return{config:validateAirportPricingConfig(specific.data(),airportId),loadedAt:Date.now(),source:"firestore"};if(airportId==="islamabad"){const legacy=await legacyRef().get();if(legacy.exists)return{config:validateAirportPricingConfig(legacy.data(),"islamabad"),loadedAt:Date.now(),source:"legacy_firestore"};if(process.env.NODE_ENV!=="production")return{config:validateAirportPricingConfig(DEFAULT_AIRPORT_PRICING,"islamabad"),loadedAt:Date.now(),source:"default_development"}}console.info("Airport pricing diagnostic",{attemptId,airportId,result:"missing",durationMs:Date.now()-startedAt});return null}
+async function refresh(airportId:AirportId,attemptId:string){try{return await read(airportId,attemptId)}catch(error){if(!transient(error))throw error;await wait(150);return read(airportId,attemptId)}}
+export async function getAirportPricingConfigWithMeta(airportId:AirportId="islamabad",attemptId="pricing-config"):Promise<{config:AirportPricingConfig;source:PricingSource}|null>{const now=Date.now(),cached=cache.get(airportId);if(cached&&now-cached.loadedAt<=FRESH_CACHE_MS)return{config:cached.config,source:"cache_fresh"};try{let pending=loads.get(airportId);if(!pending){pending=refresh(airportId,attemptId).finally(()=>loads.delete(airportId));loads.set(airportId,pending)}const loaded=await pending;if(!loaded)return null;cache.set(airportId,loaded);return{config:loaded.config,source:loaded.source}}catch(error){if(cached&&transient(error)&&now-cached.loadedAt<=MAX_STALE_MS)return{config:cached.config,source:"cache_stale"};throw error}}
+export async function getAirportPricingConfig(airportId:AirportId="islamabad"){const result=await getAirportPricingConfigWithMeta(airportId);if(!result)throw new Error("AIRPORT_PRICING_CONFIGURATION_MISSING");return result.config}
+export function getAirportPricingCacheStatus(airportId:AirportId="islamabad"){const cached=cache.get(airportId);return cached?{state:Date.now()-cached.loadedAt<=FRESH_CACHE_MS?"fresh":"stale",ageMs:Date.now()-cached.loadedAt,version:cached.config.version}:{state:"empty",ageMs:null,version:null}}
 
-export function validateAirportPricingConfig(value: unknown): AirportPricingConfig {
-  if (!value || typeof value !== "object") throw new Error("INVALID_AIRPORT_PRICING_CONFIGURATION");
-  const config = value as Record<string, unknown>;
-  if (!Number.isInteger(config.version) || Number(config.version) < 1
-    || !Number.isInteger(config.quoteValidityMinutes) || Number(config.quoteValidityMinutes) < 1
-    || !finite(config.advancePercentage) || Number(config.advancePercentage) > 100
-    || !Array.isArray(config.vehicles) || config.vehicles.length === 0
-    || !config.vehicles.every(validateVehicle)) throw new Error("INVALID_AIRPORT_PRICING_CONFIGURATION");
-  const ids = config.vehicles.map((vehicle) => vehicle.id);
-  if (new Set(ids).size !== ids.length) throw new Error("INVALID_AIRPORT_PRICING_CONFIGURATION");
-  return {
-    version: Number(config.version),
-    quoteValidityMinutes: Number(config.quoteValidityMinutes),
-    advancePercentage: Number(config.advancePercentage),
-    vehicles: config.vehicles.map((vehicle) => ({ ...vehicle })),
-  };
-}
-
-async function readPricingFromFirestore(attemptId: string): Promise<CachedPricing> {
-  const startedAt = Date.now();
-  const snapshot = await ref().get();
-  if (!snapshot.exists) {
-    if (process.env.NODE_ENV === "production") throw new Error("AIRPORT_PRICING_CONFIGURATION_MISSING");
-    const config = validateAirportPricingConfig(DEFAULT_AIRPORT_PRICING);
-    console.warn("Airport quote diagnostic", { attemptId, stage: "pricing_configuration", result: "default_development", durationMs: Date.now() - startedAt, pricingSource: "default_development" });
-    return { config, loadedAt: Date.now(), source: "default_development" };
-  }
-  const config = validateAirportPricingConfig(snapshot.data());
-  console.info("Airport quote diagnostic", { attemptId, stage: "pricing_configuration", result: "success", durationMs: Date.now() - startedAt, pricingSource: "firestore" });
-  return { config, loadedAt: Date.now(), source: "firestore" };
-}
-
-async function refreshPricing(attemptId: string): Promise<CachedPricing> {
-  const startedAt = Date.now();
-  try {
-    return await readPricingFromFirestore(attemptId);
-  } catch (error) {
-    if (!transient(error)) throw error;
-    const detail = safeError(error);
-    console.warn("Airport quote diagnostic", { attemptId, stage: "pricing_configuration", result: "retry", durationMs: Date.now() - startedAt, retryAttempt: 1, pricingSource: "retry_firestore", ...detail });
-    await wait(150);
-    return readPricingFromFirestore(attemptId);
-  }
-}
-
-export async function getAirportPricingConfigWithMeta(attemptId = "pricing-config"): Promise<{ config: AirportPricingConfig; source: PricingSource }> {
-  const now = Date.now();
-  if (cachedPricing && now - cachedPricing.loadedAt <= FRESH_CACHE_MS) {
-    console.info("Airport quote diagnostic", { attemptId, stage: "pricing_configuration", result: "success", durationMs: 0, pricingSource: "cache_fresh" });
-    return { config: cachedPricing.config, source: "cache_fresh" };
-  }
-  try {
-    pricingLoad ??= refreshPricing(attemptId).finally(() => { pricingLoad = undefined; });
-    cachedPricing = await pricingLoad;
-    return { config: cachedPricing.config, source: cachedPricing.source };
-  } catch (error) {
-    const detail = safeError(error);
-    if (cachedPricing && transient(error) && now - cachedPricing.loadedAt <= MAX_STALE_MS) {
-      console.warn("Airport quote diagnostic", { attemptId, stage: "pricing_configuration", result: "success", durationMs: 0, pricingSource: "cache_stale", cacheAgeMs: now - cachedPricing.loadedAt, ...detail });
-      return { config: cachedPricing.config, source: "cache_stale" };
-    }
-    console.error("Airport quote diagnostic", { attemptId, stage: "pricing_configuration", result: "failure", durationMs: 0, pricingSource: "firestore", ...detail });
-    throw error;
-  }
-}
-
-export function getAirportPricingCacheStatus() {
-  return cachedPricing ? { state: Date.now() - cachedPricing.loadedAt <= FRESH_CACHE_MS ? "fresh" : "stale", ageMs: Date.now() - cachedPricing.loadedAt, version: cachedPricing.config.version } : { state: "empty", ageMs: null, version: null };
-}
-
-export async function getAirportPricingConfig(): Promise<AirportPricingConfig> {
-  return (await getAirportPricingConfigWithMeta()).config;
-}
-
-export type PublicAirportStartingFare = {
-  vehicleName: string;
-  startingFare: number;
-  passengers: number;
-  luggage: LuggageLevel;
-  fuelIncluded: boolean;
-};
-
-export async function getPublicAirportStartingFares(): Promise<PublicAirportStartingFare[]> {
-  const config = await getAirportPricingConfig();
-  return config.vehicles
-    .filter((vehicle) => vehicle.active)
-    .map((vehicle) => ({
-      vehicleName: vehicle.name,
-      startingFare: vehicle.minimumFare,
-      passengers: vehicle.passengers,
-      luggage: vehicle.luggage,
-      fuelIncluded: vehicle.fuelIncluded,
-    }));
-}
-
-export async function saveAirportPricingConfig(config: AirportPricingConfig) {
-  const validated = validateAirportPricingConfig(config);
-  await ref().set({ ...validated, version: validated.version + 1, updatedAt: new Date().toISOString() });
-  cachedPricing = undefined;
-}
+export async function getEligibleAirportVehicleRules(airportId:AirportId,config:AirportPricingConfig){const fleet=await getAirportFleetModels(airportId),keys=new Set(fleet.map(item=>item.modelKey));return getBookableAirportRules(config.vehicles.filter(rule=>keys.has(airportRuleModelKey(rule))))}
+export type PublicAirportStartingFare={vehicleName:string;startingFare:number;passengers:number;luggage:LuggageLevel;fuelIncluded:boolean};
+export async function getPublicAirportStartingFares(airportId:AirportId="islamabad"):Promise<PublicAirportStartingFare[]>{const result=await getAirportPricingConfigWithMeta(airportId);if(!result||!getAirportDefinition(airportId).bookingEnabled)return[];const vehicles=await getEligibleAirportVehicleRules(airportId,result.config);if(!isAirportPricingReady(result.config.enabled,vehicles))return[];return vehicles.map(vehicle=>({vehicleName:vehicle.name,startingFare:vehicle.minimumFare,passengers:vehicle.passengers,luggage:vehicle.luggage,fuelIncluded:vehicle.fuelIncluded}))}
+export async function saveAirportPricingConfig(airportId:AirportId,config:AirportPricingConfig){const version=nextAirportPricingVersion(config.version>0?config.version:undefined),validated=validateAirportPricingConfig({...config,airportId,version},airportId);await newRef(airportId).set({...validated,airportId,updatedAt:new Date().toISOString()});cache.delete(airportId)}
