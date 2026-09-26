@@ -8,11 +8,17 @@ const require = createRequire(import.meta.url);
 const source = relative => readFileSync(new URL(`../${relative}`, import.meta.url), "utf8");
 
 function loadTravelGuides() {
-  const contentOutput = ts.transpileModule(source("src/lib/travel-guides/lahore-family-places.ts"), {
-    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-  }).outputText;
-  const contentLoaded = { exports: {} };
-  new Function("require", "module", "exports", contentOutput)(require, contentLoaded, contentLoaded.exports);
+  const loadContent = relative => {
+    const contentOutput = ts.transpileModule(source(relative), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    }).outputText;
+    const contentLoaded = { exports: {} };
+    new Function("require", "module", "exports", contentOutput)(require, contentLoaded, contentLoaded.exports);
+    return contentLoaded.exports;
+  };
+  const family = loadContent("src/lib/travel-guides/lahore-family-places.ts");
+  const oneDay = loadContent("src/lib/travel-guides/lahore-one-day-plan.ts");
+  const firstTime = loadContent("src/lib/travel-guides/lahore-first-time-visitors.ts");
   const output = ts.transpileModule(source("src/lib/travel-guides.ts"), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
   }).outputText;
@@ -21,7 +27,11 @@ function loadTravelGuides() {
     name => name === "@/lib/seo"
       ? { ORGANIZATION_ID: "https://www.rentka.co/#organization", SITE_URL: "https://www.rentka.co", WEBSITE_ID: "https://www.rentka.co/#website" }
       : name === "@/lib/travel-guides/lahore-family-places"
-        ? contentLoaded.exports
+        ? family
+        : name === "@/lib/travel-guides/lahore-one-day-plan"
+          ? oneDay
+          : name === "@/lib/travel-guides/lahore-first-time-visitors"
+            ? firstTime
         : require(name),
     loaded,
     loaded.exports,
@@ -70,7 +80,7 @@ test("article template provides one featured image, breadcrumbs, BlogPosting sch
   assert.match(component, /sizes=/);
 });
 
-test("only the substantive family guide is published while the other Lahore guides remain drafts", () => {
+test("all three substantive Lahore guides are published and publicly resolvable", () => {
   const registry = loadTravelGuides();
   assert.equal(registry.travelGuides.length, 3);
   assert.deepEqual(registry.travelGuides.map(guide => guide.title), [
@@ -80,31 +90,33 @@ test("only the substantive family guide is published while the other Lahore guid
   ]);
   for (const guide of registry.travelGuides) {
     assert.equal(guide.city, "lahore");
+    assert.equal(guide.status, "published");
+    assert.ok(guide.sections.length >= 8);
     assert.ok(guide.outline.length >= 4);
     assert.match(guide.featuredImage, /^\//);
+    assert.ok(guide.datePublished);
+    assert.equal(registry.getPublishedGuide("lahore", guide.slug)?.slug, guide.slug);
   }
-  const [published, ...drafts] = registry.travelGuides;
-  assert.equal(published.status, "published");
-  assert.ok(published.sections.length >= 8);
-  assert.equal(published.datePublished, "2026-09-25");
-  assert.equal(published.dateModified, "2026-09-25");
-  assert.equal(registry.publishedTravelGuides.length, 1);
-  assert.equal(registry.getPublishedGuide("lahore", published.slug)?.slug, published.slug);
-  for (const draft of drafts) {
-    assert.equal(draft.status, "draft");
-    assert.equal(draft.sections.length, 0);
-    assert.equal(registry.getPublishedGuide("lahore", draft.slug), undefined);
-  }
+  assert.equal(registry.publishedTravelGuides.length, 3);
+  assert.equal(new Set(registry.travelGuides.map(guide => guide.featuredImage)).size, 3);
+  assert.deepEqual(registry.travelGuides.map(guide => guide.featuredImage), [
+    "/top-places-to-visit-in-lahore-with-family.webp",
+    "/one-day-lahore-sightseeing-plan.webp",
+    "/lahore-travel-guide-for-first-time-visitors.webp",
+  ]);
+  assert.equal(registry.travelGuides[0].datePublished, "2026-09-25");
+  for (const guide of registry.travelGuides.slice(1)) assert.equal(guide.datePublished, "2026-09-26");
 });
 
 test("article schema builder produces a canonical BlogPosting for publishable content", () => {
   const registry = loadTravelGuides();
-  const guide = { ...registry.travelGuides[0], status: "published", datePublished: "2026-10-01", sections: [{ id: "intro", heading: "Introduction", paragraphs: ["Substantive reviewed copy."] }] };
-  const schema = registry.buildGuideArticleSchema(guide);
-  assert.equal(schema["@type"], "BlogPosting");
-  assert.equal(schema.mainEntityOfPage["@id"], `https://www.rentka.co/travel-guides/lahore/${guide.slug}`);
-  assert.equal(schema.author["@id"], "https://www.rentka.co/#organization");
-  assert.equal(schema.image, "https://www.rentka.co/top-places-to-visit-in-lahore-with-family.webp");
+  for (const guide of registry.travelGuides) {
+    const schema = registry.buildGuideArticleSchema(guide);
+    assert.equal(schema["@type"], "BlogPosting");
+    assert.equal(schema.mainEntityOfPage["@id"], `https://www.rentka.co/travel-guides/lahore/${guide.slug}`);
+    assert.equal(schema.author["@id"], "https://www.rentka.co/#organization");
+    assert.equal(schema.image, `https://www.rentka.co${guide.featuredImage}`);
+  }
 });
 
 test("dynamic guide metadata indexes only published guides and drafts resolve through notFound", () => {
