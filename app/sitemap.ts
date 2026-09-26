@@ -5,6 +5,7 @@ import { intercityRoutes } from "../src/data/intercityRoutes";
 import { SITE_URL, VEHICLE_CITIES, VEHICLE_MODELS, VEHICLE_SERVICE } from "../src/lib/seo";
 import { getEligibleLahoreModels } from "../src/lib/normal-rental/public-inventory";
 import { NORMAL_RENTAL_ZONES } from "../src/lib/normal-rental/zones";
+import { guidePath, publishedTravelGuides } from "../src/lib/travel-guides";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = [
@@ -17,6 +18,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/one-way-drop", priority: 0.9, changeFrequency: "weekly" as const },
     { path: "/cars", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/blog", priority: 0.8, changeFrequency: "weekly" as const },
+    { path: "/travel-guides", priority: 0.8, changeFrequency: "monthly" as const },
+    { path: "/travel-guides/lahore", priority: 0.8, changeFrequency: "monthly" as const },
     { path: "/about", priority: 0.7, changeFrequency: "monthly" as const },
     { path: "/contact", priority: 0.7, changeFrequency: "monthly" as const },
     { path: "/privacy", priority: 0.5, changeFrequency: "yearly" as const },
@@ -60,5 +63,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...vehiclePages, ...lahorePages, ...routePages, ...articlePages];
+  const travelGuidePages = publishedTravelGuides.map((guide) => ({
+    url: `${SITE_URL}${guidePath(guide)}`,
+    lastModified: new Date(guide.dateModified ?? guide.datePublished!),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...vehiclePages, ...lahorePages, ...routePages, ...articlePages, ...travelGuidePages];
 }
