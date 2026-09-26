@@ -39,6 +39,33 @@ function loadTravelGuides() {
   return loaded.exports;
 }
 
+function loadBlogArticles() {
+  const output = ts.transpileModule(source("app/blog/data.ts"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText;
+  const loaded = { exports: {} };
+  new Function("require", "module", "exports", output)(require, loaded, loaded.exports);
+  return loaded.exports.articles;
+}
+
+function loadEditorialHub() {
+  const output = ts.transpileModule(source("src/lib/editorial-hub.ts"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+  }).outputText;
+  const loaded = { exports: {} };
+  const travel = loadTravelGuides();
+  new Function("require", "module", "exports", output)(
+    name => name === "@/app/blog/data"
+      ? { articles: loadBlogArticles() }
+      : name === "@/lib/travel-guides"
+        ? travel
+        : require(name),
+    loaded,
+    loaded.exports,
+  );
+  return loaded.exports;
+}
+
 test("travel guide hubs and scalable article route exist without tag or filter pages", () => {
   for (const relative of [
     "app/travel-guides/page.tsx",
@@ -60,7 +87,7 @@ test("guide hubs are indexable with unique metadata and self-canonicals", () => 
     assert.match(page, /robots:\s*\{ index: true, follow: true \}/);
     assert.match(page, new RegExp(`canonical:[^\n]+${canonical.replaceAll("/", "\\/")}`));
   }
-  assert.match(root, /<h1/);
+  assert.match(root + source("app/blog/components/BlogHome.tsx"), /<h1/);
   assert.match(lahore, /<h1/);
 });
 
@@ -138,9 +165,40 @@ test("sitemap includes substantive hubs and only registry-approved published gui
   for (const slug of loadTravelGuides().travelGuides.map(guide => guide.slug)) assert.equal(sitemap.includes(slug), false, slug);
 });
 
-test("existing blog routes remain separate and the new hub has a natural internal link", () => {
+test("travel-guides is the unified editorial hub and blog index redirects permanently", () => {
+  const blogPage = source("app/blog/page.tsx");
+  const hubPage = source("app/travel-guides/page.tsx");
+  const blogHome = source("app/blog/components/BlogHome.tsx");
+  const registry = source("src/lib/editorial-hub.ts");
   assert.equal(existsSync(new URL("../app/blog/page.tsx", import.meta.url)), true);
   assert.equal(existsSync(new URL("../app/blog/[slug]/page.tsx", import.meta.url)), true);
-  assert.doesNotMatch(source("app/blog/page.tsx"), /travel-guides/);
+  assert.match(blogPage, /permanentRedirect\("\/travel-guides"\)/);
+  assert.match(hubPage, /<BlogHome items=\{editorialHubItems\}/);
+  assert.match(hubPage, /numberOfItems: editorialHubItems\.length/);
+  assert.match(registry, /articles\.map/);
+  assert.match(registry, /publishedTravelGuides\.map/);
+  assert.match(registry, /href: `\/blog\/\$\{article\.slug\}`/);
+  assert.match(registry, /href: guidePath\(guide\)/);
+  for (const label of ["Featured Guides", "City Guides", "Routes & Road Trips", "Airport Travel", "Car Rental Guides"]) {
+    assert.ok(blogHome.includes(label), label);
+  }
+  for (const slug of loadTravelGuides().travelGuides.map(guide => guide.slug)) {
+    assert.equal(existsSync(new URL(`../app/blog/${slug}`, import.meta.url)), false, slug);
+  }
   assert.match(source("app/layout.tsx"), /href="\/travel-guides"/);
+});
+
+test("unified hub contains every published article once with useful section and destination mappings", () => {
+  const { editorialHubItems, editorialDestinations } = loadEditorialHub();
+  assert.equal(loadBlogArticles().length, 34);
+  assert.equal(editorialHubItems.length, 37);
+  assert.equal(new Set(editorialHubItems.map(item => item.href)).size, 37);
+  assert.deepEqual(
+    Object.fromEntries(["city", "routes", "airport", "car-rental"].map(section => [section, editorialHubItems.filter(item => item.section === section).length])),
+    { city: 3, routes: 20, airport: 1, "car-rental": 13 },
+  );
+  for (const destination of ["Lahore", "Islamabad", "Rawalpindi", "Murree", "Faisalabad", "Swat", "Naran", "Hunza", "Skardu"]) {
+    assert.ok(editorialDestinations.includes(destination), destination);
+    assert.ok(editorialHubItems.some(item => item.destinations.includes(destination)), destination);
+  }
 });

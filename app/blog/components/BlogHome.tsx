@@ -14,64 +14,46 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { articles } from "../data";
-import type { Article } from "../types";
+export type EditorialHubItem = {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  imageAlt: string;
+  href: string;
+  readTime: string;
+  category: string;
+  section: "city" | "routes" | "airport" | "car-rental";
+  destinations: string[];
+  accent: string;
+};
 
 const PAGE_SIZE = 9;
-const featuredSlugs = [
-  "how-to-rent-a-car-in-islamabad-rawalpindi",
-  "airport-car-rental-islamabad-guide",
-  "one-way-car-rental-islamabad-guide",
+const featuredIds = [
+  "guide:top-places-to-visit-in-lahore-with-family",
+  "blog:how-to-rent-a-car-in-islamabad-rawalpindi",
+  "blog:airport-car-rental-islamabad-guide",
 ];
 
 const categoryGroups = [
-  { id: "all", label: "All Articles" },
+  { id: "all", label: "All Guides" },
+  { id: "city", label: "City Guides" },
+  { id: "routes", label: "Routes & Road Trips" },
+  { id: "airport", label: "Airport Travel" },
   { id: "car-rental", label: "Car Rental Guides" },
-  { id: "intercity", label: "Intercity Travel" },
-  { id: "northern", label: "Northern Areas" },
-  { id: "airport", label: "Airport Transfers" },
-  { id: "business", label: "Corporate & Monthly" },
-  { id: "vehicle", label: "Vehicle Guides" },
 ];
+const destinationFilters = ["Lahore", "Islamabad", "Rawalpindi", "Murree", "Faisalabad", "Swat", "Naran", "Hunza", "Skardu"];
 
-function matchesCategory(article: Article, group: string) {
-  const category = article.category.toLowerCase();
-  if (group === "all") return true;
-  if (group === "car-rental") {
-    return [
-      "car rental guide",
-      "one-way travel guide",
-      "wedding transportation guide",
-      "premium travel guide",
-      "professional driver service guide",
-      "family travel guide",
-      "tourist transportation guide",
-    ].includes(category);
-  }
-  if (group === "intercity") {
-    return ["intercity travel guide", "road trip guide", "one-way travel guide"].includes(category);
-  }
-  if (group === "northern") {
-    return [
-      "northern areas travel guide",
-      "azad kashmir travel guide",
-      "hill station travel guide",
-      "travel guide",
-    ].includes(category);
-  }
-  if (group === "airport") return category === "airport transfer guide";
-  if (group === "business") {
-    return ["corporate travel guide", "long-term rental guide"].includes(category);
-  }
-  return category === "vehicle rental guide";
+function matchesCategory(item: EditorialHubItem, group: string) {
+  return group === "all" || item.section === group;
 }
 
 function ArticleImage({
-  article,
+  item,
   sizes,
   priority = false,
 }: {
-  article: Article;
+  item: EditorialHubItem;
   sizes: string;
   priority?: boolean;
 }) {
@@ -81,7 +63,7 @@ function ArticleImage({
     return (
       <div
         role="img"
-        aria-label={article.title + " image unavailable"}
+        aria-label={item.title + " image unavailable"}
         className="absolute inset-0 flex flex-col items-center justify-center bg-[#0F2B46] px-4 text-center text-white"
       >
         <span className="text-sm font-bold uppercase tracking-[0.16em] text-[#9AD08F]">
@@ -96,8 +78,8 @@ function ArticleImage({
 
   return (
     <Image
-      src={article.image}
-      alt={article.title + " travel guide"}
+      src={item.image}
+      alt={item.imageAlt}
       fill
       sizes={sizes}
       priority={priority}
@@ -107,7 +89,7 @@ function ArticleImage({
   );
 }
 
-function FeaturedCard({ article, large = false }: { article: Article; large?: boolean }) {
+function FeaturedCard({ item, large = false }: { item: EditorialHubItem; large?: boolean }) {
   const cardClass = large
     ? "group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl lg:grid lg:grid-cols-[1.08fr_0.92fr]"
     : "group grid grid-cols-[0.82fr_1.18fr] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:min-h-[190px]";
@@ -118,36 +100,36 @@ function FeaturedCard({ article, large = false }: { article: Article; large?: bo
   return (
     <article className={cardClass}>
       <Link
-        href={"/blog/" + article.slug}
+        href={item.href}
         className={imageClass}
-        aria-label={"Read " + article.title}
+        aria-label={"Read " + item.title}
       >
         <ArticleImage
-          article={article}
+          item={item}
           priority={large}
           sizes={large ? "(max-width: 1024px) 100vw, 42vw" : "(max-width: 640px) 40vw, 240px"}
         />
       </Link>
       <div className={large ? "flex flex-col justify-center p-7 sm:p-9" : "flex min-w-0 flex-col justify-center p-5 sm:p-6"}>
-        <span className={"w-fit rounded-full px-3 py-1.5 text-xs font-bold " + article.accent}>
-          {article.category}
+        <span className={"w-fit rounded-full px-3 py-1.5 text-xs font-bold " + item.accent}>
+          {item.category}
         </span>
         <h3 className={large ? "mt-5 text-2xl font-extrabold leading-tight text-[#0F2B46] sm:text-3xl" : "mt-3 text-lg font-extrabold leading-snug text-[#0F2B46] sm:text-xl"}>
           <Link
-            href={"/blog/" + article.slug}
+            href={item.href}
             className="rounded-sm transition hover:text-[#347A2A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"
           >
-            {article.title}
+            {item.title}
           </Link>
         </h3>
-        {large && <p className="mt-4 text-base leading-7 text-slate-600">{article.description}</p>}
+        {large && <p className="mt-4 text-base leading-7 text-slate-600">{item.description}</p>}
         <div className="mt-5 flex flex-wrap items-center gap-4 text-sm font-semibold text-slate-500">
           <span className="inline-flex items-center gap-1.5">
             <Clock3 className="h-4 w-4" aria-hidden="true" />
-            {article.readTime}
+            {item.readTime}
           </span>
           <Link
-            href={"/blog/" + article.slug}
+            href={item.href}
             className="inline-flex items-center gap-1 rounded-sm font-bold text-[#347A2A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"
           >
             Read Article
@@ -159,39 +141,39 @@ function FeaturedCard({ article, large = false }: { article: Article; large?: bo
   );
 }
 
-function ArticleCard({ article }: { article: Article }) {
+function ArticleCard({ item }: { item: EditorialHubItem }) {
   return (
     <article className="group flex min-w-0 flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl focus-within:shadow-xl">
       <Link
-        href={"/blog/" + article.slug}
+        href={item.href}
         className="relative block aspect-[16/9] overflow-hidden bg-slate-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-[#5BAE4A]"
-        aria-label={"Read " + article.title}
+        aria-label={"Read " + item.title}
       >
         <ArticleImage
-          article={article}
+          item={item}
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
         />
       </Link>
       <div className="flex flex-1 flex-col p-6">
-        <span className={"w-fit rounded-full px-3 py-1.5 text-xs font-bold " + article.accent}>
-          {article.category}
+        <span className={"w-fit rounded-full px-3 py-1.5 text-xs font-bold " + item.accent}>
+          {item.category}
         </span>
         <h3 className="mt-5 text-xl font-extrabold leading-snug text-[#0F2B46]">
           <Link
-            href={"/blog/" + article.slug}
+            href={item.href}
             className="rounded-sm transition hover:text-[#347A2A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"
           >
-            {article.title}
+            {item.title}
           </Link>
         </h3>
-        <p className="mt-3 text-base leading-7 text-slate-600">{article.description}</p>
+        <p className="mt-3 text-base leading-7 text-slate-600">{item.description}</p>
         <div className="mt-auto flex items-center justify-between gap-3 pt-6 text-sm font-semibold">
           <span className="inline-flex items-center gap-1.5 text-slate-500">
             <Clock3 className="h-4 w-4" aria-hidden="true" />
-            {article.readTime}
+            {item.readTime}
           </span>
           <Link
-            href={"/blog/" + article.slug}
+            href={item.href}
             className="inline-flex items-center gap-1 rounded-sm font-bold text-[#347A2A] transition hover:text-[#0F2B46] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"
           >
             Read Article
@@ -210,20 +192,20 @@ function GuideLinks({
 }: {
   title: string;
   description: string;
-  items: Article[];
+  items: EditorialHubItem[];
 }) {
   return (
     <section className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-7">
       <h2 className="text-xl font-extrabold text-[#0F2B46]">{title}</h2>
       <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
       <ul className="mt-5 divide-y divide-slate-100">
-        {items.slice(0, 6).map((article) => (
-          <li key={article.slug}>
+        {items.slice(0, 6).map((item) => (
+          <li key={item.id}>
             <Link
-              href={"/blog/" + article.slug}
+              href={item.href}
               className="group/link flex items-center justify-between gap-4 rounded-lg py-3 text-sm font-bold leading-5 text-slate-700 transition hover:text-[#347A2A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"
             >
-              <span>{article.title}</span>
+              <span>{item.title}</span>
               <ArrowRight className="h-4 w-4 shrink-0 text-[#5BAE4A] transition group-hover/link:translate-x-1" aria-hidden="true" />
             </Link>
           </li>
@@ -233,29 +215,33 @@ function GuideLinks({
   );
 }
 
-export default function BlogHome() {
+export default function BlogHome({
+  items,
+}: {
+  items: EditorialHubItem[];
+}) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const featuredArticles = featuredSlugs
-    .map((slug) => articles.find((article) => article.slug === slug))
-    .filter((article): article is Article => Boolean(article));
+  const featuredArticles = featuredIds
+    .map((id) => items.find((item) => item.id === id))
+    .filter((item): item is EditorialHubItem => Boolean(item));
 
   const filteredArticles = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     const isDefaultView = category === "all" && !normalizedQuery;
 
-    return articles.filter((article) => {
-      if (isDefaultView && featuredSlugs.includes(article.slug)) return false;
-      if (!matchesCategory(article, category)) return false;
+    return items.filter((item) => {
+      if (isDefaultView && featuredIds.includes(item.id)) return false;
+      if (!matchesCategory(item, category)) return false;
       if (!normalizedQuery) return true;
-      return [article.title, article.description, article.category, article.keywords.join(" ")]
+      return [item.title, item.description, item.category, item.destinations.join(" ")]
         .join(" ")
         .toLowerCase()
         .includes(normalizedQuery);
     });
-  }, [category, query]);
+  }, [category, items, query]);
 
   const visibleArticles = filteredArticles.slice(0, visibleCount);
 
@@ -263,28 +249,22 @@ export default function BlogHome() {
     {
       title: "Popular Intercity Routes",
       description: "Plan comfortable journeys with a professional driver between Islamabad and major cities.",
-      items: articles.filter((article) =>
-        ["Intercity Travel Guide", "Road Trip Guide", "One-Way Travel Guide"].includes(article.category),
-      ),
+      items: items.filter((item) => item.section === "routes"),
     },
     {
       title: "Northern Pakistan Travel Guides",
       description: "Practical route advice for mountain destinations, valleys and hill stations.",
-      items: articles.filter((article) =>
-        ["Northern Areas Travel Guide", "Azad Kashmir Travel Guide", "Hill Station Travel Guide", "Travel Guide"].includes(article.category),
-      ),
+      items: items.filter((item) => item.section === "city" || item.destinations.some((destination) => ["Murree", "Swat", "Naran", "Hunza", "Skardu"].includes(destination))),
     },
     {
       title: "Car Rental Services in Islamabad",
       description: "Find the right car with driver for work, family travel and special occasions.",
-      items: articles.filter((article) =>
-        ["Corporate Travel Guide", "Long-Term Rental Guide", "Wedding Transportation Guide", "Premium Travel Guide", "Professional Driver Service Guide", "Family Travel Guide"].includes(article.category),
-      ),
+      items: items.filter((item) => item.section === "car-rental"),
     },
     {
       title: "Vehicle Rental Guides",
       description: "Compare popular RentKA vehicle options before making your booking.",
-      items: articles.filter((article) => article.category === "Vehicle Rental Guide"),
+      items: items.filter((item) => item.category.includes("Vehicle")),
     },
   ];
 
@@ -301,15 +281,14 @@ export default function BlogHome() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-[#5BAE4A]/25 bg-white px-4 py-2 text-sm font-bold text-[#347A2A] shadow-sm">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
-              RentKA Journal
+              RentKA Travel Guides
             </div>
             <h1 className="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-[-0.035em] text-[#0F2B46] sm:text-5xl lg:text-6xl">
-              Car Rental &amp; Travel Guides for Pakistan
+              Practical Travel Guides for Pakistan
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-              Helpful guidance for car rental with driver in Islamabad
-              and Rawalpindi, airport transfers, intercity journeys and
-              unforgettable trips across northern Pakistan.
+              Explore city itineraries, airport advice, intercity routes,
+              northern journeys and practical car-rental guidance in one place.
             </p>
             <p className="mt-3 text-sm font-bold text-[#347A2A]">Car rentals. Made simple.</p>
             <form onSubmit={handleSearch} role="search" className="mt-8 max-w-xl">
@@ -352,13 +331,13 @@ export default function BlogHome() {
             </div>
             <div className="mt-4 flex items-center justify-center gap-2 text-center text-sm font-semibold text-slate-600">
               <MapPin className="h-4 w-4 shrink-0 text-[#5BAE4A]" aria-hidden="true" />
-              Islamabad, Rawalpindi and journeys across Pakistan
+              City visits, airport travel and road journeys across Pakistan
             </div>
           </div>
         </div>
       </section>
 
-      <nav aria-label="Filter articles by topic" className="border-b border-slate-200 bg-white">
+      <nav aria-label="Filter guides by topic" className="border-b border-slate-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2.5">
             {categoryGroups.map((group) => {
@@ -382,6 +361,24 @@ export default function BlogHome() {
               );
             })}
           </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2" aria-label="Browse guides by destination">
+            <span className="mr-1 text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Destinations</span>
+            {destinationFilters.map((destination) => (
+              <button
+                key={destination}
+                type="button"
+                onClick={() => {
+                  setQuery(destination);
+                  setCategory("all");
+                  setVisibleCount(PAGE_SIZE);
+                  document.getElementById("latest-guides")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:border-[#5BAE4A] hover:text-[#347A2A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"
+              >
+                {destination}
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
 
@@ -389,18 +386,17 @@ export default function BlogHome() {
         <div className="mb-8">
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#347A2A]">Start here</p>
           <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0F2B46] sm:text-4xl">
-            Featured Car Rental Guides
+            Featured Guides
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-            Essential guidance for booking, airport pickups and one-way travel
-            with a professional driver.
+            A useful starting point for city planning, car rental and airport travel.
           </p>
         </div>
         <div className="grid gap-5 lg:grid-cols-[1.35fr_0.85fr]">
-          {featuredArticles[0] && <FeaturedCard article={featuredArticles[0]} large />}
+          {featuredArticles[0] && <FeaturedCard item={featuredArticles[0]} large />}
           <div className="grid gap-5">
-            {featuredArticles.slice(1).map((article) => (
-              <FeaturedCard key={article.slug} article={article} />
+            {featuredArticles.slice(1).map((item) => (
+              <FeaturedCard key={item.id} item={item} />
             ))}
           </div>
         </div>
@@ -412,10 +408,10 @@ export default function BlogHome() {
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#347A2A]">Explore the journal</p>
               <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0F2B46] sm:text-4xl">
-                {query || category !== "all" ? "Matching Guides" : "Latest Articles"}
+                {query || category !== "all" ? "Matching Guides" : "All Travel Guides"}
               </h2>
               <p className="mt-3 text-base text-slate-600" aria-live="polite">
-                {articles.length} articles available
+                {items.length} published guides available
               </p>
             </div>
             {(query || category !== "all") && (
@@ -436,7 +432,7 @@ export default function BlogHome() {
           {visibleArticles.length > 0 ? (
             <>
               <div className="mt-9 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                {visibleArticles.map((article) => <ArticleCard key={article.slug} article={article} />)}
+                {visibleArticles.map((item) => <ArticleCard key={item.id} item={item} />)}
               </div>
               {visibleCount < filteredArticles.length && (
                 <div className="mt-10 text-center">
@@ -445,7 +441,7 @@ export default function BlogHome() {
                     onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
                     className="inline-flex items-center gap-2 rounded-xl border border-[#0F2B46] bg-white px-6 py-3.5 font-bold text-[#0F2B46] transition hover:bg-[#0F2B46] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] focus-visible:ring-offset-2"
                   >
-                    Load More Articles
+                    Load More Guides
                     <ChevronDown className="h-4 w-4" aria-hidden="true" />
                   </button>
                 </div>
@@ -472,18 +468,18 @@ export default function BlogHome() {
           {curatedSections.map((section) => <GuideLinks key={section.title} {...section} />)}
         </div>
         <div className="mt-10 rounded-3xl border border-slate-200 bg-slate-50 p-6 sm:p-8">
-          <h2 className="text-2xl font-extrabold text-[#0F2B46]">All published guides</h2>
+          <h2 className="text-2xl font-extrabold text-[#0F2B46]">Complete editorial library</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Browse every RentKA travel and car rental with driver guide.
+            Browse every published RentKA city, route, airport and car-rental guide.
           </p>
           <ul className="mt-6 grid gap-x-8 gap-y-3 md:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => (
-              <li key={article.slug}>
+            {items.map((item) => (
+              <li key={item.id}>
                 <Link
-                  href={`/blog/${article.slug}`}
+                  href={item.href}
                   className="text-sm font-semibold text-slate-700 hover:text-[#347A2A] hover:underline"
                 >
-                  {article.title}
+                  {item.title}
                 </Link>
               </li>
             ))}
