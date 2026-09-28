@@ -18,7 +18,6 @@ import {
   trackMetaPixel,
   trackWhatsAppClick,
 } from "@/lib/tracking";
-import { requestAutomaticDispatchIntake } from "@/lib/dispatch/automatic-intake-client";
 
 const WHATSAPP_NUMBER = "923020589999";
 const GOOGLE_MAP_LIBRARIES: "places"[] = ["places"];
@@ -329,12 +328,6 @@ Please confirm availability.
         createdAt: serverTimestamp(),
       });
 
-      await requestAutomaticDispatchIntake({
-        sourceType: "twin_cities_normal",
-        sourceDocumentId: docRef.id,
-        bookingId: leadId,
-      });
-
       const reviewLink = `https://www.rentka.co/review?leadId=${docRef.id}&token=${reviewToken}`;
       const trackingPayload = {
         lead_id: leadId,
@@ -366,116 +359,20 @@ Please confirm availability.
       trackMetaPixel("Lead", trackingPayload);
       trackWhatsAppClick("main_lead_form");
 
+      await updateDoc(docRef, { reviewLink });
+      try {
+        const deliveryResponse = await fetch("/api/booking-delivery", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ source: "twin_cities_normal", sourceDocumentId: docRef.id, bookingId: leadId }),
+        });
+        if (!deliveryResponse.ok) console.warn("Booking was saved but downstream delivery was not fully accepted.");
+      } catch {
+        console.warn("Booking was saved but downstream delivery could not be requested.");
+      }
+
       if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
       else window.location.href = whatsappUrl;
-
-      void updateDoc(docRef, { reviewLink }).catch((reviewLinkError) => {
-        console.error("Firestore review link update failed:", reviewLinkError);
-      });
-
-      const emailPayload = {
-        leadId,
-        carName: context.carName ?? "",
-        carId: context.carId ?? null,
-        vendorName: context.vendorName ?? null,
-        vendorId: context.vendorId ?? null,
-        modelYear: modelYearDisplay,
-        country: context.country ?? null,
-        city: context.city ?? "",
-        service: submittedServiceLabel,
-        pricingType: context.pricingType ?? null,
-        duration: context.duration ?? null,
-        originalPrice: context.price ?? null,
-        dailyRentalRate,
-        numberOfDays,
-        estimatedRentalAmount,
-        pickupDate,
-        preferredTime,
-        pickupAddress: pickupAddress.trim(),
-        pickupLatitude,
-        pickupLongitude,
-        pickupPlaceId,
-        pickupMapLink,
-        isOutstation: outstation,
-        destinationAddress: outstation ? destinationAddress.trim() : "",
-        destinationLatitude: outstation ? destinationLatitude : null,
-        destinationLongitude: outstation ? destinationLongitude : null,
-        destinationPlaceId: outstation ? destinationPlaceId : "",
-        destinationMapLink: outstation ? destinationMapLink : "",
-        customerName: name.trim(),
-        phone: phone.trim(),
-        email: email.trim(),
-        source: "website",
-        reviewLink,
-      };
-
-      void fetch("/api/lead-booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(emailPayload),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            console.error("Standard booking email notification was not accepted.");
-          }
-        })
-        .catch(() => {
-          console.error("Standard booking email notification request failed.");
-        });
-
-      const sheetPayload = {
-        name: name.trim(),
-        phone: phone.trim(),
-        email: email.trim() || "",
-        carName: context.carName || "",
-        vendorName: context.vendorName || "",
-        vendorId: context.vendorId || "",
-        modelYear: String(modelYearDisplay ?? ""),
-        country: context.country || "",
-        city: context.city || "",
-        service: context.service || "",
-        serviceType: context.pricingType || "",
-        packageName: context.pricingType || "",
-        packageDuration: context.duration || "",
-        packagePrice: context.price ? String(context.price) : "",
-        pickupDate,
-        preferredTime,
-        source: "website",
-        leadId,
-        status: "new",
-        pickupAddress: pickupAddress.trim(),
-        pickupLatitude,
-        pickupLongitude,
-        pickupPlaceId,
-        pickupMapLink,
-        numberOfDays,
-        dailyRentalRate,
-        estimatedRentalAmount,
-        destinationAddress: outstation ? destinationAddress.trim() : "",
-        destinationLatitude: outstation ? destinationLatitude : null,
-        destinationLongitude: outstation ? destinationLongitude : null,
-        destinationPlaceId: outstation ? destinationPlaceId : "",
-        destinationMapLink: outstation ? destinationMapLink : "",
-        isOutstation: outstation,
-        firestoreDocumentId: docRef.id,
-        reviewLink,
-        submittedAt: new Date().toISOString(),
-      };
-
-      void fetch("/api/lead-sheet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sheetPayload),
-      })
-        .then(async (response) => {
-          const result = (await response.json().catch(() => null)) as { success?: boolean } | null;
-          if (!response.ok || result?.success !== true) {
-            console.warn("Booking lead sheet sync was not confirmed.");
-          }
-        })
-        .catch(() => {
-          console.warn("Booking lead sheet sync request failed.");
-        });
 
       setDesktopWhatsappUrl(whatsappUrl);
       setSuccess(true);

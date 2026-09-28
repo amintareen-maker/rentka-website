@@ -58,5 +58,5 @@ test("existing internal lead data and Sheet fields remain intact", async () => {
   for (const field of ["inventoryId: selected.inventoryId", "vendorName: selected.vendorName", "vendorId: selected.vendorId", "carName: selected.modelName", "modelYear:"]) {
     assert.match(source, new RegExp(field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   }
-  assert.match(source, /publicVehicleLabel: publicVehicleLabel \?\? ""/);
+  assert.match(source, /publicVehicleLabel: selected\.showAsSeparateCard \? normalRentalPublicLabel\(selected\) : null/);
 });

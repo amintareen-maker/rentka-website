@@ -67,7 +67,9 @@ export async function sendBookingEmails(booking: TaBooking) {
   if (!key || !from || !rentka) { await ref.update({ "notificationStatus.rentkaEmail": "FAILED", "notificationStatus.requesterEmail": "FAILED", "notificationStatus.updatedAt": new Date().toISOString() }); return; }
   const resend = new Resend(key); const shell = (title: string, body: string) => `<div style="font-family:Arial;max-width:720px;margin:auto"><h1>${escape(title)}</h1><table style="width:100%;border-collapse:collapse">${body}</table><p>This is a transport request awaiting RentKA confirmation.</p></div>`;
   const [a, b] = await Promise.allSettled([resend.emails.send({ from, to: rentka, subject: `New TA booking ${booking.bookingId}`, html: shell("New TA Connections Booking", rows(booking, true)) }), resend.emails.send({ from, to: booking.requesterEmail!, subject: `Booking request received — ${booking.bookingId}`, html: shell("Booking Request Submitted", rows(booking, false)) })]);
-  await ref.update({ "notificationStatus.rentkaEmail": a.status === "fulfilled" && !a.value.error ? "SENT" : "FAILED", "notificationStatus.requesterEmail": b.status === "fulfilled" && !b.value.error ? "SENT" : "FAILED", "notificationStatus.updatedAt": new Date().toISOString() });
+  const status = { rentkaEmail: a.status === "fulfilled" && !a.value.error ? "SENT" : "FAILED", requesterEmail: b.status === "fulfilled" && !b.value.error ? "SENT" : "FAILED" } as const;
+  await ref.update({ "notificationStatus.rentkaEmail": status.rentkaEmail, "notificationStatus.requesterEmail": status.requesterEmail, "notificationStatus.updatedAt": new Date().toISOString() });
+  return status;
 }
 
 export function whatsappMessage(booking: TaBooking) {

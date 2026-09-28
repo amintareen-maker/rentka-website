@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import { after, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
-import { sendAirportBookingNotification, type AirportBookingNotification } from "@/lib/airport/notification";
+import type { AirportBookingNotification } from "@/lib/airport/notification";
 import { isValidAirportPhone, normalizeAirportPhone } from "@/lib/airport/phone";
-import { attemptAutomaticOperationalIntake } from "@/lib/dispatch/automatic-intake";
+import { orchestrateBookingDelivery } from "@/lib/booking-delivery/orchestrator";
 import { getAirportDefinition, isAirportId } from "@/lib/airport/constants";
 import { airportBookingId, airportCounterDocumentId, nextAirportSequence } from "@/lib/airport/counter";
 
@@ -88,14 +88,10 @@ export async function POST(request: Request) {
       return nextBooking;
     });
     const persistedAt = Date.now();
-    await attemptAutomaticOperationalIntake("airport", bookingRef.id);
     after(async () => {
-      const emailStartedAt = Date.now();
-      const emailSent = await sendAirportBookingNotification(booking);
-      await bookingRef.update({ notificationStatus: emailSent ? "sent" : "failed", notificationUpdatedAt: new Date().toISOString() }).catch(() => {
-        console.error("Airport booking notification status could not be updated.", { attemptId });
+      await orchestrateBookingDelivery("airport", bookingRef.id, request.url).catch(error => {
+        console.error("[booking-delivery]", { bookingId: booking.bookingId, source: "airport", sourceDocumentId: bookingRef.id, status: "orchestration_failed", error: error instanceof Error ? error.message : "Unknown delivery error" });
       });
-      console.info("Airport booking diagnostic", { attemptId, stage: "email_notification", result: emailSent ? "sent" : "failed", durationMs: Date.now() - emailStartedAt });
     });
     stage = "api_response";
     console.info("Airport booking diagnostic", { attemptId, stage: "booking_persistence", result: "success", durationMs: persistedAt - startedAt });

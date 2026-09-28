@@ -7,7 +7,7 @@ import { normalRentalPublicLabel } from "@/lib/normal-rental/inventory-core";
 import { getNormalRentalBookingContext, resolveNormalRentalLeadCode } from "@/lib/normal-rental/zones";
 import { isValidPakistanPlace } from "@/lib/normal-rental/place-validation";
 import { publicLahoreOptionId } from "@/lib/normal-rental/public-inventory";
-import { attemptAutomaticOperationalIntake } from "@/lib/dispatch/automatic-intake";
+import { orchestrateBookingDelivery } from "@/lib/booking-delivery/orchestrator";
 
 type Payload = Record<string, unknown>;
 const value = (payload: Payload, key: string) => typeof payload[key] === "string" ? payload[key].trim() : "";
@@ -81,40 +81,13 @@ export async function createLahoreLead(request: Request, source: "admin_lahore_p
     return generated;
   });
   const integrationWarnings: string[] = [];
-  await attemptAutomaticOperationalIntake("lahore_normal", leadRef.id);
   if (source === "rent_a_car_lahore") {
-    const base = new URL(request.url);
-    const destinationMapLink = pricingType === "outsideCity" ? mapsLink(destinationLatitude, destinationLongitude) : "";
-    const publicVehicleLabel = selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : null;
-    const common = {
-      leadId, carName: selected.modelName, carId: selected.inventoryId, vendorName: selected.vendorName, vendorId: selected.vendorId,
-      publicVehicleLabel,
-      modelYear: selected.modelYearLabel ?? selected.modelYear ?? null, country: "PK", city: context.cityLabel,
-      service: "With Driver", pricingType, duration, originalPrice: rate, dailyRentalRate: rate, numberOfDays,
-      estimatedRentalAmount: rate * numberOfDays, pickupDate, preferredTime, pickupAddress, pickupLatitude, pickupLongitude,
-      pickupPlaceId, pickupMapLink: mapsLink(pickupLatitude, pickupLongitude), isOutstation: pricingType === "outsideCity",
-      destinationAddress: pricingType === "outsideCity" ? destinationAddress : "",
-      destinationLatitude: pricingType === "outsideCity" ? destinationLatitude : null,
-      destinationLongitude: pricingType === "outsideCity" ? destinationLongitude : null,
-      destinationPlaceId: pricingType === "outsideCity" ? destinationPlaceId : "", destinationMapLink,
-      customerName, phone, email, source, reviewLink,
-    };
-    const sheetPayload = {
-      leadId, name: customerName, phone, email, carName: selected.modelName, vendorName: selected.vendorName,
-      vendorId: selected.vendorId, modelYear: String(common.modelYear ?? ""), publicVehicleLabel: publicVehicleLabel ?? "", country: "PK", city: context.cityLabel,
-      service: "withDriver", serviceType: pricingType, packageName: pricingType, packageDuration: duration,
-      packagePrice: String(rate), pickupDate, preferredTime, source, status: "new", pickupAddress,
-      numberOfDays, dailyRentalRate: rate, estimatedRentalAmount: rate * numberOfDays,
-      destinationAddress: pricingType === "outsideCity" ? destinationAddress : "", isOutstation: pricingType === "outsideCity",
-    };
-    const integrations = await Promise.allSettled([
-      fetch(new URL("/api/lead-booking", base), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(common) }),
-      fetch(new URL("/api/lead-sheet", base), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(sheetPayload) }),
-    ]);
-    const labels = ["email", "Google Sheets"];
-    integrations.forEach((result, index) => {
-      if (result.status === "rejected" || !result.value.ok) integrationWarnings.push(`${labels[index]} failed`);
-    });
+    try {
+      const delivery = await orchestrateBookingDelivery("lahore_normal", leadRef.id, request.url);
+      for (const [destination, outcome] of Object.entries(delivery.result)) if (outcome?.status === "failed") integrationWarnings.push(`${destination} failed`);
+    } catch {
+      integrationWarnings.push("delivery orchestration failed");
+    }
   }
   return NextResponse.json({
     ok: true, leadId, reviewLink, dailyRentalRate: rate, estimatedRentalAmount: rate * numberOfDays,

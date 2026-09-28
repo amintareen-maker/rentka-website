@@ -17,8 +17,8 @@ test("Lahore vehicle branch is resolver-backed while Twin Cities legacy branch r
 });
 
 test("public and admin routes fix their own source and share the server lead core", async () => {
-  const [publicRoute, adminRoute, core] = await Promise.all([
-    read("app/api/normal-rental-lead/route.ts"), read("app/api/admin/normal-rental-test-lead/route.ts"), read("src/lib/normal-rental/lahore-lead.ts"),
+  const [publicRoute, adminRoute, core, delivery] = await Promise.all([
+    read("app/api/normal-rental-lead/route.ts"), read("app/api/admin/normal-rental-test-lead/route.ts"), read("src/lib/normal-rental/lahore-lead.ts"), read("src/lib/booking-delivery/service.ts"),
   ]);
   assert.match(publicRoute, /handleLahoreLead\(request, "rent_a_car_lahore"\)/);
   assert.match(publicRoute, /publicLeadRateLimit/);
@@ -27,8 +27,9 @@ test("public and admin routes fix their own source and share the server lead cor
   assert.match(core, /resolveNormalRentalInventory\(\{ zoneId: "lahore"/);
   assert.match(core, /db\.runTransaction/);
   assert.match(core, /publicLahoreOptionId/);
-  assert.match(core, /\/api\/lead-booking/);
-  assert.match(core, /\/api\/lead-sheet/);
+  assert.match(core, /orchestrateBookingDelivery\("lahore_normal"/);
+  assert.match(delivery, /\/api\/lead-booking/);
+  assert.match(delivery, /\/api\/lead-sheet/);
   assert.doesNotMatch(core, /value\(payload, "source"\)/);
 });
 
