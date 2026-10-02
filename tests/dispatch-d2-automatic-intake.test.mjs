@@ -57,11 +57,11 @@ test("every creation path hooks into the shared automatic intake after source pe
     oneWay: readFileSync(new URL("../src/components/intercity/IntercityBookingModal.tsx", import.meta.url), "utf8"),
     ta: readFileSync(new URL("../app/api/partner/ta-connections/bookings/route.ts", import.meta.url), "utf8"),
   };
-  assert.match(files.twin, /requestAutomaticDispatchIntake\(\{[\s\S]*sourceType: "twin_cities_normal"/);
-  assert.match(files.lahore, /deliverPublicNormalRentalLead\(deliverySource, leadRef\.id/);
-  assert.match(files.airport, /attemptAutomaticOperationalIntake\("airport", bookingRef\.id\)/);
-  assert.match(files.oneWay, /requestAutomaticDispatchIntake\(\{[\s\S]*sourceType: "one_way_drop"/);
-  assert.match(files.ta, /attemptAutomaticOperationalIntake\("ta_connections", result\.booking\.bookingId\)/);
+  assert.match(files.twin, /fetch\("\/api\/booking-delivery"/);
+  assert.match(files.lahore, /orchestrateBookingDelivery\(deliverySource, leadRef\.id/);
+  assert.match(files.airport, /orchestrateBookingDelivery\("airport", bookingRef\.id/);
+  assert.match(files.oneWay, /fetch\("\/api\/booking-delivery"/);
+  assert.match(files.ta, /orchestrateBookingDelivery\("ta_connections", result\.booking\.bookingId/);
 });
 
 test("automatic intake stays server-side and introduces no D3 behavior", () => {

@@ -8,7 +8,7 @@ import { PUBLIC_NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
 import GoogleReviews from "@/components/GoogleReviews";
 import RouteGrid from "@/components/intercity/RouteGrid";
 import ArticleGrid from "./blog/components/ArticleGrid";
-import Script from "next/script";
+import JsonLd from "@/components/JsonLd";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -163,12 +163,12 @@ export default async function Page() {
 
   return (
   <>
-    <Script
+    <JsonLd
       id="rentka-entities"
       type="application/ld+json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(entitySchema) }}
     />
-    <Script
+    <JsonLd
   id="faq-schema"
   type="application/ld+json"
   dangerouslySetInnerHTML={{

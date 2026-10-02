@@ -5,17 +5,17 @@ import { createRequire } from "node:module";
 import vm from "node:vm";
 import ts from "typescript";
 import { normalizeNormalRentalInventory, normalRentalModelHref, normalRentalStartingPrice, groupNormalRentalInventoryCards } from "../src/lib/normal-rental/inventory-core.ts";
-import { getNormalRentalBookingContext, normalRentalZoneForCity, PUBLIC_NORMAL_RENTAL_ZONES } from "../src/lib/normal-rental/zones.ts";
+import { normalRentalZoneForCity, PUBLIC_NORMAL_RENTAL_ZONES } from "../src/lib/normal-rental/zones.ts";
 import { adaptSource } from "../src/lib/dispatch/booking-adapters.ts";
 import { formatLahoreWhatsAppVehicleLines } from "../src/lib/normal-rental/lead-output.ts";
 
 const require = createRequire(import.meta.url);
 const read = (file) => readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
 function load(file, mocks) {
-  const module = { exports: {} };
+  const loaded = { exports: {} };
   const code = ts.transpileModule(read(file), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText;
-  vm.runInNewContext(code, { module, exports: module.exports, require: (id) => Object.hasOwn(mocks, id) ? mocks[id] : require(id), console, URL, Response, Request }, { filename: file });
-  return module.exports;
+  vm.runInNewContext(code, { module: loaded, exports: loaded.exports, require: (id) => Object.hasOwn(mocks, id) ? mocks[id] : require(id), console, URL, Response, Request }, { filename: file });
+  return loaded.exports;
 }
 const rate = (daily) => ({ withDriver: { withinCity: { daily, weekly: daily * 6 }, outsideCity: { daily: daily + 1000 } } });
 const model = { id: "corolla", data: { model: "Toyota Corolla", imageURL: "https://example.com/car.png", active: false } };
@@ -91,7 +91,6 @@ function leadHarness(inventory) {
     "@/lib/normal-rental/public-inventory": publicApi,
     "@/lib/dispatch/automatic-intake": { attemptAutomaticOperationalIntake: async () => ({ id: "preview-intake" }) },
     "@/lib/booking-delivery/orchestrator": { orchestrateBookingDelivery: async (...args) => { if (!deliveries.some((previous) => previous[0] === args[0] && previous[1] === args[1])) deliveries.push(args); return { result: {} }; } },
-    "@/lib/normal-rental/public-lead-delivery": { deliverPublicNormalRentalLead: async (...args) => { if (!deliveries.some((previous) => previous[0] === args[0] && previous[1] === args[1])) deliveries.push(args); return []; } },
   });
   return { core, records, deliveries };
 }

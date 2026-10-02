@@ -7,7 +7,7 @@ import { normalRentalPublicLabel } from "@/lib/normal-rental/inventory-core";
 import { getNormalRentalBookingContext, resolveNormalRentalLeadCode, normalRentalZoneForCity, NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
 import { isValidPakistanPlace } from "@/lib/normal-rental/place-validation";
 import { publicNormalRentalOptionId } from "@/lib/normal-rental/public-inventory";
-import { deliverPublicNormalRentalLead } from "@/lib/normal-rental/public-lead-delivery";
+import { orchestrateBookingDelivery } from "@/lib/booking-delivery/orchestrator";
 import { attemptAutomaticOperationalIntake } from "@/lib/dispatch/automatic-intake";
 
 type Payload = Record<string, unknown>;
@@ -66,7 +66,8 @@ export async function createLahoreLead(request: Request, source: "admin_lahore_p
     : db.collection("leads").doc();
   const deliverPersistedLead = async () => {
     try {
-      return await deliverPublicNormalRentalLead(deliverySource, leadRef.id, request.url);
+      const delivery = await orchestrateBookingDelivery(deliverySource, leadRef.id, request.url);
+      return Object.entries(delivery.result).flatMap(([destination, outcome]) => outcome?.status === "failed" || outcome?.status === "processing" ? [`${destination} ${outcome.status}`] : []);
     } catch {
       return ["delivery preparation failed"];
     }

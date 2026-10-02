@@ -18,7 +18,7 @@ test("Both canonical vehicle branches use resolver-backed public inventory", asy
 
 test("public and admin routes fix their own source and share the server lead core", async () => {
   const [publicRoute, adminRoute, core, delivery] = await Promise.all([
-    read("app/api/normal-rental-lead/route.ts"), read("app/api/admin/normal-rental-test-lead/route.ts"), read("src/lib/normal-rental/lahore-lead.ts"), read("src/lib/normal-rental/public-lead-delivery.ts"),
+    read("app/api/normal-rental-lead/route.ts"), read("app/api/admin/normal-rental-test-lead/route.ts"), read("src/lib/normal-rental/lahore-lead.ts"), read("src/lib/booking-delivery/service.ts"),
   ]);
   assert.match(publicRoute, /handleLahoreLead\(request, "rent_a_car_lahore"\)/);
   assert.match(publicRoute, /publicLeadRateLimit/);
@@ -27,7 +27,7 @@ test("public and admin routes fix their own source and share the server lead cor
   assert.match(core, /resolveNormalRentalInventory\(\{ zoneId, cityId/);
   assert.match(core, /db\.runTransaction/);
   assert.match(core, /publicNormalRentalOptionId/);
-  assert.match(core, /deliverPublicNormalRentalLead\(deliverySource/);
+  assert.match(core, /orchestrateBookingDelivery\(deliverySource/);
   assert.match(delivery, /\/api\/lead-booking/);
   assert.match(delivery, /\/api\/lead-sheet/);
   assert.doesNotMatch(core, /value\(payload, "source"\)/);

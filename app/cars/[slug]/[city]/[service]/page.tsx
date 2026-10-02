@@ -1,6 +1,6 @@
 export const revalidate = 60;
 
-import Script from "next/script";
+import JsonLd from "@/components/JsonLd";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -97,7 +97,7 @@ export default async function Page({
       { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })) },
     ];
     return <>
-      {schemas.map((schema, index) => <Script key={index} id={`lahore-car-schema-${index}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replaceAll("<", "\\u003c") }}/>) }
+      {schemas.map((schema, index) => <JsonLd key={index} id={`lahore-car-schema-${index}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replaceAll("<", "\\u003c") }}/>) }
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <Breadcrumbs items={breadcrumbItems}/>
         <header className="mt-7 max-w-3xl"><p className="text-sm font-bold uppercase tracking-widest text-[var(--rentka-green)]">Lahore · Driver included</p><h1 className="mt-2 text-3xl font-extrabold capitalize text-[var(--rentka-blue)] sm:text-4xl">{model.modelName} with Driver in Lahore</h1><p className="mt-4 leading-7 text-slate-600">Choose a current Within Lahore or Outstation package, add your trip details and request availability from RentKA. Prices currently start from PKR {minimum.toLocaleString("en-PK")} per day.</p></header>
@@ -181,14 +181,14 @@ const carFaqs = [
 
   return (
     <>
-  <Script
+  <JsonLd
   id="car-schema"
   type="application/ld+json"
   dangerouslySetInnerHTML={{
     __html: JSON.stringify(carSchema),
   }}
 />
-  <Script
+  <JsonLd
   id="breadcrumb-schema"
   type="application/ld+json"
   dangerouslySetInnerHTML={{
@@ -283,7 +283,7 @@ const carFaqs = [
   <h2 className="mb-4 text-xl font-semibold">Frequently Asked Questions</h2>
   <div className="space-y-4 text-sm text-slate-700">{carFaqs.map((faq) => <div key={faq.question}><p className="font-medium">{faq.question}</p><p>{faq.answer}</p></div>)}</div>
 </div>
-<Script id="faq-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: carFaqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) }) }} />
+<JsonLd id="faq-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: carFaqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) }) }} />
 
     </main>
 </>

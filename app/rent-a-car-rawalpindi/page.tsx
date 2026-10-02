@@ -2,7 +2,7 @@ export const revalidate = 60;
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
+import JsonLd from "@/components/JsonLd";
 import {
   ArrowRight,
   BadgeCheck,
@@ -232,17 +232,17 @@ const faqSchema = {
 export default function RawalpindiRentalPage() {
   return (
     <>
-      <Script
+      <JsonLd
         id="breadcrumb-schema-rawalpindi"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
-      <Script
+      <JsonLd
         id="service-schema-rawalpindi"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
       />
-      <Script
+      <JsonLd
         id="faq-schema-rawalpindi"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}

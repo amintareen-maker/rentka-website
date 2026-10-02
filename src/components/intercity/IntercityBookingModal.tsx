@@ -30,12 +30,8 @@ import {
   trackMetaPixel,
   trackWhatsAppClick,
 } from "@/lib/tracking";
-import { requestAutomaticDispatchIntake } from "@/lib/dispatch/automatic-intake-client";
 
 const GOOGLE_LIBRARIES: "places"[] = ["places"];
-
-const SHEETS_WEBHOOK =
-  "https://script.google.com/macros/s/AKfycbyYVkemVM2O_pIPwYCLyqMCMIsDoLRLfzYsEGE__OrLjH6_lCRZCHim7R-3s_pn6JOQ9w/exec";
 
 type Props = {
   open: boolean;
@@ -340,12 +336,6 @@ Thank you.
         createdAt: serverTimestamp(),
       });
 
-      await requestAutomaticDispatchIntake({
-        sourceType: "one_way_drop",
-        sourceDocumentId: sourceDocument.id,
-        bookingId: leadId,
-      });
-
       const trackingPayload = {
         lead_id: leadId,
         booking_id: leadId,
@@ -373,63 +363,24 @@ Thank you.
       trackMetaPixel("Lead", trackingPayload);
       trackWhatsAppClick("one_way_drop");
 
-      // The record and tracking are complete; open WhatsApp before waiting for email.
       const completeWhatsAppUrl = `${whatsappUrl}${encodeURIComponent("\nBooking ID: " + leadId)}`;
       setReadyWhatsApp(completeWhatsAppUrl);
       if (whatsappTab && !whatsappTab.closed) whatsappTab.location.href = completeWhatsAppUrl;
 
-      let emailSent = false;
-
       try {
-        const emailResponse = await fetch("/api/intercity-booking", {
+        const deliveryResponse = await fetch("/api/booking-delivery", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(bookingPayload),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ source: "one_way_drop", sourceDocumentId: sourceDocument.id, bookingId: leadId }),
         });
-
-        emailSent = emailResponse.ok;
-
-        if (!emailResponse.ok) {
-          console.error("Intercity booking email notification was not accepted.");
-        }
-      } catch (emailError) {
-        console.error("Intercity booking email request failed:", emailError);
+        if (!deliveryResponse.ok) console.warn("Booking was saved but downstream delivery was not fully accepted.");
+      } catch {
+        console.warn("Booking was saved but downstream delivery could not be requested.");
       }
 
-
-      const formData = new URLSearchParams({
-        leadId,
-        name: name.trim(),
-        phone: phone.trim(),
-        city: route.from,
-        destinationCity: route.to,
-        routeSlug: route.slug || "",
-        pickupAddress: pickupAddress.trim(),
-        dropAddress: dropAddress.trim(),
-        pickupDate: travelDateValue,
-        preferredTime: pickupTime,
-        passengers,
-        carName: vehicle,
-        packagePrice: price === null ? "" : String(price),
-        notes: notes.trim(),
-        source: "one_way_drop",
-        status: "new",
-      });
-
-      void fetch(`${SHEETS_WEBHOOK}?${formData.toString()}`, {
-        method: "POST",
-        keepalive: true,
-      }).catch((sheetError) => {
-        console.error("Google Sheets lead sync failed:", sheetError);
-      });
-
       // If popups were blocked or closed, navigate only after notifications
-      // have been started so the booking integrations remain intact.
+      // have completed so navigation cannot cancel critical delivery.
       if (!whatsappTab || whatsappTab.closed) window.location.href = completeWhatsAppUrl;
-
-      if (!emailSent) console.error("Booking saved; email notification unavailable.");
 
     } catch (err) {
       console.error(err);

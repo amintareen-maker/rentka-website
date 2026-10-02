@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 
 const base = process.argv[2] ?? "http://localhost:3100";
-const routes = ["/", "/rent-a-car-islamabad", "/rent-a-car-rawalpindi", "/rent-a-car-lahore", "/cars/toyota-corolla/islamabad/with-driver", "/cars/toyota-corolla/lahore/with-driver"];
+const routes = ["/", "/rent-a-car-islamabad", "/rent-a-car-rawalpindi", "/rent-a-car-lahore", "/cars/toyota-corolla/islamabad/with-driver", "/cars/toyota-corolla/lahore/with-driver", "/travel-guides", "/travel-guides/lahore", "/travel-guides/lahore/top-places-to-visit-in-lahore-with-family", "/travel-guides/lahore/one-day-lahore-sightseeing-plan", "/travel-guides/lahore/lahore-travel-guide-for-first-time-visitors"];
 const organizationId = "https://www.rentka.co/#organization";
 const decode = (text) => text.replaceAll("&amp;", "&").replaceAll("&quot;", '"').replaceAll("&#x27;", "'").replaceAll("&#39;", "'").replaceAll("&gt;", ">").replaceAll("&lt;", "<").replace(/\s+/g, " ").trim();
 await mkdir("output/multi-city-schema", { recursive: true });
@@ -15,6 +15,7 @@ for (const route of routes) {
   assert.equal(canonical, "https://www.rentka.co" + route, route + " canonical");
   assert.doesNotMatch(html, /\\?"vendor(?:Id|Name)\\?"\s*:/, route + " public vendor payload");
   const schemas = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map((match) => JSON.parse(match[1]));
+  assert.ok(schemas.length > 0, route + " server-rendered JSON-LD");
   const entities = schemas.flatMap((schema) => schema["@graph"] ?? [schema]);
   const visibleText = decode(html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " "));
   const ids = entities.filter((entity) => entity["@id"]).map((entity) => entity["@id"]);
@@ -33,6 +34,11 @@ for (const route of routes) {
     assert.equal(entities.find((entity) => entity["@type"] === "WebSite").publisher["@id"], organizationId);
     for (const href of ["/rent-a-car-islamabad", "/rent-a-car-rawalpindi", "/rent-a-car-lahore", "/airport-transfer", "/one-way-drop", "/travel-guides"]) assert.ok(html.includes(`href="${href}"`), href);
   }
+  if (route === "/travel-guides") {
+    assert.ok(entities.some((entity) => entity["@type"] === "CollectionPage"));
+    for (const slug of ["top-places-to-visit-in-lahore-with-family", "one-day-lahore-sightseeing-plan", "lahore-travel-guide-for-first-time-visitors"]) assert.ok(html.includes(`/travel-guides/lahore/${slug}`));
+  }
+  if (route.startsWith("/travel-guides/lahore/")) assert.ok(entities.some((entity) => entity["@type"] === "BlogPosting"));
   const name = route === "/" ? "home" : route.slice(1).replaceAll("/", "-");
   await writeFile(`output/multi-city-schema/${name}.json`, JSON.stringify(schemas, null, 2));
   await writeFile(`output/multi-city-render-${name}.html`, html);
@@ -57,6 +63,10 @@ const filtered = await (await fetch(base + "/?city=lahore&service=with-driver"))
 assert.equal(filtered.match(/<link rel="canonical" href="([^"]+)"/)?.[1], "https://www.rentka.co/");
 const sitemap = await (await fetch(base + "/sitemap.xml")).text();
 assert.doesNotMatch(sitemap, /\?city=|\?service=/);
+for (const route of routes.filter((route) => route.startsWith("/travel-guides"))) assert.ok(sitemap.includes("https://www.rentka.co" + route), route + " sitemap");
+const blog = await fetch(base + "/blog", { redirect: "manual" });
+assert.equal(blog.status, 308);
+assert.ok(blog.headers.get("location").endsWith("/travel-guides"));
 const robots = await (await fetch(base + "/robots.txt")).text();
 assert.ok(robots.includes("Allow: /"));
 await writeFile("output/multi-city-render-check.json", JSON.stringify({ routes: results, inventories, filterCanonical: "https://www.rentka.co/", sitemapFilterVariants: false, robotsPublicAllowed: true }, null, 2));

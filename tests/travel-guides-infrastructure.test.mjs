@@ -55,7 +55,7 @@ function loadEditorialHub() {
   const loaded = { exports: {} };
   const travel = loadTravelGuides();
   new Function("require", "module", "exports", output)(
-    name => name === "@/app/blog/data"
+    name => (name === "@/app/blog/data" || name === "../../app/blog/data")
       ? { articles: loadBlogArticles() }
       : name === "@/lib/travel-guides"
         ? travel

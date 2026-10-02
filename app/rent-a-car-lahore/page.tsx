@@ -2,7 +2,7 @@ export const revalidate = 60;
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import Script from "next/script";
+import JsonLd from "@/components/JsonLd";
 import { redirect } from "next/navigation";
 import { ArrowRight, BadgeCheck, Building2, CalendarCheck, CarFront, CheckCircle2, MapPin, MessageCircle, Route, ShieldCheck } from "lucide-react";
 import { hasAdminSession } from "../admin/_lib/session";
@@ -74,7 +74,7 @@ export default async function LahoreRentalPage() {
   }, undefined);
 
   return <>
-    {schemas.map((schema, index) => <Script key={index} id={`lahore-schema-${index + 1}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replaceAll("<", "\\u003c") }}/>) }
+    {schemas.map((schema, index) => <JsonLd key={index} id={`lahore-schema-${index + 1}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replaceAll("<", "\\u003c") }}/>) }
     <main className="overflow-x-clip bg-white">
       {prelaunch && <div className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-center text-sm font-bold text-amber-950">
         Private pre-launch page · Admin inspection only · Analytics suppressed · <Link href="/admin/pricing/inventory?zone=lahore" className="underline underline-offset-2">Manage Lahore inventory</Link>
