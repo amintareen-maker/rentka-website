@@ -58,7 +58,7 @@ test("every creation path hooks into the shared automatic intake after source pe
     ta: readFileSync(new URL("../app/api/partner/ta-connections/bookings/route.ts", import.meta.url), "utf8"),
   };
   assert.match(files.twin, /requestAutomaticDispatchIntake\(\{[\s\S]*sourceType: "twin_cities_normal"/);
-  assert.match(files.lahore, /attemptAutomaticOperationalIntake\("lahore_normal", leadRef\.id\)/);
+  assert.match(files.lahore, /deliverPublicNormalRentalLead\(deliverySource, leadRef\.id/);
   assert.match(files.airport, /attemptAutomaticOperationalIntake\("airport", bookingRef\.id\)/);
   assert.match(files.oneWay, /requestAutomaticDispatchIntake\(\{[\s\S]*sourceType: "one_way_drop"/);
   assert.match(files.ta, /attemptAutomaticOperationalIntake\("ta_connections", result\.booking\.bookingId\)/);

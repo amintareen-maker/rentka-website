@@ -50,7 +50,8 @@ const validHttpsUrl = (value: string) => {
 };
 const rates = (value: unknown): NormalRentalRateSet => {
   const data = object(value);
-  return { daily: number(data.daily), weekly: number(data.weekly), monthly: number(data.monthly) };
+  const positive = (value: unknown) => { const rate = number(value); return rate !== undefined && rate > 0 ? rate : undefined; };
+  return { daily: positive(data.daily), weekly: positive(data.weekly), monthly: positive(data.monthly) };
 };
 const pricing = (value: unknown): NormalRentalPricing => {
   const withDriver = object(object(value).withDriver);
@@ -70,12 +71,16 @@ export function normalizeNormalRentalInventory(input: ResolverInput): Normalized
     const vendorById = new Map(input.legacyVendors.map((vendor) => [vendor.id, vendor.data]));
     return input.legacyCars.flatMap((car) => {
       const cities = Array.isArray(car.data.cityList) ? car.data.cityList.map((city) => text(city).toLowerCase()) : [];
-      if (car.data.active === false || !cities.some((city) => city === "islamabad" || city === "rawalpindi")) return [];
+      const supports = object(car.data.supports);
+      if (car.data.active === false || supports.withDriver === false || !cities.some((city) => city === "islamabad" || city === "rawalpindi")) return [];
       const modelName = text(car.data.model) || text(car.data.name);
       const vendorId = text(car.data.vendorId);
       const vendor = vendorById.get(vendorId);
       const resolvedPricing = pricing(car.data.pricing);
-      if (!modelName || !vendorId || !vendor || !validPricing(resolvedPricing)) return [];
+      if (supports.withinCity === false) resolvedPricing.withDriver.withinCity = {};
+      if (supports.outsideCity === false) resolvedPricing.withDriver.outsideCity = {};
+      if (!modelName || !vendorId || !vendor || vendor.active === false
+        || ![resolvedPricing.withDriver.withinCity.daily, resolvedPricing.withDriver.outsideCity.daily].some((rate) => (rate ?? 0) > 0)) return [];
       return [{
         inventoryId: car.id, source: "legacy" as const, zoneId: input.zoneId, cityId: input.cityId,
         modelKey: normalizeNormalRentalModelKey(modelName), modelName, modelSlug: normalizeNormalRentalModelKey(modelName),
@@ -147,6 +152,12 @@ export function shouldOpenInventoryComparison(card: NormalRentalInventoryCard) {
   return !card.separate && card.options.length > 1;
 }
 
-export function normalRentalModelHref(item: Pick<NormalizedNormalRentalInventory, "modelSlug">) {
-  return `/cars/${item.modelSlug}/lahore/with-driver`;
+export function normalRentalModelHref(item: Pick<NormalizedNormalRentalInventory, "modelSlug">, cityId = "lahore") {
+  return `/cars/${item.modelSlug}/${cityId}/with-driver`;
+}
+
+export function normalRentalStartingPrice(options: LahoreBookingInventory[]) {
+  const within = options.flatMap((item) => item.pricing.withDriver.withinCity.daily ? [item.pricing.withDriver.withinCity.daily] : []);
+  const available = within.length ? within : options.flatMap((item) => item.pricing.withDriver.outsideCity.daily ? [item.pricing.withDriver.outsideCity.daily] : []);
+  return available.length ? Math.min(...available) : undefined;
 }

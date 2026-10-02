@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { NORMAL_RENTAL_ZONES, type NormalRentalZoneId } from "@/lib/normal-rental/zones";
 import { hasAdminSession } from "../_lib/session";
 import {
   createOperationsVendor, deleteOperationsInventory, isOperatingZone, loadOperations, normalizeModelKey,
@@ -30,9 +31,14 @@ function rates(form: FormData, prefix: string): RateSet {
   if (result.daily === undefined) throw new Error(`${prefix} daily rate is required.`);
   return result;
 }
-const done = (zoneId: string, message: string) => {
+const done = (zoneId: NormalRentalZoneId, message: string) => {
   revalidatePath("/admin/pricing");
   revalidatePath("/admin/pricing/inventory");
+  revalidatePath("/");
+  revalidatePath("/cars");
+  revalidatePath("/cars/[slug]/[city]/[service]", "page");
+  revalidatePath("/sitemap.xml");
+  for (const cityId of NORMAL_RENTAL_ZONES[zoneId].cityIds) revalidatePath(`/rent-a-car-${cityId}`);
   redirect(`/admin/pricing/inventory?zone=${encodeURIComponent(zoneId)}&saved=${encodeURIComponent(message)}`);
 };
 

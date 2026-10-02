@@ -1,3 +1,5 @@
+export const revalidate = 60;
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
@@ -19,7 +21,7 @@ import {
 } from "lucide-react";
 
 import GoogleReviews from "@/components/GoogleReviews";
-import CityVehicleSelector from "@/components/city-pages/CityVehicleSelector";
+import PublicCityInventory from "@/components/normal-rental/PublicCityInventory";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import PreferredSourceButton from "@/components/PreferredSourceButton";
 
@@ -339,7 +341,7 @@ export default function RawalpindiRentalPage() {
         </section>
 
         <div className="mx-auto max-w-7xl space-y-16 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-          <CityVehicleSelector />
+          <PublicCityInventory city="rawalpindi" />
 
           <section>
             <div className="mb-8">

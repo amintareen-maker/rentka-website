@@ -1,4 +1,6 @@
-﻿import type { Metadata } from "next";
+﻿export const revalidate = 60;
+
+import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import {
@@ -19,7 +21,7 @@ import {
 } from "lucide-react";
 
 import GoogleReviews from "@/components/GoogleReviews";
-import CityVehicleSelector from "@/components/city-pages/CityVehicleSelector";
+import PublicCityInventory from "@/components/normal-rental/PublicCityInventory";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { ORGANIZATION_ID } from "@/lib/seo";
 import PreferredSourceButton from "@/components/PreferredSourceButton";
@@ -341,7 +343,7 @@ export default function IslamabadRentalPage() {
         </section>
 
         <div className="mx-auto max-w-7xl space-y-16 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
-          <CityVehicleSelector city="islamabad" />
+          <PublicCityInventory city="islamabad" />
 
           <section className="rounded-[2rem] border border-slate-200 bg-slate-50 p-7 sm:p-10">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-[var(--rentka-green)]">

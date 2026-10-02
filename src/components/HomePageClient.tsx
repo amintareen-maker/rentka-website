@@ -1,428 +1,56 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import LahoreBookingClient from "@/components/lahore/LahoreBookingClient";
+import type { LahoreBookingInventory } from "@/lib/normal-rental/inventory-core";
+import { PUBLIC_NORMAL_RENTAL_ZONES, getNormalRentalBookingContext, normalRentalZoneForCity, type NormalRentalCityId } from "@/lib/normal-rental/zones";
 import { trackDataLayer as trackEvent } from "@/lib/tracking";
-import { useState, useEffect, useMemo } from "react";
-import { usePathname } from "next/navigation";
-import { useCars, Car } from "@/lib/useCars";
-import { useCountries } from "@/lib/useLocations";
-import ModelListingsBottomSheet from "@/components/ModelListingsBottomSheet";
-import CarDetailsModal from "@/components/CarDetailsModal";
 
+type Props = { initialInventory: Partial<Record<NormalRentalCityId, LahoreBookingInventory[]>>; children?: ReactNode };
 
-/* =============================
-   TYPES (MODEL CARD)
-============================== */
-type CarModel = {
-  model: string;
-  imageURL?: string;
-  category?: string;
-  count: number;
-  minPrice?: number;
-};
-
-export default function HomePageClient({
-  initialCars = [],
-  children,
-}: {
-  initialCars?: Car[];
-  children?: ReactNode;
-}) {
-  /* -----------------------------
-     URL STATE
-  ------------------------------ */
-  const pathname = usePathname();
-  const router = useRouter();
-
-  /* -----------------------------
-     FILTER STATE
-  ------------------------------ */
-  const [country] = useState<string>("PK");
-  const [city, setCity] = useState<string>("islamabad");
-  const [service, setService] =
-    useState<"selfDrive" | "withDriver">("withDriver");
-
-  const [filterError, setFilterError] = useState<{
-    city?: boolean;
-    service?: boolean;
-  }>({});
-
-  const [shakeKey, setShakeKey] = useState(0);
-
-  /* -----------------------------
-     HOW RENTKA WORKS ANIMATION
-  ------------------------------ */
+export default function HomePageClient({ initialInventory, children }: Props) {
+  const [city, setCity] = useState<NormalRentalCityId>("islamabad");
+  const [inventory, setInventory] = useState(initialInventory.islamabad ?? []);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [stepsVisible, setStepsVisible] = useState(false);
-
-  /* ✅ ADDED CHAT STATE (nothing else changed) */
-  const [chatOpen, setChatOpen] = useState(false);
-  // SCROLL EFFECT
+  const pending = useRef<AbortController | undefined>(undefined);
+  const context = getNormalRentalBookingContext(normalRentalZoneForCity(city)!, city);
   useEffect(() => {
-    const onScroll = () => {
-      const el = document.getElementById("how-rentka-works");
-      if (!el) return;
-
-      const rect = el.getBoundingClientRect();
-      if (rect.top < window.innerHeight - 120) {
-        setStepsVisible(true);
-      }
-    };
-
-    window.addEventListener("scroll", onScroll);
-    onScroll();
-
-    return () => window.removeEventListener("scroll", onScroll);
+    const onScroll = () => { const rect = document.getElementById("how-rentka-works")?.getBoundingClientRect(); if (rect && rect.top < window.innerHeight - 120) setStepsVisible(true); };
+    window.addEventListener("scroll", onScroll); onScroll();
+    return () => { window.removeEventListener("scroll", onScroll); pending.current?.abort(); };
   }, []);
-
-  // ✅ AUTO-OPEN CHAT AFTER 5 SECONDS (SEPARATE HOOK)
-  useEffect(() => {
-  if (!city) return;
-
-  const timer = setTimeout(() => {
-    if (!service) {
-      setChatOpen(true);
-    }
-  }, 6000);
-
-  return () => clearTimeout(timer);
-}, [city, service]);
-
-  /* -----------------------------
-  LOCATIONS
-  ------------------------------ */
-  const countries = useCountries();
-
-  /* -----------------------------
-     CARS
-  ------------------------------ */
-  const { cars, loading } = useCars({ 
-  country, 
-  city, 
-  service,
-  initialCars 
-});
-
-  /* -----------------------------
-     PRICE EXTRACTION
-  ------------------------------ */
-  const extractDailyPrice = (
-  data: Car,
-  service?: "selfDrive" | "withDriver"
-): number | undefined => {
-
-  if (!service) return undefined;
-
-  if (service === "selfDrive") {
-    return data.pricing?.selfDrive?.withinCity?.daily;
+  async function selectCity(selectedCity: NormalRentalCityId) {
+    pending.current?.abort();
+    const controller = new AbortController(); pending.current = controller;
+    setCity(selectedCity); setInventory(initialInventory[selectedCity] ?? []); setLoading(true); setError("");
+    trackEvent("select_city", { city: selectedCity, zone_id: normalRentalZoneForCity(selectedCity), country: "PK" });
+    try {
+      const response = await fetch(`/api/normal-rental-inventory?city=${selectedCity}`, { signal: controller.signal, cache: "no-store" });
+      if (!response.ok) throw new Error("Unable to load current cars. Please try again.");
+      const data = await response.json() as { inventory: LahoreBookingInventory[] };
+      if (!controller.signal.aborted) setInventory(data.inventory);
+    } catch (caught) {
+      if (!controller.signal.aborted) { setInventory([]); setError(caught instanceof Error ? caught.message : "Unable to load cars."); }
+    } finally { if (!controller.signal.aborted) setLoading(false); }
   }
-
-  if (service === "withDriver") {
-    return data.pricing?.withDriver?.withinCity?.daily;
-  }
-
-  return undefined;
-};
-
-  /* -----------------------------
-     DERIVE MODELS
-  ------------------------------ */
-  const models: CarModel[] = useMemo(() => {
-    const map: Record<string, CarModel> = {};
-
-    cars.forEach((car) => {
-      if (!car.model) return;
-
-      const price = extractDailyPrice(car, service);
-
-      if (!map[car.model]) {
-        map[car.model] = {
-          model: car.model,
-          imageURL: car.imageURL,
-          category: car.category,
-          count: 0,
-          minPrice:
-            typeof price === "number" ? price : undefined,
-        };
-      }
-
-      map[car.model].count += 1;
-
-      if (
-        typeof price === "number" &&
-        (map[car.model].minPrice === undefined ||
-          price < map[car.model].minPrice!)
-      ) {
-        map[car.model].minPrice = price;
-      }
-    });
-
-    return Object.values(map);
-  }, [cars]);
-
-  /* -----------------------------
-     BLOCKED ACTION
-  ------------------------------ */
- const handleBlockedAction = () => {
-  setShakeKey((k) => k + 1);
-  setFilterError({
-    city: !city,
-    service: !service,
-  });
-
-  document
-    .getElementById("filters")
-    ?.scrollIntoView({ behavior: "smooth" });
-};
-
-  const canBrowseModels = Boolean(city && service);
-
-  /* -----------------------------
-     STEP 2 STATE
-  ------------------------------ */
-  const [modelOpen, setModelOpen] = useState(false);
-  const [selectedModel, setSelectedModel] =
-    useState<string | null>(null);
-
-  const [selectedCar, setSelectedCar] =
-    useState<Car | null>(null);
-
-
-  /* -----------------------------
-     OPEN FROM URL
-  ------------------------------ */
-  // BACK BUTTON HANDLING
-useEffect(() => {
-  const handleBack = () => {
-    const path = window.location.pathname;
-
-    if (path === "/") {
-      setSelectedCar(null);
-      setModelOpen(false);
-      return;
-    }
-
-    if (/^\/cars\/[^/]+\/[^/]+\/[^/]+$/.test(path)) {
-      setSelectedCar(null);
-      setModelOpen(true);
-    }
-  };
-
-  window.addEventListener("popstate", handleBack);
-  return () => window.removeEventListener("popstate", handleBack);
-}, []);
-
-
-// URL → MODAL SYNC (SEPARATE HOOK)
-useEffect(() => {
-  if (!city || !service) return;
-
-  const match = pathname.match(/^\/cars\/([^/]+)\/([^/]+)\/([^/]+)$/);
-  
-  if (!match) return;
-
-  const urlCity = match[2];
-  const urlService = match[3];
-
-  if (urlCity !== city) return;
-
-  const slug = decodeURIComponent(match[1]).replace(/-/g, " ");
-
-  const found = models.find(
-    (m) => m.model.toLowerCase() === slug.toLowerCase()
-  );
-
-  if (found) {
-    setSelectedModel(found.model);
-    setModelOpen(true);
-  }
-}, [pathname, models, city, service]);
-  return (
-
-    
-    <>
-
-    
-      {/* FILTERS */}
-      <section
-        id="filters"
-        className="bg-slate-50 border-b border-slate-200 pt-6 md:pt-0"
-      >
-        <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="mb-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--rentka-green)] mb-2">
-  Choose Your City & Service
-</h2>
-
-<p className="text-[var(--rentka-blue)]">
-  All bookings include a driver. Select your location to see available cars.
-</p>
-          </div>
-
-          <div className="rounded-2xl bg-white p-5 md:p-8 shadow-lg">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
-              <div>
-                <label className="block text-sm font-semibold text-[var(--rentka-blue) mb-2">
-                  Country
-                </label>
-                <select className="w-full rounded-lg border border-slate-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)] focus:border-[var(--rentka-green)]">
-                  {countries.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-              <label className="block text-sm font-semibold text-[var(--rentka-blue) mb-2">
-                City/Area
-              </label>
-                <select
-                  key={`city-${shakeKey}`}
-                  value={city ?? ""}
-                  onChange={(e) => {
-                    const selectedCity = e.target.value;
-
-                    trackEvent("select_city", {
-                      city: selectedCity,
-                    });
-
-                    setCity(selectedCity);
-                    setService("withDriver");
-                    setFilterError((p) => ({ ...p, city: false }));
-                  }}
-                  className={`w-full rounded-lg px-4 py-3 border ${
-                  filterError.city
-                    ? "border-red-500 ring-1 ring-red-500 shake"
-                    : "border-slate-300 focus:border-[var(--rentka-green)]"
-                } focus:outline-none focus:ring-2 focus:ring-[var(--rentka-green)]`}
-                >
-                  <option value="islamabad">
-  Islamabad / Rawalpindi
-</option>
-                  
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-[var(--rentka-blue) mb-2">
-                  Service
-                </label>
-                <div
-                  className={`w-full rounded-lg px-4 py-3 border ${
-                                  filterError.service
-                                    ? "border-red-500 ring-1 ring-red-500 shake"
-                                    : "border-slate-300 focus:border-[var(--rentka-green)]"
-                                }`}
-                                >
-                                  With Driver
-                                </div>
-                              </div>
-                            </div>
-
-                            {(filterError.city || filterError.service) && (
-                              <p className="mt-3 text-sm text-red-600">
-                                Please select city and service to proceed
-                              </p>
-                            )}
-                          </div>
-                          <div className="text-center mt-6 mb-2">
-                </div>
-                        </div>
-                      </section>
-
-                      {/* MODELS GRID */}
-                      <section className="bg-white py-16">
-                        <div className="mx-auto max-w-7xl px-6">
-                          {!loading && models.length > 0 && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                              {models.map((m) => {
-                  const slug = m.model.toLowerCase().replace(/\s+/g, "-");
-
-                  const serviceSlug = "with-driver";
-
-                  const url = `/cars/${slug}/${city}/${serviceSlug}`;
-
-                  return (
-                    <Link
-                      key={m.model}
-                      href={url}
-                      prefetch={true}
-                      onClick={(e) => {
-                        if (!canBrowseModels) {
-                          e.preventDefault();
-                          handleBlockedAction();
-                          return;
-                        }
-
-                        e.preventDefault();
-
-                        // Google Analytics
-                        trackEvent("select_model", {
-                          model: m.model,
-                          city,
-                          service,
-                          price: m.minPrice || 0,
-                        });
-
-                        // Meta Pixel
-                        if (typeof window !== "undefined" && (window as any).fbq) {
-                          (window as any).fbq("track", "ViewContent", {
-                            content_name: m.model,
-                            content_category: "Vehicle",
-                            content_type: "CarModel",
-                            city,
-                            service,
-                            value: m.minPrice || 0,
-                            currency: "PKR",
-                            page_location: window.location.href,
-                          });
-                        }
-
-                        window.history.pushState({}, "", url);
-
-                        setSelectedModel(m.model);
-                        setModelOpen(true);
-                      }}
-                      className="block text-left rounded-2xl border border-slate-200 bg-white hover:shadow-lg hover:border-[var(--rentka-blue)] transition p-4"
-                    >
-                      <div className="aspect-[8/10] bg-white rounded-lg mb-4 overflow-hidden flex items-center justify-center border border-slate-200">
-                        {m.imageURL && (
-                          <img
-                            src={m.imageURL}
-                            alt={m.model}
-                            className="max-w-full max-h-full object-contain p-2"
-                          />
-                        )}
-                      </div>
-
-                      <h3 className="font-semibold text-slate-900 group-hover:text-[var(--rentka-blue)] transition">
-                        {m.model}
-                      </h3>
-
-                      {typeof m.minPrice === "number" && (
-                        <p className="text-sm text-slate-600 mt-1">
-                          Starting from{" "}
-                          <span className="font-bold text-[var(--rentka-green)]">
-                            PKR {m.minPrice}
-                          </span>
-                          <span className="text-slate-500"> /day (Driver Included)</span>
-                        </p>
-                      )}
-
-                      <p className="text-sm text-slate-500 mt-1">
-                        {m.count} option(s)
-                      </p>
-                    </Link>
-                  );
-                })}
-            </div>
-          )}
+  return <>
+    <section id="filters" className="border-b border-slate-200 bg-slate-50">
+      <div className="mx-auto max-w-7xl px-6 py-12">
+        <div className="mb-8 text-center"><h2 className="text-2xl font-bold text-[var(--rentka-green)] md:text-3xl">Choose Your City &amp; Service</h2><p className="mt-2 text-[var(--rentka-blue)]">All bookings include a driver. Select your location to see available cars.</p></div>
+        <div className="grid gap-5 rounded-2xl bg-white p-5 shadow-lg md:grid-cols-3 md:p-8">
+          <label className="text-sm font-semibold text-[var(--rentka-blue)]">Country<select value="PK" disabled className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3"><option value="PK">Pakistan</option></select></label>
+          <label className="text-sm font-semibold text-[var(--rentka-blue)]">City/Area<select value={city} onChange={(event) => void selectCity(event.target.value as NormalRentalCityId)} className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3 focus:ring-2 focus:ring-[var(--rentka-green)]">{PUBLIC_NORMAL_RENTAL_ZONES.map((zone) => <option key={zone.id} value={zone.defaultCityId}>{zone.label}</option>)}</select></label>
+          <label className="text-sm font-semibold text-[var(--rentka-blue)]">Service<select value="withDriver" disabled className="mt-2 w-full rounded-lg border border-slate-300 px-4 py-3"><option value="withDriver">With Driver</option></select></label>
         </div>
-      </section>
-
+      </div>
+    </section>
+    <section aria-label="Available vehicles" aria-busy={loading} className="bg-white py-16"><div className="mx-auto max-w-7xl px-6">
+      {loading ? <p role="status" className="py-12 text-center">Loading current cars and prices…</p> : error ? <div role="alert" className="py-12 text-center"><p>{error}</p><button onClick={() => void selectCity(city)} className="mt-4 rounded-lg bg-[var(--rentka-green)] px-5 py-3 text-white">Try again</button></div> : <LahoreBookingClient key={city} inventory={inventory} context={context} variant="prelaunch" source="homepage" />}
+    </div></section>
+    <section aria-labelledby="locations-heading" className="border-y border-slate-200 bg-slate-50 py-12"><div className="mx-auto max-w-7xl px-6"><h2 id="locations-heading" className="text-3xl font-bold text-[var(--rentka-blue)]">Our Locations</h2><p className="mt-3 text-slate-600">Explore city guides and travel services in our active markets.</p><nav aria-label="Locations and services" className="mt-6 grid gap-3 sm:grid-cols-3">{PUBLIC_NORMAL_RENTAL_ZONES.flatMap((zone) => zone.cityIds).map((cityId) => <Link key={cityId} href={`/rent-a-car-${cityId}`} className="rounded-xl border bg-white p-4 font-semibold capitalize text-[var(--rentka-blue)]">Car rental in {cityId}</Link>)}<Link href="/airport-transfer" className="rounded-xl border bg-white p-4 font-semibold">Airport Transfer</Link><Link href="/one-way-drop" className="rounded-xl border bg-white p-4 font-semibold">One-Way Drop</Link><Link href="/travel-guides" className="rounded-xl border bg-white p-4 font-semibold">Travel Guides</Link></nav></div></section>
       {/* HOW RENTKA WORKS */}
       <section
         id="how-rentka-works"
@@ -447,7 +75,7 @@ useEffect(() => {
             }`}
           >
             A considered rental experience, Dedicated support throughout your ride.
-             Simple, fast, and reliable car rental with driver in Islamabad.
+             Simple, fast, and reliable car rental with driver in Islamabad, Rawalpindi and Lahore.
           </p>
           
 
@@ -516,71 +144,5 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* STEP 2 */}
-      <ModelListingsBottomSheet
-        open={modelOpen}
-        model={selectedModel}
-        country={country}
-        city={city}
-        service={service}
-        onClose={() => {
-  setModelOpen(false);
-  window.history.pushState({}, "", "/");
-}}
-        onSelectCar={(car) => {
-          setSelectedCar(car);   // 👈 THIS WAS MISSING
-          setModelOpen(false);
-        }}
-        />
-      {/* STEP 3 */}
-      <CarDetailsModal
-        open={Boolean(selectedCar)}
-        car={selectedCar}
-        service={service as "selfDrive" | "withDriver"}
-        city={city}
-        onClose={() => {
-          setSelectedCar(null);   // close details
-          setModelOpen(true);     // 👈 GO BACK TO LIST
-        }}
-      />
-      
-      {/* ✅ LOADING OVERLAY */}
-      {loading && city && service && (
-      <div className="fixed inset-0 z-[60] bg-white/70 backdrop-blur-sm flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          
-          {/* Spinner */}
-          <div className="w-10 h-10 border-4 border-slate-300 border-t-[var(--rentka-green)] rounded-full animate-spin" />
-
-          {/* Text */}
-          <p className="text-sm text-slate-700 font-medium">
-            Loading available cars...
-          </p>
-        </div>
-      </div>
-    )}
-      
-      <style jsx>{`
-        .shake {
-          animation: shake 0.35s ease-in-out;
-        }
-        @keyframes shake {
-          0% { transform: translateX(0); }
-          20% { transform: translateX(-4px); }
-          40% { transform: translateX(4px); }
-          60% { transform: translateX(-3px); }
-          80% { transform: translateX(3px); }
-          100% { transform: translateX(0); }
-        }
-          @keyframes fade-in {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.25s ease-out;
-        }
-      `}</style>
-    </>
-  );
+    </>;
 }

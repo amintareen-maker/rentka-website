@@ -5,30 +5,31 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
-test("Lahore vehicle branch is resolver-backed while Twin Cities legacy branch remains", async () => {
+test("Both canonical vehicle branches use resolver-backed public inventory", async () => {
   const page = await read("app/cars/[slug]/[city]/[service]/page.tsx");
   assert.match(page, /if \(city === "lahore"\)/);
   assert.match(page, /getEligibleLahoreModel\(slug\)/);
   assert.match(page, /if \(!model\) notFound\(\)/);
-  assert.match(page, /collection\(liteDb, "countries", country, "cars"\)/);
-  assert.match(page, /requestedCity === "islamabad"/);
+  assert.match(page, /getPublicNormalRentalInventory\(context\.zoneId, context\.cityId\)/);
+  assert.doesNotMatch(page, /carsWithVendors|CarListingClient|vendorData/);
   assert.match(page, /https:\/\/www\.rentka\.co\/cars\/\$\{slug\}\/lahore\/\$\{service\}/);
   assert.doesNotMatch(page, /canonical.*rent-a-car-islamabad/);
 });
 
 test("public and admin routes fix their own source and share the server lead core", async () => {
-  const [publicRoute, adminRoute, core] = await Promise.all([
-    read("app/api/normal-rental-lead/route.ts"), read("app/api/admin/normal-rental-test-lead/route.ts"), read("src/lib/normal-rental/lahore-lead.ts"),
+  const [publicRoute, adminRoute, core, delivery] = await Promise.all([
+    read("app/api/normal-rental-lead/route.ts"), read("app/api/admin/normal-rental-test-lead/route.ts"), read("src/lib/normal-rental/lahore-lead.ts"), read("src/lib/normal-rental/public-lead-delivery.ts"),
   ]);
   assert.match(publicRoute, /handleLahoreLead\(request, "rent_a_car_lahore"\)/);
   assert.match(publicRoute, /publicLeadRateLimit/);
   assert.match(adminRoute, /hasAdminSession/);
   assert.match(adminRoute, /handleLahoreLead\(request, "admin_lahore_preview"\)/);
-  assert.match(core, /resolveNormalRentalInventory\(\{ zoneId: "lahore"/);
+  assert.match(core, /resolveNormalRentalInventory\(\{ zoneId, cityId/);
   assert.match(core, /db\.runTransaction/);
-  assert.match(core, /publicLahoreOptionId/);
-  assert.match(core, /\/api\/lead-booking/);
-  assert.match(core, /\/api\/lead-sheet/);
+  assert.match(core, /publicNormalRentalOptionId/);
+  assert.match(core, /deliverPublicNormalRentalLead\(deliverySource/);
+  assert.match(delivery, /\/api\/lead-booking/);
+  assert.match(delivery, /\/api\/lead-sheet/);
   assert.doesNotMatch(core, /value\(payload, "source"\)/);
 });
 
@@ -42,10 +43,10 @@ test("public browser inventory strips vendor fields and uses opaque option IDs",
   assert.match(vehicle, /toPublicLahoreInventory\(model\.inventory\)/);
 });
 
-test("homepage SEO remains Islamabad-focused while Lahore is a secondary CTA", async () => {
+test("homepage SEO represents all active markets with a configured inventory selector", async () => {
   const page = await read("app/page.tsx");
-  assert.match(page, /Car Rental with Driver Islamabad & Rawalpindi/);
-  assert.match(page, /Explore Lahore Car Rental/);
+  assert.match(page, /Car Rental with Driver in Islamabad, Rawalpindi & Lahore/);
+  assert.match(page, /PUBLIC_NORMAL_RENTAL_ZONES/);
 });
 
 test("public Lahore landing is enabled and no longer proxy-suppressed", async () => {

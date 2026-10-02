@@ -1,14 +1,13 @@
-import { liteDb } from "@/lib/firebaseLite";
-import { collection, getDocs } from "firebase/firestore/lite";
-import CarListingClient from "@/components/CarListingClient";
-import { doc, getDoc } from "firebase/firestore/lite";
+export const revalidate = 60;
+
 import Script from "next/script";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import LahoreBookingClient from "@/components/lahore/LahoreBookingClient";
-import { getEligibleLahoreModel, getEligibleLahoreModels, toPublicLahoreInventory } from "@/lib/normal-rental/public-inventory";
+import { getEligibleLahoreModel, getEligibleLahoreModels, toPublicLahoreInventory, getPublicNormalRentalInventory } from "@/lib/normal-rental/public-inventory";
 import { getNormalRentalBookingContext, NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
+import { normalRentalStartingPrice } from "@/lib/normal-rental/inventory-core";
 import Breadcrumbs, { breadcrumbJsonLd } from "@/components/Breadcrumbs";
 import {
   ORGANIZATION_ID,
@@ -17,11 +16,6 @@ import {
   VEHICLE_SERVICE,
   isValidVehicleRoute,
 } from "@/lib/seo";
-
-type Vendor = {
-  name?: string;
-  logoUrl?: string;
-};
 
 type VehiclePageProps = {
   params: Promise<{ slug: string; city: string; service: string }>;
@@ -76,27 +70,6 @@ export async function generateMetadata({ params }: VehiclePageProps): Promise<Me
   };
 }
 
-type Car = {
-  id: string;
-  name?: string;
-  model?: string;
-  imageURL?: string;
-  vendorId?: string;
-  cityList?: string[];
-  supports?: {
-    withoutDriver?: boolean;
-    withDriver?: boolean;
-  };
-  pricing?: {
-    selfDrive?: {
-      withinCity?: { daily?: number };
-    };
-    withDriver?: {
-      withinCity?: { daily?: number };
-    };
-  };
-};
-
 export default async function Page({
   params,
 }: VehiclePageProps) {
@@ -128,7 +101,7 @@ export default async function Page({
       <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <Breadcrumbs items={breadcrumbItems}/>
         <header className="mt-7 max-w-3xl"><p className="text-sm font-bold uppercase tracking-widest text-[var(--rentka-green)]">Lahore · Driver included</p><h1 className="mt-2 text-3xl font-extrabold capitalize text-[var(--rentka-blue)] sm:text-4xl">{model.modelName} with Driver in Lahore</h1><p className="mt-4 leading-7 text-slate-600">Choose a current Within Lahore or Outstation package, add your trip details and request availability from RentKA. Prices currently start from PKR {minimum.toLocaleString("en-PK")} per day.</p></header>
-        <section aria-labelledby="lahore-model-booking" className="mt-10"><h2 id="lahore-model-booking" className="mb-6 text-2xl font-extrabold text-[var(--rentka-blue)]">View Packages &amp; Request Booking</h2><LahoreBookingClient inventory={toPublicLahoreInventory(model.inventory)} context={{ cityLabel: context.cityLabel }} variant="prelaunch"/></section>
+        <section aria-labelledby="lahore-model-booking" className="mt-10"><h2 id="lahore-model-booking" className="mb-6 text-2xl font-extrabold text-[var(--rentka-blue)]">View Packages &amp; Request Booking</h2><LahoreBookingClient inventory={toPublicLahoreInventory(model.inventory)} context={context} variant="prelaunch" source="model_page"/></section>
         <section className="mt-14 grid gap-5 sm:grid-cols-2" aria-labelledby="lahore-model-travel"><h2 id="lahore-model-travel" className="sr-only">Lahore travel options</h2><article className="rounded-2xl bg-slate-50 p-6"><h3 className="text-xl font-bold text-[var(--rentka-blue)]">Within Lahore</h3><p className="mt-3 leading-7 text-slate-600">Request pickup for daily travel, appointments, business meetings, weddings or family commitments across Lahore.</p></article><article className="rounded-2xl bg-[var(--rentka-blue)] p-6 text-white"><h3 className="text-xl font-bold">Outstation From Lahore</h3><p className="mt-3 leading-7 text-slate-200">Select your Lahore pickup and destination, then RentKA will check the car and route requirements before confirmation.</p></article></section>
         <section className="mt-14" aria-labelledby="lahore-model-faq"><h2 id="lahore-model-faq" className="text-2xl font-extrabold text-[var(--rentka-blue)]">Frequently Asked Questions</h2><div className="mt-5 space-y-5">{faq.map((item) => <article key={item.question}><h3 className="font-bold text-slate-900">{item.question}</h3><p className="mt-2 leading-7 text-slate-600">{item.answer}</p></article>)}</div></section>
         {related.length > 0 && <section className="mt-14" aria-labelledby="related-lahore-cars"><h2 id="related-lahore-cars" className="text-xl font-bold text-[var(--rentka-blue)]">More Cars Available in Lahore</h2><div className="mt-5 flex flex-wrap gap-3">{related.map((item) => <Link key={item.modelSlug} href={`/cars/${item.modelSlug}/lahore/${VEHICLE_SERVICE}`} className="rounded-xl bg-slate-100 px-4 py-3 font-semibold hover:bg-slate-200">{item.modelName} with driver</Link>)}</div></section>}
@@ -141,106 +114,9 @@ export default async function Page({
   }
   
 
-  const country = "PK";
-
-  
-  const selectedService = "withDriver";
-
-  const snapshot = await getDocs(
-    collection(liteDb, "countries", country, "cars")
-  ).catch(() => null);
-
-  const normalize = (str?: string) =>
-    (str || "").toLowerCase().replace(/\s+/g, "-");
-
-  const cars: (Car & { vendor?: Vendor })[] = [];
-
-// ✅ STEP 1: FILTER FIRST (NO API CALLS)
-const filteredCars = (snapshot?.docs || []).filter((docItem) => {
-  const data = docItem.data() as Car;
-
-  if (!data.model || normalize(data.model) !== normalize(slug)) return false;
-
-  // Islamabad & Rawalpindi share inventory
-
-const requestedCity = city.toLowerCase();
-
-const cityMatches =
-  requestedCity === "islamabad" ||
-  requestedCity === "rawalpindi"
-    ? data.cityList?.some((c) => {
-        const normalized = c.toLowerCase();
-
-        return (
-          normalized === "islamabad" ||
-          normalized === "rawalpindi"
-        );
-      })
-    : data.cityList?.some(
-        (c) =>
-          c.toLowerCase() === requestedCity
-      );
-
-if (!cityMatches) return false;
-
-  if (
-    selectedService === "withDriver" &&
-    data.supports?.withDriver === false
-  )
-    return false;
-
-  return true;
-});
-
-// 🚀 STEP 2: FETCH VENDORS IN PARALLEL (FAST)
-const carsWithVendors = await Promise.all(
-  filteredCars.map(async (docItem) => {
-    const data = docItem.data() as Car;
-
-    let vendorData: Vendor | null = null;
-
-    if (data.vendorId) {
-      try {
-        const vendorRef = doc(
-          liteDb,
-          "countries",
-          country,
-          "vendors",
-          data.vendorId
-        );
-
-        const vendorSnap = await getDoc(vendorRef);
-
-        if (vendorSnap.exists()) {
-          vendorData = vendorSnap.data() as Vendor;
-        }
-      } catch {
-        vendorData = null;
-      }
-    }
-
-    return {
-      ...data,
-      id: docItem.id,
-      vendor: vendorData || undefined,
-    };
-  })
-);
-
-// ✅ FINAL RESULT
-cars.push(...carsWithVendors);
-
-  let minPrice: number | null = null;
-
-cars.forEach((car) => {
-  const price = car.pricing?.withDriver?.withinCity?.daily;
-
-  if (price && price > 0) {
-    if (minPrice === null || price < minPrice) {
-      minPrice = price;
-    }
-  }
-});
+  const context = getNormalRentalBookingContext("twin_cities", city);
+  const inventory = (await getPublicNormalRentalInventory(context.zoneId, context.cityId)).filter((item) => item.modelSlug === slug);
+  const minPrice = normalRentalStartingPrice(inventory) ?? null;
 
 const isDriver = service?.toLowerCase() === "with-driver";
 const carName = slug ? slug.replace(/-/g, " ") : "Cars";
@@ -296,6 +172,11 @@ const breadcrumbItems = [
   { name: `${carName} With Driver`, href: `/cars/${slug}/${city}/${service}` },
 ];
 const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
+const carFaqs = [
+  { question: `What is the price of ${carName} with driver in ${city}?`, answer: typeof minPrice === "number" ? `Prices currently start from Rs ${minPrice}/day, subject to package, duration and availability.` : "Pricing depends on the confirmed vehicle, itinerary, duration and availability. Request a quotation for your travel date." },
+  { question: "Can I book online?", answer: "Yes, bookings can be made online and confirmed via WhatsApp." },
+  { question: "Are there any hidden charges?", answer: "RentKA explains the applicable rental, fuel, toll, parking and overtime terms before booking confirmation." },
+];
 
 
   return (
@@ -327,7 +208,7 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
       {/* 🔥 SEO PARAGRAPH */}
       <p className="text-slate-600 max-w-2xl mb-10">
         Looking to rent a {slug ? slug.replace(/-/g, " ") : "car"} in {city}? 
-        Prices start from Rs {minPrice}/day (may vary by vendor and availability). 
+        {minPrice === null ? "Request current availability and pricing." : `Prices start from Rs ${minPrice}/day, subject to package and availability.`}
         RentKA connects you with verified rental partners, allowing you to compare options, 
         choose what fits your requirement, and book easily with clear and transparent pricing. 
         Ideal for airport transfers, family trips, and daily city travel.
@@ -350,7 +231,7 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
       </section>
 
       {/* 🔥 EMPTY STATE */}
-      {cars.length === 0 && (
+      {inventory.length === 0 && (
         <div className="bg-slate-100 rounded-xl p-6 text-center">
           <p className="text-slate-700 font-medium">
             No cars available right now for this selection.
@@ -359,11 +240,7 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
       )}
 
       {/* 🔥 LISTINGS */}
-      <CarListingClient
-        cars={cars}
-        service={selectedService}
-        city={city}
-      />
+      <LahoreBookingClient inventory={inventory} context={context} variant="prelaunch" source="model_page" />
 
       <div className="mt-12">
   <h2 className="text-lg font-semibold mb-4">
@@ -403,82 +280,11 @@ const breadcrumbSchema = breadcrumbJsonLd(breadcrumbItems);
         </ul>
       </div>
 <div className="mt-16">
-  <h2 className="text-xl font-semibold mb-4">
-    Frequently Asked Questions
-  </h2>
-
-  <div className="space-y-4 text-sm text-slate-700">
-    <div>
-      <p className="font-medium">
-        What is the price of {carName} with driver in {city}?
-      </p>
-      <p>
-        {typeof minPrice === "number"
-          ? `Prices currently start from Rs ${minPrice}/day, subject to vendor, duration and availability.`
-          : "Pricing depends on the confirmed vehicle, itinerary, duration and availability. Request a quotation for your travel date."}
-      </p>
-    </div>
-
-    <div>
-      <p className="font-medium">
-        Can I book online?
-      </p>
-      <p>
-        Yes, bookings can be made online and confirmed via WhatsApp.
-      </p>
-    </div>
-
-    <div>
-      <p className="font-medium">
-        Are there any hidden charges?
-      </p>
-      <p>
-        No, RentKA works with verified vendors and ensures transparent pricing before confirmation.
-      </p>
-    </div>
-  </div>
+  <h2 className="mb-4 text-xl font-semibold">Frequently Asked Questions</h2>
+  <div className="space-y-4 text-sm text-slate-700">{carFaqs.map((faq) => <div key={faq.question}><p className="font-medium">{faq.question}</p><p>{faq.answer}</p></div>)}</div>
 </div>
+<Script id="faq-schema" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: carFaqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) }) }} />
 
-<Script
-  id="faq-schema"
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{
-    __html: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: [
-        {
-          "@type": "Question",
-          name: `What is the price of ${carName} with driver in ${city}?`,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: typeof minPrice === "number"
-              ? `Prices currently start from Rs ${minPrice} per day, subject to vendor and availability.`
-              : "Pricing depends on the confirmed vehicle, itinerary, duration and availability. Request a quotation for your travel date.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Can I book online?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "Yes, bookings can be made online and confirmed via WhatsApp.",
-          },
-        },
-        {
-          "@type": "Question",
-          name: "Are there any hidden charges?",
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: "RentKA explains the applicable rental, fuel, toll, parking and overtime terms before booking confirmation.",
-          },
-        },
-      ],
-    }),
-  }}
-/>
-
-  
     </main>
 </>
 );

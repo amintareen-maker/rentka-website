@@ -74,15 +74,15 @@ export default function HeroBanner() {
           {/* LEFT */}
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-[var(--rentka-blue)] leading-tight">
-              Car Rental with Driver in Islamabad &amp; Rawalpindi
+              Car Rental with Driver in Islamabad, Rawalpindi &amp; Lahore
             </h1>
 
             <p className="mt-6 text-lg text-gray-600 max-w-xl">
-              Browse cars with transparent pricing, trusted vendors, and quick booking support.
+              Browse cars with transparent pricing, driver-included packages, and quick booking support.
             </p>
 
             <p className="mt-4 text-gray-700 font-medium">
-              One platform - multiple options, vehicle providers and rates, with applicable charges explained before confirmation.
+              One platform - multiple cities, vehicles and packages, with applicable charges explained before confirmation.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">

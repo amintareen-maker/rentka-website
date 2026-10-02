@@ -1,12 +1,13 @@
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { resolveNormalRentalInventory } from "@/lib/normal-rental/inventory-resolver";
 import { normalRentalPublicLabel } from "@/lib/normal-rental/inventory-core";
-import { getNormalRentalBookingContext, resolveNormalRentalLeadCode } from "@/lib/normal-rental/zones";
+import { getNormalRentalBookingContext, resolveNormalRentalLeadCode, normalRentalZoneForCity, NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
 import { isValidPakistanPlace } from "@/lib/normal-rental/place-validation";
-import { publicLahoreOptionId } from "@/lib/normal-rental/public-inventory";
+import { publicNormalRentalOptionId } from "@/lib/normal-rental/public-inventory";
+import { deliverPublicNormalRentalLead } from "@/lib/normal-rental/public-lead-delivery";
 import { attemptAutomaticOperationalIntake } from "@/lib/dispatch/automatic-intake";
 
 type Payload = Record<string, unknown>;
@@ -17,6 +18,16 @@ const mapsLink = (latitude: number, longitude: number) => `https://maps.google.c
 export async function createLahoreLead(request: Request, source: "admin_lahore_preview" | "rent_a_car_lahore") {
   let payload: Payload;
   try { payload = await request.json() as Payload; } catch { return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 }); }
+  const publicRequest = source === "rent_a_car_lahore";
+  const cityId = publicRequest ? value(payload, "cityId") || "lahore" : "lahore";
+  const zoneId = normalRentalZoneForCity(cityId);
+  if (!zoneId || (publicRequest && (!NORMAL_RENTAL_ZONES[zoneId].publicEnabled || (value(payload, "zoneId") && value(payload, "zoneId") !== zoneId)))) {
+    return NextResponse.json({ ok: false, error: "Invalid booking city or zone." }, { status: 400 });
+  }
+  const context = getNormalRentalBookingContext(zoneId, cityId);
+  const leadSource = publicRequest && zoneId === "twin_cities" ? "website" : source;
+  const deliverySource = zoneId === "twin_cities" ? "twin_cities_normal" : "lahore_normal";
+  const entryPoint = ["homepage", "city_page", "model_page"].includes(value(payload, "entryPoint")) ? value(payload, "entryPoint") : "city_page";
   const inventoryId = value(payload, "inventoryId");
   const pricingType = value(payload, "pricingType");
   const duration = value(payload, "duration");
@@ -34,27 +45,57 @@ export async function createLahoreLead(request: Request, source: "admin_lahore_p
   const phone = value(payload, "phone");
   const email = value(payload, "email");
   const numberOfDays = Number(payload.numberOfDays);
+  const validPlace = (address: string, placeId: string, latitude: number, longitude: number) =>
+    zoneId === "twin_cities" && !placeId
+      ? Boolean(address && address.length <= 1000)
+      : isValidPakistanPlace({ address, placeId, latitude, longitude });
   if (!inventoryId
     || !["withinCity", "outsideCity"].includes(pricingType) || !["daily", "weekly", "monthly"].includes(duration)
     || !/^\d{4}-\d{2}-\d{2}$/.test(pickupDate) || !/^\d{2}:\d{2}$/.test(preferredTime)
-    || !isValidPakistanPlace({ address: pickupAddress, placeId: pickupPlaceId, latitude: pickupLatitude, longitude: pickupLongitude })
-    || (pricingType === "outsideCity" && !isValidPakistanPlace({ address: destinationAddress, placeId: destinationPlaceId, latitude: destinationLatitude, longitude: destinationLongitude })) || !customerName || !phone
+    || !validPlace(pickupAddress, pickupPlaceId, pickupLatitude, pickupLongitude)
+    || (pricingType === "outsideCity" && !validPlace(destinationAddress, destinationPlaceId, destinationLatitude, destinationLongitude)) || !customerName || !phone
     || !Number.isInteger(numberOfDays) || numberOfDays < 1 || numberOfDays > 30) {
     return NextResponse.json({ ok: false, error: "Complete all required test booking fields." }, { status: 400 });
   }
-  const inventory = await resolveNormalRentalInventory({ zoneId: "lahore", cityId: "lahore", service: "withDriver" });
-  const selected = inventory.find((item) => source === "rent_a_car_lahore" ? publicLahoreOptionId(item.inventoryId) === inventoryId : item.inventoryId === inventoryId);
-  if (!selected) return NextResponse.json({ ok: false, error: "This Lahore inventory option is not active or eligible." }, { status: 409 });
-  const rate = selected.pricing.withDriver[pricingType as "withinCity" | "outsideCity"][duration as "daily" | "weekly" | "monthly"];
-  if (!rate || rate <= 0) return NextResponse.json({ ok: false, error: "The selected Lahore rate is unavailable." }, { status: 409 });
-  const context = getNormalRentalBookingContext("lahore");
-  const cityCode = resolveNormalRentalLeadCode(context);
   const db = getAdminDb();
+  const submissionKey = value(payload, "submissionKey");
+  if (submissionKey && !/^[a-zA-Z0-9-]{16,80}$/.test(submissionKey)) return NextResponse.json({ ok: false, error: "Invalid submission key." }, { status: 400 });
+  const requestFingerprint = createHash("sha256").update(JSON.stringify({ zoneId, cityId, inventoryId, pricingType, duration, pickupDate, preferredTime, pickupAddress, pickupPlaceId, pickupLatitude, pickupLongitude, destinationAddress, destinationPlaceId, destinationLatitude, destinationLongitude, customerName, phone, email, numberOfDays })).digest("hex");
+  const leadRef = submissionKey && publicRequest
+    ? db.collection("leads").doc("public-" + createHash("sha256").update(submissionKey).digest("hex"))
+    : db.collection("leads").doc();
+  const deliverPersistedLead = async () => {
+    try {
+      return await deliverPublicNormalRentalLead(deliverySource, leadRef.id, request.url);
+    } catch {
+      return ["delivery preparation failed"];
+    }
+  };
+  if (submissionKey && publicRequest) {
+    const existing = await leadRef.get();
+    if (existing.exists) {
+      const saved = existing.data()!;
+      if (saved.requestFingerprint !== requestFingerprint) return NextResponse.json({ ok: false, error: "This submission key has already been used." }, { status: 409 });
+      const integrationWarnings = await deliverPersistedLead();
+      return NextResponse.json({ ok: true, leadId: saved.leadId, reviewLink: saved.reviewLink, dailyRentalRate: saved.dailyRentalRate, estimatedRentalAmount: saved.estimatedRentalAmount, ...(integrationWarnings.length ? { integrationWarnings } : {}) });
+    }
+  }
+  const inventory = await resolveNormalRentalInventory({ zoneId, cityId, service: "withDriver" });
+  const selected = inventory.find((item) => publicRequest ? publicNormalRentalOptionId(item.inventoryId, zoneId) === inventoryId : item.inventoryId === inventoryId);
+  if (!selected) return NextResponse.json({ ok: false, error: "This inventory option is not active or eligible." }, { status: 409 });
+  const rate = selected.pricing.withDriver[pricingType as "withinCity" | "outsideCity"][duration as "daily" | "weekly" | "monthly"];
+  if (!rate || rate <= 0) return NextResponse.json({ ok: false, error: "The selected rate is unavailable." }, { status: 409 });
+  const cityCode = resolveNormalRentalLeadCode(context);
   const counterRef = db.collection("meta").doc("counters");
-  const leadRef = db.collection("leads").doc();
   const reviewToken = randomBytes(8).toString("base64url");
   const reviewLink = `https://www.rentka.co/review?leadId=${leadRef.id}&token=${reviewToken}`;
-  const leadId = await db.runTransaction(async (transaction) => {
+  const persisted = await db.runTransaction(async (transaction) => {
+    const existing = await transaction.get(leadRef);
+    if (existing.exists) {
+      const saved = existing.data()!;
+      if (saved.requestFingerprint !== requestFingerprint) throw new Error("Submission key already used.");
+      return { leadId: saved.leadId as string, reviewLink: saved.reviewLink as string, dailyRentalRate: saved.dailyRentalRate as number, estimatedRentalAmount: saved.estimatedRentalAmount as number, replayed: true };
+    }
     const counter = await transaction.get(counterRef);
     if (!counter.exists) throw new Error("Counter document does not exist.");
     const next = Number(counter.data()?.leadCounter ?? 0) + 1;
@@ -64,60 +105,30 @@ export async function createLahoreLead(request: Request, source: "admin_lahore_p
     transaction.create(leadRef, {
       leadId: generated, name: customerName, phone, email: email || null,
       carName: selected.modelName, inventoryId: selected.inventoryId,
+      ...(selected.source === "legacy" ? { carId: selected.inventoryId } : {}),
       publicVehicleLabel: selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : null,
       country: "PK", city: context.cityLabel, cityId: context.cityId,
       zoneId: context.zoneId, cityCode, service: "withDriver", modelYear: selected.modelYearLabel ?? selected.modelYear ?? null,
       vendorName: selected.vendorName, vendorId: selected.vendorId, pricingType, duration, price: rate,
-      pickupDate, preferredTime, pickupAddress, pickupLatitude, pickupLongitude, pickupPlaceId, pickupMapLink: mapsLink(pickupLatitude, pickupLongitude),
+      pickupDate, preferredTime, pickupAddress,
+      pickupLatitude: Number.isFinite(pickupLatitude) ? pickupLatitude : null,
+      pickupLongitude: Number.isFinite(pickupLongitude) ? pickupLongitude : null,
+      pickupPlaceId, pickupMapLink: Number.isFinite(pickupLatitude) && Number.isFinite(pickupLongitude) ? mapsLink(pickupLatitude, pickupLongitude) : null,
       numberOfDays, dailyRentalRate: rate, estimatedRentalAmount: rate * numberOfDays,
       destinationAddress: pricingType === "outsideCity" ? destinationAddress : null,
-      destinationLatitude: pricingType === "outsideCity" ? destinationLatitude : null,
-      destinationLongitude: pricingType === "outsideCity" ? destinationLongitude : null,
+      destinationLatitude: pricingType === "outsideCity" && Number.isFinite(destinationLatitude) ? destinationLatitude : null,
+      destinationLongitude: pricingType === "outsideCity" && Number.isFinite(destinationLongitude) ? destinationLongitude : null,
       destinationPlaceId: pricingType === "outsideCity" ? destinationPlaceId : null,
-      destinationMapLink: pricingType === "outsideCity" ? mapsLink(destinationLatitude, destinationLongitude) : null,
-      source, status: "new", adminPrivateTest: source === "admin_lahore_preview",
+      destinationMapLink: pricingType === "outsideCity" && Number.isFinite(destinationLatitude) && Number.isFinite(destinationLongitude) ? mapsLink(destinationLatitude, destinationLongitude) : null,
+      source: leadSource, entryPoint, requestFingerprint, status: "new", adminPrivateTest: source === "admin_lahore_preview",
       reviewSubmitted: false, reviewSent: false, reviewToken, reviewLink, createdAt: FieldValue.serverTimestamp(),
     });
-    return generated;
+    return { leadId: generated, reviewLink, dailyRentalRate: rate, estimatedRentalAmount: rate * numberOfDays, replayed: false };
   });
-  const integrationWarnings: string[] = [];
-  await attemptAutomaticOperationalIntake("lahore_normal", leadRef.id);
-  if (source === "rent_a_car_lahore") {
-    const base = new URL(request.url);
-    const destinationMapLink = pricingType === "outsideCity" ? mapsLink(destinationLatitude, destinationLongitude) : "";
-    const publicVehicleLabel = selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : null;
-    const common = {
-      leadId, carName: selected.modelName, carId: selected.inventoryId, vendorName: selected.vendorName, vendorId: selected.vendorId,
-      publicVehicleLabel,
-      modelYear: selected.modelYearLabel ?? selected.modelYear ?? null, country: "PK", city: context.cityLabel,
-      service: "With Driver", pricingType, duration, originalPrice: rate, dailyRentalRate: rate, numberOfDays,
-      estimatedRentalAmount: rate * numberOfDays, pickupDate, preferredTime, pickupAddress, pickupLatitude, pickupLongitude,
-      pickupPlaceId, pickupMapLink: mapsLink(pickupLatitude, pickupLongitude), isOutstation: pricingType === "outsideCity",
-      destinationAddress: pricingType === "outsideCity" ? destinationAddress : "",
-      destinationLatitude: pricingType === "outsideCity" ? destinationLatitude : null,
-      destinationLongitude: pricingType === "outsideCity" ? destinationLongitude : null,
-      destinationPlaceId: pricingType === "outsideCity" ? destinationPlaceId : "", destinationMapLink,
-      customerName, phone, email, source, reviewLink,
-    };
-    const sheetPayload = {
-      leadId, name: customerName, phone, email, carName: selected.modelName, vendorName: selected.vendorName,
-      vendorId: selected.vendorId, modelYear: String(common.modelYear ?? ""), publicVehicleLabel: publicVehicleLabel ?? "", country: "PK", city: context.cityLabel,
-      service: "withDriver", serviceType: pricingType, packageName: pricingType, packageDuration: duration,
-      packagePrice: String(rate), pickupDate, preferredTime, source, status: "new", pickupAddress,
-      numberOfDays, dailyRentalRate: rate, estimatedRentalAmount: rate * numberOfDays,
-      destinationAddress: pricingType === "outsideCity" ? destinationAddress : "", isOutstation: pricingType === "outsideCity",
-    };
-    const integrations = await Promise.allSettled([
-      fetch(new URL("/api/lead-booking", base), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(common) }),
-      fetch(new URL("/api/lead-sheet", base), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(sheetPayload) }),
-    ]);
-    const labels = ["email", "Google Sheets"];
-    integrations.forEach((result, index) => {
-      if (result.status === "rejected" || !result.value.ok) integrationWarnings.push(`${labels[index]} failed`);
-    });
-  }
+  if (!publicRequest) await attemptAutomaticOperationalIntake("lahore_normal", leadRef.id);
+  const integrationWarnings = publicRequest ? await deliverPersistedLead() : [];
   return NextResponse.json({
-    ok: true, leadId, reviewLink, dailyRentalRate: rate, estimatedRentalAmount: rate * numberOfDays,
+    ok: true, leadId: persisted.leadId, reviewLink: persisted.reviewLink, dailyRentalRate: persisted.dailyRentalRate, estimatedRentalAmount: persisted.estimatedRentalAmount,
     ...(source === "admin_lahore_preview" ? { inventory: selected } : {}),
     ...(integrationWarnings.length ? { integrationWarnings } : {}),
   });

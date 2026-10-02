@@ -19,7 +19,7 @@ test("Lahore emits generate_lead only after a successful response with a lead ID
   const event = eventPosition(source, "generate_lead");
   assert.ok(event > source.indexOf("parseTestLeadResponse(responseBody"));
   assert.ok(event > source.indexOf("if (!lead.leadId)"));
-  assert.match(source, /if \(prelaunch\) \{\s*trackDataLayer\("generate_lead"/);
+  assert.match(source, /if \(prelaunch && !conversionRecorded\.current\) \{\s*conversionRecorded\.current = true;\s*trackDataLayer\("generate_lead"/);
   assert.match(source, /submissionInProgress\.current/);
   assert.ok(event < source.indexOf("whatsappWindow.location.href = whatsappUrl"));
 });

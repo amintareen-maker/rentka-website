@@ -23,8 +23,15 @@ export type NormalRentalZoneId = keyof typeof NORMAL_RENTAL_ZONES;
 export type NormalRentalCityId = (typeof NORMAL_RENTAL_ZONES)[NormalRentalZoneId]["cityIds"][number];
 
 export function isNormalRentalZoneId(value: string): value is NormalRentalZoneId {
-  return value in NORMAL_RENTAL_ZONES;
+  return Object.hasOwn(NORMAL_RENTAL_ZONES, value);
 }
+
+export function normalRentalZoneForCity(cityId: string): NormalRentalZoneId | undefined {
+  return (Object.keys(NORMAL_RENTAL_ZONES) as NormalRentalZoneId[]).find((zoneId) =>
+    cityBelongsToNormalRentalZone(zoneId, cityId));
+}
+
+export const PUBLIC_NORMAL_RENTAL_ZONES = Object.values(NORMAL_RENTAL_ZONES).filter((zone) => zone.publicEnabled);
 
 export function cityBelongsToNormalRentalZone(zoneId: NormalRentalZoneId, cityId: string) {
   return (NORMAL_RENTAL_ZONES[zoneId].cityIds as readonly string[]).includes(cityId.toLowerCase());

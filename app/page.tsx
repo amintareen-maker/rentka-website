@@ -3,8 +3,8 @@ export const revalidate = 60;
 import HomeCTA from "@/components/HomeCTA";
 import HeroBanner from "@/components/HeroBanner";
 import HomePageClient from "@/components/HomePageClient";
-import { collection, getDocs, query, limit } from "firebase/firestore/lite";
-import { liteDb } from "@/lib/firebaseLite";
+import { getPublicNormalRentalInventory } from "@/lib/normal-rental/public-inventory";
+import { PUBLIC_NORMAL_RENTAL_ZONES } from "@/lib/normal-rental/zones";
 import GoogleReviews from "@/components/GoogleReviews";
 import RouteGrid from "@/components/intercity/RouteGrid";
 import ArticleGrid from "./blog/components/ArticleGrid";
@@ -12,16 +12,18 @@ import Script from "next/script";
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LOCAL_BUSINESS_ID, LOGO_ID, ORGANIZATION_ID, WEBSITE_ID } from "@/lib/seo";
-import type { Car } from "@/lib/useCars";
+import { LOGO_ID, ORGANIZATION_ID, WEBSITE_ID } from "@/lib/seo";
 import PreferredSourceButton from "@/components/PreferredSourceButton";
 
 export const metadata: Metadata = {
+  // Next normalizes a root URL against metadataBase to its origin without '/'.
+  // This page uses absolute social URLs so its exact root canonical is retained.
+  metadataBase: null,
   title: { absolute:
-    "Car Rental with Driver Islamabad & Rawalpindi | RentKA",
+    "RentKA | Car Rental with Driver in Islamabad, Rawalpindi & Lahore",
   },
   description:
-    "Book car rental with driver in Islamabad and Rawalpindi for city travel, airport transfers, corporate transport and intercity trips with clear quotations.",
+    "Book car rental with driver in Islamabad, Rawalpindi and Lahore. Compare vehicles and pricing for within-city travel, airport transfers, outstation trips and one-way drops.",
   keywords: [
     "rent a car islamabad",
     "rent a car rawalpindi",
@@ -36,143 +38,84 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title:
-      "Car Rental with Driver Islamabad & Rawalpindi | RentKA",
+      "RentKA | Car Rental with Driver in Islamabad, Rawalpindi & Lahore",
     description:
-      "Book cars with professional drivers in Islamabad and Rawalpindi for airport, city, corporate and intercity travel.",
+      "Book cars with professional drivers in Islamabad, Rawalpindi and Lahore for airport, city, corporate and intercity travel.",
     url: "https://www.rentka.co",
     siteName: "RentKA",
     locale: "en_PK",
     type: "website",
-    images: [{ url: "/hero-1.webp", alt: "Car rental with driver in Islamabad and Rawalpindi" }],
+    images: [{ url: "https://www.rentka.co/hero-1.webp", alt: "Car rental with driver in Islamabad, Rawalpindi and Lahore" }],
   },
+  twitter: { card: "summary_large_image", images: ["https://www.rentka.co/hero-1.webp"] },
 };
 
-async function getInitialCars() {
-  try {
-    const ref = collection(liteDb, "countries", "PK", "cars");
-    const q = query(ref, limit(20));
-    const snap = await getDocs(q);
-    const cars: Car[] = [];
-
-    snap.forEach((doc) => {
-      cars.push({
-        ...(doc.data() as Omit<Car, "id" | "country">),
-        id: doc.id,
-        country: "PK",
-      });
-    });
-
-    return cars;
-  } catch {
-    return [];
-  }
-}
+const homeFaqs = [
+{
+        q: "How much does it cost to rent a car in Islamabad?",
+        a: "Choose your city above to view current starting prices from eligible RentKA vehicles. Rates vary by vehicle, trip type, duration and travel requirements; final availability and charges are confirmed before booking."
+      },
+      {
+        q: "Is fuel included in RentKA prices?",
+        a: "Most RentKA bookings are fuel excluded, allowing customers to pay only for the fuel used during their trip. Some fixed-route airport transfers and special packages may include fuel."
+      },
+      {
+        q: "Can I book a Corolla with driver in Islamabad?",
+        a: "Yes. Toyota Corolla is one of our most requested vehicles for airport transfers, business travel, family visits, city rides, and out-of-city trips including Murree and Nathiagali."
+      },
+      {
+        q: "Do you provide airport pickup and drop?",
+        a: "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other cars with a driver."
+      },
+      {
+        q: "Can tourists and overseas Pakistanis book a car?",
+        a: "Absolutely. RentKA regularly serves overseas Pakistanis, tourists, business travelers, and international visitors arriving in Islamabad."
+      },
+      {
+        q: "How do I pay?",
+        a: "RentKA accepts payments through JazzCash and online bank transfer to the official company account. For customer safety and payment transparency, we recommend avoiding cash payments to drivers. A 20% advance is required to confirm the booking, while the remaining balance can be paid before the journey begins. Fuel and other charges via Cash to Driver, when applicable, may be settled separately during the trip."
+      },
+      {
+        q: "Do you provide Hiace rental for families?",
+        a: "Yes. RentKA provides Toyota Hiace rental services for family trips, corporate transportation, weddings, tours, airport transfers, and group travel."
+      },
+      {
+        q: "Can I book a car for Murree?",
+        a: "Yes. We provide transportation from Islamabad and Rawalpindi to Murree, Nathiagali, Ayubia, Patriata, and other tourist destinations."
+      },
+      {
+        q: "How far in advance should I book?",
+        a: "We recommend booking 24–48 hours in advance, especially during weekends, holidays, and peak travel seasons."
+      },
+      {
+        q: "Is driver included in the rental price?",
+        a: "Yes. All RentKA rentals include a professional driver for a safe and hassle-free travel experience."
+      },
+      {
+        q: "Do I need to pay in advance?",
+        a: "A 20% advance payment is required to reserve your vehicle. The remaining balance is paid when the driver arrives at the pickup location before the journey begins. This booking process helps secure availability while maintaining transparency and convenience for customers."
+      },
+      {
+        q: "Which areas do you serve?",
+        a: "RentKA serves Lahore, Islamabad, Rawalpindi, Bahria Town, DHA, Chaklala, Blue Area, Islamabad International Airport, Murree, Nathiagali, and surrounding areas."
+      }
+];
 
 export default async function Page() {
-  const initialCars = await getInitialCars();
+  const initialInventory = Object.fromEntries(await Promise.all(PUBLIC_NORMAL_RENTAL_ZONES.map(async (zone) => [zone.defaultCityId, await getPublicNormalRentalInventory(zone.id, zone.defaultCityId)])));
 
   const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: homeFaqs.map((faq) => ({
       "@type": "Question",
-      "name": "How much does it cost to rent a car in Islamabad?",
-      "acceptedAnswer": {
+      name: faq.q,
+      acceptedAnswer: {
         "@type": "Answer",
-        "text": "RentKA offers affordable car rental services in Islamabad and Rawalpindi with prices starting from around PKR 4,500 per day for economy vehicles. Rates vary depending on vehicle category, trip type, duration, and travel requirements."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is fuel included in RentKA prices?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Most RentKA bookings are fuel excluded, allowing customers to pay only for the fuel used during their trip. Some fixed-route airport transfers and special packages may include fuel."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can I book a Corolla with driver in Islamabad?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. Toyota Corolla is one of our most requested vehicles for airport transfers, business travel, family visits, city rides, and out-of-city trips including Murree and Nathiagali."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you provide airport pickup and drop?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other cars with a driver."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can tourists and overseas Pakistanis book a car?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Absolutely. RentKA regularly serves overseas Pakistanis, tourists, business travelers, and international visitors arriving in Islamabad."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How do I pay?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "RentKA accepts payments through JazzCash and online bank transfer to the official company account. A 20 percent advance is required to confirm the booking, while the remaining balance is paid before the journey begins."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you provide Hiace rental for families?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. RentKA provides Toyota Hiace rental services for family trips, corporate transportation, weddings, tours, airport transfers, and group travel."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can I book a car for Murree?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. We provide transportation from Islamabad and Rawalpindi to Murree, Nathiagali, Ayubia, Patriata, and other tourist destinations."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How far in advance should I book?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "We recommend booking 24 to 48 hours in advance, especially during weekends, holidays, and peak travel seasons."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is driver included in the rental price?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. All RentKA rentals include a professional driver for a safe and hassle-free travel experience."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do I need to pay in advance?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "A 20 percent advance payment is required to reserve your vehicle. The remaining balance is paid when the driver arrives at the pickup location before the journey begins."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Which areas do you serve?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "RentKA serves Islamabad, Rawalpindi, Bahria Town, DHA, Chaklala, Blue Area, Islamabad International Airport, Murree, Nathiagali, and surrounding areas."
-      }
-    }
-  ]
-};
+        text: faq.a,
+      },
+    })),
+  };
 
   const entitySchema = {
     "@context": "https://schema.org",
@@ -187,8 +130,8 @@ export default async function Page() {
         "@type": "Organization",
         "@id": ORGANIZATION_ID,
         name: "RentKA",
-        legalName: "RentKA (SMC-PRIVATE) LIMITED",
-        description: "RentKA (SMC-PRIVATE) LIMITED is a professional car rental company with driver based in Islamabad, Pakistan. We provide airport transfers, car rental with driver, one-way intercity travel, corporate transportation, hotel transfers, monthly rentals, and professional driver services across Pakistan.",
+        legalName: "RENTKA (SMC-PRIVATE) LIMITED",
+        description: "RentKA (SMC-PRIVATE) LIMITED is a professional car rental company with driver based in Islamabad, Pakistan. We provide airport transfers, car rental with driver, one-way intercity travel, corporate transportation, hotel transfers, monthly rentals, and professional driver services in Islamabad, Rawalpindi and Lahore.",
         url: "https://www.rentka.co/",
         logo: { "@id": LOGO_ID },
         telephone: "+923020589999",
@@ -207,23 +150,6 @@ export default async function Page() {
           "https://x.com/RentKACarRental",
           "https://www.youtube.com/@RentKACarRental",
         ],
-      },
-      {
-        "@type": "CarRental",
-        "@id": LOCAL_BUSINESS_ID,
-        name: "RentKA",
-        description: "Car rental with professional drivers for Islamabad, Rawalpindi, airport transfers and intercity travel across Pakistan.",
-        url: "https://www.rentka.co/",
-        image: { "@id": LOGO_ID },
-        telephone: "+923020589999",
-        parentOrganization: { "@id": ORGANIZATION_ID },
-        address: {
-          "@type": "PostalAddress",
-          streetAddress: "Suite 4, Floor 4, Redco Plaza, Jinnah Avenue, Blue Area",
-          addressLocality: "Islamabad",
-          addressRegion: "Islamabad Capital Territory",
-          addressCountry: "PK",
-        },
       },
       {
         "@type": "WebSite",
@@ -252,8 +178,7 @@ export default async function Page() {
 
     <HeroBanner />
     
-      <HomePageClient initialCars={initialCars}>
-        <section className="border-b border-slate-200 bg-white"><div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-6 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-bold text-[var(--rentka-blue)]">Need a car in Lahore?</p><p className="mt-1 text-sm text-slate-600">View current Lahore cars and with-driver package prices.</p></div><Link href="/rent-a-car-lahore" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--rentka-green)] px-5 py-3 font-bold text-white">Explore Lahore Car Rental →</Link></div></section>
+      <HomePageClient initialInventory={initialInventory}>
         <RouteGrid
           limit={6}
           showViewAll
@@ -359,7 +284,7 @@ export default async function Page() {
 
           <div>
             <h2 className="text-2xl font-semibold mb-3">
-              Explore RentKA Services in the Twin Cities
+              Explore RentKA Services
             </h2>
             <p className="text-slate-700 leading-relaxed">
               Choose the RentKA service page for your pickup city:{" "}
@@ -433,56 +358,7 @@ export default async function Page() {
 
   <div className="space-y-4">
 
-    {[
-      {
-        q: "How much does it cost to rent a car in Islamabad?",
-        a: "RentKA offers affordable car rental services in Islamabad and Rawalpindi with prices starting from around PKR 4,500 per day for economy vehicles. Rates vary depending on vehicle category, trip type, duration, and travel requirements."
-      },
-      {
-        q: "Is fuel included in RentKA prices?",
-        a: "Most RentKA bookings are fuel excluded, allowing customers to pay only for the fuel used during their trip. Some fixed-route airport transfers and special packages may include fuel."
-      },
-      {
-        q: "Can I book a Corolla with driver in Islamabad?",
-        a: "Yes. Toyota Corolla is one of our most requested vehicles for airport transfers, business travel, family visits, city rides, and out-of-city trips including Murree and Nathiagali."
-      },
-      {
-        q: "Do you provide airport pickup and drop?",
-        a: "Yes. RentKA provides airport pickup and drop services to and from Islamabad International Airport with Corolla, BR-V, Hiace, and other cars with a driver."
-      },
-      {
-        q: "Can tourists and overseas Pakistanis book a car?",
-        a: "Absolutely. RentKA regularly serves overseas Pakistanis, tourists, business travelers, and international visitors arriving in Islamabad."
-      },
-      {
-        q: "How do I pay?",
-        a: "RentKA accepts payments through JazzCash and online bank transfer to the official company account. For customer safety and payment transparency, we recommend avoiding cash payments to drivers. A 20% advance is required to confirm the booking, while the remaining balance can be paid before the journey begins. Fuel and other charges via Cash to Driver, when applicable, may be settled separately during the trip."
-      },
-      {
-        q: "Do you provide Hiace rental for families?",
-        a: "Yes. RentKA provides Toyota Hiace rental services for family trips, corporate transportation, weddings, tours, airport transfers, and group travel."
-      },
-      {
-        q: "Can I book a car for Murree?",
-        a: "Yes. We provide transportation from Islamabad and Rawalpindi to Murree, Nathiagali, Ayubia, Patriata, and other tourist destinations."
-      },
-      {
-        q: "How far in advance should I book?",
-        a: "We recommend booking 24–48 hours in advance, especially during weekends, holidays, and peak travel seasons."
-      },
-      {
-        q: "Is driver included in the rental price?",
-        a: "Yes. All RentKA rentals include a professional driver for a safe and hassle-free travel experience."
-      },
-      {
-        q: "Do I need to pay in advance?",
-        a: "A 20% advance payment is required to reserve your vehicle. The remaining balance is paid when the driver arrives at the pickup location before the journey begins. This booking process helps secure availability while maintaining transparency and convenience for customers."
-      },
-      {
-        q: "Which areas do you serve?",
-        a: "RentKA serves Islamabad, Rawalpindi, Bahria Town, DHA, Chaklala, Blue Area, Islamabad International Airport, Murree, Nathiagali, and surrounding areas."
-      }
-    ].map((faq, index) => (
+    {homeFaqs.map((faq, index) => (
       <details
         key={index}
         className="group bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-[var(--rentka-green)] transition-all"

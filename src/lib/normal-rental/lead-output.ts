@@ -23,12 +23,13 @@ export function formatLahoreWhatsAppVehicleLines(input: LahoreVehicleOutput & {
   pricingType: "withinCity" | "outsideCity";
   duration: "daily" | "weekly" | "monthly";
   rate: number;
+  cityLabel?: string;
 }) {
   const durationUnit = { daily: "day", weekly: "week", monthly: "month" }[input.duration];
   return [
     `Vehicle: ${resolveCustomerVehicleName(input)}`,
     ...(text(input.modelYear) ? [`Model Year: ${text(input.modelYear)}`] : []),
-    `Service: ${input.pricingType === "withinCity" ? "Within Lahore" : "Outstation"}`,
+    `Service: ${input.pricingType === "withinCity" ? `Within ${input.cityLabel || "Lahore"}` : "Outstation"}`,
     "Driver: Included",
     `Rate: PKR ${input.rate.toLocaleString("en-PK")}/${durationUnit}`,
   ];

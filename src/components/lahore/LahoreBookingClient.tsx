@@ -7,14 +7,14 @@ import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { GooglePlacesProvider } from "../../../app/admin/pricing-calculator/_components/GooglePlacesProvider";
 import { PlaceInput } from "../../../app/admin/pricing-calculator/_components/PlaceInput";
 import type { ResolvedPlace } from "../../../app/admin/pricing-calculator/_lib/types";
-import { groupNormalRentalInventoryCards, normalRentalModelHref, normalRentalPublicLabel, shouldOpenInventoryComparison, type LahoreBookingInventory } from "@/lib/normal-rental/inventory-core";
+import { groupNormalRentalInventoryCards, normalRentalModelHref, normalRentalPublicLabel, shouldOpenInventoryComparison, normalRentalStartingPrice, type LahoreBookingInventory } from "@/lib/normal-rental/inventory-core";
 import { parseTestLeadResponse } from "@/lib/normal-rental/test-lead-response";
 import { formatLahoreWhatsAppVehicleLines } from "@/lib/normal-rental/lead-output";
 import type { NormalRentalBookingContext } from "@/lib/normal-rental/zones";
-import { trackDataLayer } from "@/lib/tracking";
+import { trackDataLayer, trackGoogleAdsLead, trackMetaPixel, trackWhatsAppClick } from "@/lib/tracking";
 import styles from "../../../app/admin/pricing/preview/PreviewClient.module.css";
 
-type Props = { inventory: LahoreBookingInventory[]; context: Pick<NormalRentalBookingContext, "cityLabel">; variant?: "private-test" | "prelaunch" };
+type Props = { inventory: LahoreBookingInventory[]; context: Pick<NormalRentalBookingContext, "cityLabel"> & Partial<Pick<NormalRentalBookingContext, "zoneId" | "cityId">>; source?: "homepage" | "city_page" | "model_page"; variant?: "private-test" | "prelaunch" };
 type PackageType = "withinCity" | "outsideCity";
 type Duration = "daily" | "weekly" | "monthly";
 type CreatedLead = { leadId: string; reviewLink: string; inventory?: LahoreBookingInventory; dailyRentalRate: number; estimatedRentalAmount: number; integrationWarnings?: string[] };
@@ -52,8 +52,13 @@ const PickerButton = forwardRef<HTMLButtonElement, { value?: string; onClick?: (
 ));
 PickerButton.displayName = "PickerButton";
 
-export default function LahoreBookingClient({ inventory, context, variant = "private-test" }: Props) {
+export default function LahoreBookingClient({ inventory, context, variant = "private-test", source }: Props) {
   const prelaunch = variant === "prelaunch";
+  const zoneId = context.zoneId ?? "lahore";
+  const cityId = context.cityId ?? "lahore";
+  const twinCities = zoneId === "twin_cities";
+  const submissionKey = useRef<string | undefined>(undefined);
+  const conversionRecorded = useRef(false);
   const cards = useMemo(() => groupNormalRentalInventoryCards(inventory), [inventory]);
   const [modelOptions, setModelOptions] = useState<LahoreBookingInventory[]>();
   const [selected, setSelected] = useState<LahoreBookingInventory>();
@@ -131,13 +136,13 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
     : cards.length === 2
       ? "mx-auto grid max-w-5xl gap-5 sm:grid-cols-2"
       : "grid gap-5 sm:grid-cols-2 lg:grid-cols-3";
-  if (inventory.length === 0) return <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center font-semibold text-slate-600">No active Lahore inventory available.</div>;
+  if (inventory.length === 0) return <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center font-semibold text-slate-600">No eligible cars available for {context.cityLabel} right now.</div>;
 
   async function submit(formData: FormData) {
     if (!selected || !currentRate || submissionInProgress.current) return;
     const focusField = (selector: string) => requestAnimationFrame(() => document.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true }));
-    if (!pickupPlace) { setError("Please select a pickup location from the Google suggestions."); focusField("#lahore-preview-pickup"); return; }
-    if (packageType === "outsideCity" && !destinationPlace) { setError("Please select a destination from the Google suggestions."); focusField("#lahore-preview-destination"); return; }
+    if (!pickupPlace && (!twinCities || !pickupAddress.trim())) { setError("Please select a pickup location from the Google suggestions."); focusField("#lahore-preview-pickup"); return; }
+    if (packageType === "outsideCity" && !destinationPlace && (!twinCities || !destinationAddress.trim())) { setError("Please select a destination from the Google suggestions."); focusField("#lahore-preview-destination"); return; }
     if (!String(formData.get("customerName") || "").trim()) { setError("Please enter your name."); focusField("input[name='customerName']"); return; }
     if (!String(formData.get("phone") || "").trim()) { setError("Please enter your phone number."); focusField("input[name='phone']"); return; }
     submissionInProgress.current = true; setLoading(true); setError("");
@@ -145,14 +150,15 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
     let committedLead: CreatedLead | undefined;
     try {
       const payload = {
-        inventoryId: selected.inventoryId, pricingType: packageType, duration, source: prelaunch ? "rent_a_car_lahore" : "admin_lahore_preview",
+        zoneId, cityId, country: "PK", service: "withDriver", submissionKey: submissionKey.current ?? (submissionKey.current = crypto.randomUUID()),
+        entryPoint: source, inventoryId: selected.inventoryId, pricingType: packageType, duration, source: prelaunch ? "rent_a_car_lahore" : "admin_lahore_preview",
         pickupDate: String(formData.get("pickupDate") || ""), preferredTime: String(formData.get("preferredTime") || ""),
-        pickupAddress: pickupPlace.formattedAddress, pickupPlaceId: pickupPlace.placeId,
-        pickupLatitude: pickupPlace.lat, pickupLongitude: pickupPlace.lng,
-        destinationAddress: packageType === "outsideCity" ? destinationPlace!.formattedAddress : "",
-        destinationPlaceId: packageType === "outsideCity" ? destinationPlace!.placeId : "",
-        destinationLatitude: packageType === "outsideCity" ? destinationPlace!.lat : null,
-        destinationLongitude: packageType === "outsideCity" ? destinationPlace!.lng : null,
+        pickupAddress: pickupPlace?.formattedAddress ?? pickupAddress.trim(), pickupPlaceId: pickupPlace?.placeId ?? "",
+        pickupLatitude: pickupPlace?.lat ?? null, pickupLongitude: pickupPlace?.lng ?? null,
+        destinationAddress: packageType === "outsideCity" ? (destinationPlace?.formattedAddress ?? destinationAddress.trim()) : "",
+        destinationPlaceId: packageType === "outsideCity" ? (destinationPlace?.placeId ?? "") : "",
+        destinationLatitude: packageType === "outsideCity" ? (destinationPlace?.lat ?? null) : null,
+        destinationLongitude: packageType === "outsideCity" ? (destinationPlace?.lng ?? null) : null,
         numberOfDays: Number(formData.get("numberOfDays")), customerName: String(formData.get("customerName") || ""),
         phone: String(formData.get("phone") || ""), email: String(formData.get("email") || ""),
       };
@@ -162,7 +168,8 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
       if (!lead.leadId) throw new Error("The booking request did not return a lead ID.");
       committedLead = lead;
       setCreated(lead);
-      if (prelaunch) {
+      if (prelaunch && !conversionRecorded.current) {
+        conversionRecorded.current = true;
         trackDataLayer("generate_lead", {
           lead_id: lead.leadId,
           booking_id: lead.leadId,
@@ -175,15 +182,22 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
           value: lead.estimatedRentalAmount,
           estimated_rental_amount: lead.estimatedRentalAmount,
           currency: "PKR",
-          source: "rent_a_car_lahore",
-          flow: "lahore_normal",
+          source: twinCities ? "website" : "rent_a_car_lahore",
+          flow: twinCities ? "twin_cities_normal" : "lahore_normal",
           pricing_type: packageType,
           duration,
         });
+        if (twinCities) {
+          const trackingPayload = { lead_id: lead.leadId, booking_id: lead.leadId, city: cityId, service: "withDriver", car: selected.modelName, car_id: selected.inventoryId, value: lead.estimatedRentalAmount, price: currentRate, currency: "PKR", source: "website", flow: "twin_cities_normal", pricing_type: packageType, duration };
+          trackDataLayer("lead_submit", trackingPayload);
+          trackGoogleAdsLead(trackingPayload);
+          trackMetaPixel("Lead", trackingPayload);
+          trackWhatsAppClick("main_lead_form");
+        }
       }
       const destination = packageType === "outsideCity" ? `\nTravelling To: ${payload.destinationAddress}` : "";
-      const vehicleLines = formatLahoreWhatsAppVehicleLines({ carName: selected.modelName, modelYear: selected.modelYearLabel ?? selected.modelYear, publicVehicleLabel: selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : selected.publicLabel, pricingType: packageType, duration, rate: currentRate });
-      const message = `Hi RentKA\n\nI submitted a ${prelaunch ? "Lahore car rental request" : "private Lahore test request"}.\n\nBooking reference: *${lead.leadId}*\nCity: ${context.cityLabel}\n${vehicleLines.join("\n")}\nRental Duration: ${duration}\nPickup: ${payload.pickupAddress}${destination}\nDate: ${payload.pickupDate}\nTime: ${payload.preferredTime}\nDays: ${payload.numberOfDays}\nEstimated Rental: PKR ${lead.estimatedRentalAmount.toLocaleString("en-PK")}\n\nCustomer: ${payload.customerName}\nPhone: ${payload.phone}\nEmail: ${payload.email || "Not provided"}\n\nPlease confirm availability.`;
+      const vehicleLines = formatLahoreWhatsAppVehicleLines({ carName: selected.modelName, modelYear: selected.modelYearLabel ?? selected.modelYear, publicVehicleLabel: selected.showAsSeparateCard ? normalRentalPublicLabel(selected) : selected.publicLabel, cityLabel: context.cityLabel, pricingType: packageType, duration, rate: currentRate });
+      const message = `Hi RentKA\n\nI submitted a ${prelaunch ? `${context.cityLabel} car rental request` : "private Lahore test request"}.\n\nBooking reference: *${lead.leadId}*\nCity: ${context.cityLabel}\n${vehicleLines.join("\n")}\nRental Duration: ${duration}\nPickup: ${payload.pickupAddress}${destination}\nDate: ${payload.pickupDate}\nTime: ${payload.preferredTime}\nDays: ${payload.numberOfDays}\nEstimated Rental: PKR ${lead.estimatedRentalAmount.toLocaleString("en-PK")}\n\nCustomer: ${payload.customerName}\nPhone: ${payload.phone}\nEmail: ${payload.email || "Not provided"}\n\nPlease confirm availability.`;
       const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
       if (whatsappWindow) whatsappWindow.location.href = whatsappUrl;
 
@@ -236,21 +250,43 @@ export default function LahoreBookingClient({ inventory, context, variant = "pri
     } finally { submissionInProgress.current = false; setLoading(false); }
   }
 
+  function trackModelSelection(option: LahoreBookingInventory, price?: number) {
+    trackDataLayer("select_model", { model: option.modelName, city: cityId, service: "withDriver", price: price ?? 0 });
+    trackMetaPixel("ViewContent", { content_name: option.modelName, content_category: "Vehicle", content_type: "CarModel", city: cityId, service: "withDriver", value: price ?? 0, currency: "PKR" });
+  }
+
+  function chooseOption(option: LahoreBookingInventory) {
+    submissionKey.current = undefined;
+    conversionRecorded.current = false;
+    setCreated(undefined);
+    setError("");
+    setPackageType(option.pricing.withDriver.withinCity.daily ? "withinCity" : "outsideCity");
+    setDuration("daily");
+    if (prelaunch) {
+      trackDataLayer("car_detail_view", { car_name: option.modelName, car_id: option.inventoryId, city: cityId, service: "withDriver" });
+      trackDataLayer("booking_intent", { city: cityId, service: "withDriver", model: option.modelName, car_name: option.modelName, car_id: option.inventoryId, vehicle_id: option.inventoryId, price: normalRentalStartingPrice([option]), duration: "daily", pricing_type: option.pricing.withDriver.withinCity.daily ? "withinCity" : "outsideCity" });
+    }
+    setSelected(option);
+  }
+
   return <GooglePlacesProvider><>
-    <div className={inventoryGridClass}>{cards.map((card) => { const options = card.options; const first = options[0]; const minimum = Math.min(...options.map((item) => item.pricing.withDriver.withinCity.daily ?? Infinity)); const hasWithinCity = options.some((item) => item.pricing.withDriver.withinCity.daily !== undefined); const hasOutstation = options.some((item) => item.pricing.withDriver.outsideCity.daily !== undefined); return <article key={card.key} className="group rounded-3xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#5BAE4A] hover:shadow-lg sm:p-6"><div className="relative h-56 sm:h-64"><Image src={first.imageURL} alt={`${card.label} available with driver in Lahore`} fill unoptimized sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px" className="object-contain transition duration-300 group-hover:scale-[1.03]"/></div><div className="mt-5 flex flex-wrap gap-2 text-xs font-bold text-slate-700"><span className="rounded-full bg-green-50 px-3 py-1.5 text-green-800">Driver included</span>{hasWithinCity && <span className="rounded-full bg-slate-100 px-3 py-1.5">Within Lahore</span>}{hasOutstation && <span className="rounded-full bg-slate-100 px-3 py-1.5">Outstation</span>}</div><h3 className="mt-4 text-2xl font-black text-[#0F2B46]"><Link href={normalRentalModelHref(first)} className="rounded-sm underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]">{card.label}</Link></h3>{first.modelYearLabel && <p className="mt-1 text-sm font-semibold text-slate-600">Model year: {first.modelYearLabel}</p>}<p className="mt-3 text-lg font-black text-[#5BAE4A]">From PKR {minimum.toLocaleString("en-PK")} <span className="text-sm font-semibold text-slate-500">/ day</span></p><button type="button" aria-haspopup="dialog" onClick={() => shouldOpenInventoryComparison(card) ? setModelOptions(options) : setSelected(first)} className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#0F2B46] px-5 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] focus-visible:ring-offset-2">View Rates &amp; Book →</button></article>; })}</div>
-    {modelOptions && !selected && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"><div role="dialog" aria-modal="true" aria-labelledby="lahore-options-title" className="max-h-[90dvh] w-full max-w-3xl overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:max-h-[85vh] sm:rounded-2xl sm:p-6"><button type="button" aria-label="Close vehicle options" onClick={() => setModelOptions(undefined)} className="float-right rounded-lg p-2 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]">✕</button><h2 id="lahore-options-title" className="text-2xl font-black text-[#0F2B46]">{modelOptions[0].modelName}</h2><p className="mt-2 text-sm text-slate-600">Compare the available package prices, then choose the option that suits your trip.</p><div className="mt-5 space-y-3">{modelOptions.map((option) => <button key={option.inventoryId} type="button" onClick={() => setSelected(option)} className="w-full rounded-xl border p-4 text-left hover:border-[#5BAE4A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"><p className="font-bold">{normalRentalPublicLabel(option)}</p><div className="mt-2 grid gap-2 text-sm sm:grid-cols-2"><p>Within Lahore: PKR {option.pricing.withDriver.withinCity.daily?.toLocaleString("en-PK")}</p><p>Outstation: PKR {option.pricing.withDriver.outsideCity.daily?.toLocaleString("en-PK")}</p></div></button>)}</div></div></div>}
+    <div className={inventoryGridClass}>{cards.map((card) => { const options = card.options; const first = options[0]; const minimum = normalRentalStartingPrice(options); const hasWithinCity = options.some((item) => item.pricing.withDriver.withinCity.daily !== undefined); const hasOutstation = options.some((item) => item.pricing.withDriver.outsideCity.daily !== undefined); return <article key={card.key} className="group rounded-3xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#5BAE4A] hover:shadow-lg sm:p-6"><div className="relative h-56 sm:h-64"><Image src={first.imageURL} alt={`${card.label} available with driver in ${context.cityLabel}`} fill unoptimized sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 640px" className="object-contain transition duration-300 group-hover:scale-[1.03]"/></div><div className="mt-5 flex flex-wrap gap-2 text-xs font-bold text-slate-700"><span className="rounded-full bg-green-50 px-3 py-1.5 text-green-800">Driver included</span>{hasWithinCity && <span className="rounded-full bg-slate-100 px-3 py-1.5">Within {context.cityLabel}</span>}{hasOutstation && <span className="rounded-full bg-slate-100 px-3 py-1.5">Outstation</span>}</div><h3 className="mt-4 text-2xl font-black text-[#0F2B46]"><Link href={normalRentalModelHref(first, cityId)} onClick={() => trackModelSelection(first, minimum)} className="rounded-sm underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]">{card.label}</Link></h3>{first.modelYearLabel && <p className="mt-1 text-sm font-semibold text-slate-600">Model year: {first.modelYearLabel}</p>}<p className="mt-3 text-lg font-black text-[#5BAE4A]">From PKR {minimum?.toLocaleString("en-PK")} <span className="text-sm font-semibold text-slate-500">/ day</span></p><button type="button" aria-haspopup="dialog" onClick={() => {
+      trackModelSelection(first, minimum);
+      if (shouldOpenInventoryComparison(card)) setModelOptions(options); else chooseOption(first);
+    }} className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-[#0F2B46] px-5 py-3 text-sm font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] focus-visible:ring-offset-2">View Rates &amp; Book →</button></article>; })}</div>
+    {modelOptions && !selected && <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"><div role="dialog" aria-modal="true" aria-labelledby="lahore-options-title" className="max-h-[90dvh] w-full max-w-3xl overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:max-h-[85vh] sm:rounded-2xl sm:p-6"><button type="button" aria-label="Close vehicle options" onClick={() => setModelOptions(undefined)} className="float-right rounded-lg p-2 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]">✕</button><h2 id="lahore-options-title" className="text-2xl font-black text-[#0F2B46]">{modelOptions[0].modelName}</h2><p className="mt-2 text-sm text-slate-600">Compare the available package prices, then choose the option that suits your trip.</p><div className="mt-5 space-y-3">{modelOptions.map((option) => <button key={option.inventoryId} type="button" onClick={() => chooseOption(option)} className="w-full rounded-xl border p-4 text-left hover:border-[#5BAE4A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]"><p className="font-bold">{normalRentalPublicLabel(option)}</p><div className="mt-2 grid gap-2 text-sm sm:grid-cols-2"><p>Within {context.cityLabel}: {option.pricing.withDriver.withinCity.daily ? `PKR ${option.pricing.withDriver.withinCity.daily.toLocaleString("en-PK")}` : "Unavailable"}</p><p>Outstation: {option.pricing.withDriver.outsideCity.daily ? `PKR ${option.pricing.withDriver.outsideCity.daily.toLocaleString("en-PK")}` : "Unavailable"}</p></div></button>)}</div></div></div>}
     {selected && <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 p-0 sm:p-4"><div role="dialog" aria-modal="true" aria-labelledby="lahore-booking-title" className="mx-auto mt-8 min-h-[calc(100dvh-2rem)] max-w-2xl rounded-t-3xl bg-white p-5 shadow-2xl sm:my-6 sm:min-h-0 sm:rounded-2xl sm:p-6"><button type="button" aria-label="Close booking form" onClick={() => { setDateOpen(false); setTimeOpen(false); setSelected(undefined); setCreated(undefined); }} className="float-right rounded-lg p-2 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A]">✕</button><p className="text-xs font-bold uppercase tracking-wider text-[#5BAE4A]">{context.cityLabel} · With Driver</p><h2 id="lahore-booking-title" className="mt-2 text-2xl font-black text-[#0F2B46]">{selectedDisplayName}</h2>{!prelaunch && <p className="mt-1 text-sm text-slate-600">{selected.vendorName}</p>}
-      <div className="mt-5 grid grid-cols-2 gap-3" aria-label="Rental package"><button type="button" aria-pressed={packageType === "withinCity"} onClick={() => setPackageType("withinCity")} className={`rounded-lg border p-3 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] ${packageType === "withinCity" ? "bg-[#0F2B46] text-white" : ""}`}>Within City</button><button type="button" aria-pressed={packageType === "outsideCity"} onClick={() => setPackageType("outsideCity")} className={`rounded-lg border p-3 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] ${packageType === "outsideCity" ? "bg-[#0F2B46] text-white" : ""}`}>Outstation</button></div>
+      <div className="mt-5 grid grid-cols-2 gap-3" aria-label="Rental package"><button type="button" disabled={!selected.pricing.withDriver.withinCity.daily} aria-pressed={packageType === "withinCity"} onClick={() => setPackageType("withinCity")} className={`rounded-lg border p-3 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] ${packageType === "withinCity" ? "bg-[#0F2B46] text-white" : ""}`}>Within City</button><button type="button" disabled={!selected.pricing.withDriver.outsideCity.daily} aria-pressed={packageType === "outsideCity"} onClick={() => setPackageType("outsideCity")} className={`rounded-lg border p-3 font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] ${packageType === "outsideCity" ? "bg-[#0F2B46] text-white" : ""}`}>Outstation</button></div>
       <label className="mt-4 block text-sm font-semibold">Rental duration<select value={duration} onChange={(event) => setDuration(event.target.value as Duration)} className={input}>{(["daily", "weekly", "monthly"] as const).filter((item) => selected.pricing.withDriver[packageType][item] !== undefined).map((item) => <option key={item}>{item}</option>)}</select></label><div className="mt-3 rounded-xl bg-green-50 px-4 py-3"><p className="text-xs font-bold uppercase tracking-wide text-green-800">Selected package rate</p><p className="mt-1 text-xl font-black text-[#5BAE4A]">{currentRate ? `PKR ${currentRate.toLocaleString("en-PK")}` : "Rate unavailable"}</p></div>
       {created ? <div className={`mt-6 rounded-xl border p-5 ${created.integrationWarnings?.length ? "border-amber-300 bg-amber-50" : "border-green-200 bg-green-50"}`}><p className="font-bold text-slate-900">{prelaunch ? "Booking request created" : "Test lead created"}: {created.leadId}</p>{created.integrationWarnings?.length ? <><p className="mt-2 font-bold text-amber-900">Lead {created.leadId} was created, but {created.integrationWarnings.join(" and ")}. Do not resubmit.</p><p className="mt-1 text-sm text-amber-800">Check the server logs and the affected integration using this lead ID.</p></> : <p className="mt-1 text-sm text-green-800">Email and Sheets notifications completed; final confirmation continues in WhatsApp.</p>}</div> : <form action={submit} className="mt-6 space-y-3"><div className="grid gap-3 sm:grid-cols-2">
         <div className="min-w-0"><label className="mb-1 block text-sm font-semibold text-slate-700">Pickup date</label><DatePicker selected={pickupDate} onChange={(date: Date | null) => { if (!date) return; setPickupDate(date); setDateOpen(false); requestAnimationFrame(() => dateTrigger.current?.focus()); }} open={dateOpen} onInputClick={() => { setTimeOpen(false); setDateOpen(true); }} onClickOutside={() => setDateOpen(false)} onCalendarClose={() => dateTrigger.current?.focus()} minDate={initial.date} dateFormat="dd MMM yyyy" shouldCloseOnSelect popperPlacement="bottom-start" calendarClassName={styles.calendar} popperClassName={styles.popper} customInput={<PickerButton ref={dateTrigger} label="Choose pickup date"/>}/><input type="hidden" name="pickupDate" value={formatStoredDate(pickupDate)}/></div>
         <div ref={timeContainer} className="relative min-w-0"><label className="mb-1 block text-sm font-semibold text-slate-700">Pickup time</label><button ref={timeTrigger} type="button" aria-haspopup="listbox" aria-expanded={timeOpen} onClick={() => { setDateOpen(false); setTimeOpen((open) => !open); }} className={`${input} min-h-10 text-left`}>{TIME_OPTIONS.find((option) => option.value === preferredTime)?.label}</button><input type="hidden" name="preferredTime" value={preferredTime}/>{timeOpen && <div role="listbox" aria-label="Pickup time options" className="absolute left-0 right-0 z-[70] mt-1 max-h-60 overflow-y-auto rounded-lg border border-slate-200 bg-white p-1 shadow-xl">{TIME_OPTIONS.map((option) => <button key={option.value} type="button" role="option" aria-selected={preferredTime === option.value} onClick={() => { setPreferredTime(option.value); setTimeOpen(false); requestAnimationFrame(() => timeTrigger.current?.focus()); }} className={`block w-full rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100 focus:bg-slate-100 focus:outline-none ${preferredTime === option.value ? "font-bold text-[#0F2B46]" : "text-slate-700"}`}>{option.label}{preferredTime === option.value ? " — selected" : ""}</button>)}</div>}</div>
       </div>
-      <label className="block text-sm font-semibold text-slate-700">Pickup location<PlaceInput id="lahore-preview-pickup" value={pickupAddress} place={pickupPlace} placeholder="Search pickup location" selectionRequired onTextChange={(address) => { setPickupAddress(address); setPickupPlace(undefined); }} onSelect={(place) => { setPickupAddress(place.formattedAddress); setPickupPlace(place); setError(""); }}/></label>
-      {packageType === "outsideCity" && <label className="block text-sm font-semibold text-slate-700">Destination<PlaceInput id="lahore-preview-destination" value={destinationAddress} place={destinationPlace} placeholder="Search destination" selectionRequired onTextChange={(address) => { setDestinationAddress(address); setDestinationPlace(undefined); }} onSelect={(place) => { setDestinationAddress(place.formattedAddress); setDestinationPlace(place); setError(""); }}/></label>}
+      <label className="block text-sm font-semibold text-slate-700">Pickup location<PlaceInput id="lahore-preview-pickup" value={pickupAddress} place={pickupPlace} placeholder="Search pickup location" selectionRequired={!twinCities} onTextChange={(address) => { setPickupAddress(address); setPickupPlace(undefined); }} onSelect={(place) => { setPickupAddress(place.formattedAddress); setPickupPlace(place); setError(""); }}/></label>
+      {packageType === "outsideCity" && <label className="block text-sm font-semibold text-slate-700">Destination<PlaceInput id="lahore-preview-destination" value={destinationAddress} place={destinationPlace} placeholder="Search destination" selectionRequired={!twinCities} onTextChange={(address) => { setDestinationAddress(address); setDestinationPlace(undefined); }} onSelect={(place) => { setDestinationAddress(place.formattedAddress); setDestinationPlace(place); setError(""); }}/></label>}
       <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm font-semibold text-slate-700">Number of days<input className={input} required name="numberOfDays" type="number" min="1" max="30" defaultValue="1"/></label><label className="text-sm font-semibold text-slate-700">Customer name<input className={input} required name="customerName" autoComplete="name"/></label></div>
       <div className="grid gap-3 sm:grid-cols-2"><label className="text-sm font-semibold text-slate-700">Phone / WhatsApp<input className={input} required name="phone" inputMode="tel" autoComplete="tel"/></label><label className="text-sm font-semibold text-slate-700">Email <span className="font-normal text-slate-500">(optional)</span><input className={input} name="email" type="email" autoComplete="email"/></label></div>
-      {error && <p ref={errorRef} tabIndex={-1} role="alert" className="text-sm font-semibold text-red-700">{error}</p>}<button disabled={loading || !currentRate} className="w-full rounded-lg bg-[#5BAE4A] py-3 font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] focus-visible:ring-offset-2 disabled:opacity-50">{loading ? (prelaunch ? "Creating booking request…" : "Creating private test lead…") : (prelaunch ? "Request Lahore Booking" : "Submit Private Lahore Test")}</button></form>}
+      {error && <p ref={errorRef} tabIndex={-1} role="alert" className="text-sm font-semibold text-red-700">{error}</p>}<button disabled={loading || !currentRate} className="w-full rounded-lg bg-[#5BAE4A] py-3 font-bold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#5BAE4A] focus-visible:ring-offset-2 disabled:opacity-50">{loading ? (prelaunch ? "Creating booking request…" : "Creating private test lead…") : (prelaunch ? "Request Booking" : "Submit Private Lahore Test")}</button></form>}
     </div></div>}
   </></GooglePlacesProvider>;
 }
